@@ -2,17 +2,18 @@ import numpy as np
 from numpy import linalg as LA
 from pymatgen.core.structure import Structure
 import phonopy
+from radtools import MagnonDispersion
 
 import DARK.constants as const
 
 class Material():
-    def __init__(self, name, structure, num_e, num_p, num_n, atomic_masses):
+    def __init__(self, name, structure, num_e, num_p, num_n, m_atoms):
         self.name = name
         self.structure = structure
         self.num_e = num_e
         self.num_p = num_p
         self.num_n = num_n
-        self.n_atoms = structure.num_sites
+        self.n_atoms = len(structure.species)
 
         # Define transformation matrices
         # Transpose is to keep up with original PhonoDark convention
@@ -20,6 +21,10 @@ class Material():
         self.real_cart_to_frac = LA.inv(self.real_frac_to_cart)
         self.recip_frac_to_cart = structure.lattice.reciprocal_lattice.matrix.T
         self.recip_cart_to_frac = LA.inv(self.recip_frac_to_cart)
+
+        self.m_atoms = m_atoms
+        self.m_cell = np.sum(m_atoms)
+        self.xj = structure.cart_coords
 
 class PhononMaterial(Material):
     def __init__(self, name, phonopy_yaml_path):
@@ -34,7 +39,7 @@ class PhononMaterial(Material):
         num_e = Z
         num_p = Z
         num_n = A-Z
-        atomic_masses = A * const.amu_to_eV
+        m_atoms = A * const.amu_to_eV
 
         # NAC parameters (born effective charges and dielectric tensor)
         self.born = np.array(phonopy_file.nac_params.get('born', np.zeros((n_atoms, 3, 3))))
@@ -49,12 +54,14 @@ class PhononMaterial(Material):
 
         structure = Structure(lattice, species, positions)
 
-        super().__init__(name, structure, num_e, num_p, num_n, atomic_masses)
+        super().__init__(name, structure, num_e, num_p, num_n, m_atoms)
 
-    def get_eig(self, mesh, with_eigenvectors=True):
+    def get_eig(self, k_points, with_eigenvectors=True):
+        """
+        k_points: numpy arrays of k-points, fractional coordinates
+        """
         # run phonopy in mesh mode 
-        self.phonopy_file.run_qpoints(mesh, with_eigenvectors=with_eigenvectors)
-
+        self.phonopy_file.run_qpoints(k_points, with_eigenvectors=with_eigenvectors)
 
         mesh_dict = self.phonopy_file.get_qpoints_dict()
 
@@ -62,13 +69,12 @@ class PhononMaterial(Material):
         # convert frequencies to correct units
         omega = const.THz_to_eV*mesh_dict['frequencies']
 
-        n_k = len(mesh)
+        n_k = len(k_points)
 
-        # q, nu, i, alpha
         # Need to reshape the eigenvectors from (n_k, n_modes, n_modes) 
         # to (n_k, n_atoms, n_modes, 3)
-        eigenvectors = np.zeros((len(mesh), self.n_modes, self.n_atoms, 3), dtype=complex)
-        # Should rewrite this with a reshape...
+        eigenvectors = np.zeros((len(k_points), self.n_modes, self.n_atoms, 3), dtype=complex)
+        # TODO: Should rewrite this with a reshape...
         for q in range(n_k):
             for nu in range(self.n_modes):
                 eigenvectors[q,nu] = np.array_split(
@@ -77,8 +83,84 @@ class PhononMaterial(Material):
         return omega, eigenvectors
     
 class MagnonMaterial(Material):
-    def __init__(self):
+    def __init__(self, name, hamiltonian, m_cell):
+        """
+        In the current implementation, the hamiltonian only
+        contains the magnetic atoms and their interactions.
+        So m_cell needs to be specified separately
+        """
         print("Not implemented yet!")
+        self.hamiltonian = hamiltonian
+        n_atoms = len(hamiltonian.magnetic_atoms)
+        self.n_modes = n_atoms
+        self.dispersion = MagnonDispersion(hamiltonian, phase_convention='tanner')
+
+        n_atoms = len(hamiltonian.magnetic_atoms)  # Number of magnetic atoms
+        # Atom positions in cartesian coordinates (units of 1/eV)
+        self.xj = np.array(
+            [
+                hamiltonian.get_atom_coordinates(atom, relative=False)
+                for atom in hamiltonian.magnetic_atoms
+            ]
+        )
+        # Spins
+        self.sqrt_spins_2 = np.sqrt(np.array([atom.spin for atom in hamiltonian.magnetic_atoms])/2)
+        self.rj = self.dispersion.u # The vectors for rotating to local coordiante system
+
+        positions = np.array([a.position for a in hamiltonian.magnetic_atoms])
+        lattice = hamiltonian.cell * const.Ang_to_inveV
+        species = [a.type for a in hamiltonian.magnetic_atoms]
+        structure = Structure(lattice, species, positions)
+
+        m_atoms = [m_cell/n_atoms]*n_atoms
+        super().__init__(name, structure, None, None, None, m_atoms)
+    
+    def get_eig(self, k, G):
+        """
+        k: single k-point, cartesian coordinates (units of eV)
+        G: single G-point, cartesian coordinates (units of eV)
+        """
+        # Calculate the prefactor
+        prefactor = self.sqrt_spins_2 * np.exp(1j * np.dot(self.xj, G))
+
+        # See Tanner's Disseration and RadTools doc for explanation of the 1/2
+        N = self.n_atoms
+        omega_nu_k, Tk = self._get_omega_T(self.dispersion.h(k)/2) 
+        Uk_conj = np.conjugate(Tk[:N, :N]) # This is U_{j,nu,k})*
+        V_minusk = np.conjugate(Tk[N:, :N]) # This is ((V_{j,nu,-k})*)*
+
+        epsilon_nu_k_G = (prefactor[:, None] * V_minusk).T @ np.conjugate(self.rj) + (prefactor[:, None] * Uk_conj).T @ self.rj
+
+        return omega_nu_k, epsilon_nu_k_G  # n, and nx3 array of complex numbers
+
+    def _get_omega_T(self,D):
+        """
+        D: grand dynamical matrix (2N x 2N)
+        """
+        N = self.n_atoms
+        g = np.diag([1]*N + [-1]*N)
+
+        # We want D = K^dagger K whereas numpy uses K K^dagger
+        K = np.conjugate(np.linalg.cholesky(D)).T
+        L, U = np.linalg.eig(K @ g @ np.conjugate(K).T)
+
+        # Arrange so that the first N are positive
+        # And last N are negatives of the first N 
+        # (see Eq. I4 in Tanner's Dissertation)
+        sort_order = np.argsort(L)[::-1]
+        sort_order = np.concatenate((sort_order[:N], sort_order[2*N:N-1:-1]))
+        U = U[:, sort_order]
+        L = np.diag(L[sort_order])
+
+        # Now E is 1/2*diag([omega_1, omega_2, ..., omega_N,
+        #                    omega_1, omega_2, ..., omega_N])
+        # See Eq. (I4) in Tanner's Dissertation
+        E = g @ L
+        omega = 2*np.diag(np.real(E[:N])) 
+        T = np.linalg.inv(K) @ U @ np.sqrt(E)
+
+        return omega, T
+
 
 # TODO: c_dict and c_dict_form should prob just be merged?
 class Model:
