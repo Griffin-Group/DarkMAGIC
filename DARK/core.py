@@ -4,6 +4,8 @@ from pymatgen.core.structure import Structure
 import phonopy
 from radtools import MagnonDispersion
 
+from numpy.typing import ArrayLike
+
 import DARK.constants as const
 
 
@@ -195,9 +197,9 @@ class Model:
 class Numerics:
     def __init__(
         self,
-        N_abc: np.array | list = [50, 25, 25],
-        power_abc: np.array | list = [2, 1, 1],
-        n_DW_xyz: np.array | list = [20, 20, 20],
+        N_abc: ArrayLike = [50, 25, 25],
+        power_abc: ArrayLike = [2, 1, 1],
+        n_DW_xyz: ArrayLike = [20, 20, 20],
         bin_width: float = 1e-3,
         q_cut: bool = True,
         special_mesh: bool = True,
