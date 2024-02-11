@@ -79,3 +79,26 @@ class PhononMaterial(Material):
 class MagnonMaterial(Material):
     def __init__(self):
         print("Not implemented yet!")
+
+# TODO: c_dict and c_dict_form should prob just be merged?
+class Model:
+    def __init__(self, name, c_dict, c_dict_form, m_chi=None, times=None, Fmed_power=0, power_V=0, s_chi=0.5):
+        """
+        name: string
+        m_chi: list of floats, DM masses (eV)
+        times: list of floats, time of day for calculating earth velocity vector
+        Fmed_power: float, negative power of q in the Fmed term
+        power_V: float, power of q in the V term (for special mesh)
+        s_chi float, spin of DM particle
+        """
+        self.name = name
+
+        if m_chi is None:
+            m_chi = np.logspace(3, 7, 50)
+        self.m_chi = m_chi
+        if times is None:
+            times = [0]
+        self.times = times
+        self.Fmed_power = Fmed_power
+        self.power_V = power_V
+        self.s_chi = s_chi
