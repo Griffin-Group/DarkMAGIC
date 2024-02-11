@@ -20,7 +20,7 @@ Ang_to_inveV = 1/inveV_to_Ang
 
 # mass
 kg_to_eV = constants.c**2/constants.e
-amu_to_eV = constants.physical_constants['atomic mass constant'] * kg_to_eV
+amu_to_eV = constants.physical_constants['atomic mass constant'][0] * kg_to_eV
 
 # Energy and frequency
 Hz_to_eV = constants.h/constants.e
