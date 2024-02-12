@@ -134,6 +134,8 @@ class MagnonMaterial(Material):
         contains the magnetic atoms and their interactions.
         So m_cell needs to be specified separately
         """
+        # Ensure the hamiltonian is in the correct units
+        hamiltonian.cell *= const.Ang_to_inveV
         self.hamiltonian = hamiltonian
         n_atoms = len(hamiltonian.magnetic_atoms)
         self.n_modes = n_atoms
@@ -155,7 +157,7 @@ class MagnonMaterial(Material):
         self.rj = self.dispersion.u
 
         positions = np.array([a.position for a in hamiltonian.magnetic_atoms])
-        lattice = hamiltonian.cell * const.Ang_to_inveV
+        lattice = hamiltonian.cell
         species = [a.type for a in hamiltonian.magnetic_atoms]
         structure = Structure(lattice, species, positions)
 
