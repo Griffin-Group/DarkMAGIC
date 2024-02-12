@@ -39,11 +39,11 @@ class MagnonCalculation:
     def __init__(
         self,
         m_chi: float,
-        time: float | None,
-        v_e: ArrayLike | None,
         material: MagnonMaterial,
         model: Model,
         numerics: Numerics,
+        time: float | None = 0,
+        v_e: ArrayLike | None = None,
     ):
         self.m_chi = m_chi
         if time is None and v_e is None:
@@ -51,41 +51,43 @@ class MagnonCalculation:
         if time is not None and v_e is not None:
             raise ValueError("Only one of time or v_e should be provided")
         if time is not None:
-            ve = self.compute_ve(time)
+            self.v_e = self.compute_ve(time)
+        else:
+            self.v_e = v_e
 
         self.material = material
         self.model = model
         self.numerics = numerics
 
-        delta = 2 * Model.power_V - 2 * Model.Fmed_power
+        delta = 2 * model.power_V - 2 * model.Fmed_power
         [self.q_cart, self.jacobian] = create_q_mesh(
             m_chi,
             0,
-            v_e,
+            self.v_e,
             numerics,
-            None,
-            None,
+            material,
             delta,
         )
 
         self.k_cart = generate_k_XYZ_mesh_from_q_XYZ_mesh(
-            self.q_XYZ_list, material.recip_frac_to_cart
+            self.q_cart, material.recip_frac_to_cart
         )
         self.G_cart = get_G_XYZ_list_from_q_XYZ_list(
-            self.q_XYZ_list, material.recip_frac_to_cart
+            self.q_cart, material.recip_frac_to_cart
         )
 
-    def compute_ve(t):
+    def compute_ve(self, t):
         """
         Returns the earth's velocity in the lab frame at time t (in hours)
         """
         phi = 2 * np.pi * (t / 24.0)
+        theta = const.theta_earth
 
         return const.VE * np.array(
             [
-                np.sin(const.THETA_E) * np.sin(phi),
-                np.cos(const.THETA_E) * np.sin(const.THETA_E) * (np.cos(phi) - 1),
-                (np.sin(const.THETA_E) ** 2) * np.cos(phi) + np.cos(const.THETA_E) ** 2,
+                np.sin(theta) * np.sin(phi),
+                np.cos(theta) * np.sin(theta) * (np.cos(phi) - 1),
+                (np.sin(theta) ** 2) * np.cos(phi) + np.cos(theta) ** 2,
             ]
         )
 
@@ -96,23 +98,16 @@ class MagnonCalculation:
         Computes the differential rate
         """
 
-        n_a = self.numerics.N_abc[0]
-        n_b = self.numerics.N_abc[1]
-        n_c = self.numerics.N_abc[2]
-        energy_bin_width = Numerics.bin_width
-
         # threshold     = physics_parameters['threshold']
-        m_cell = self.material.m_cell
         # m_cell = 2749.367e9 # YIG mass, all ions
         # m_cell = 821.5e9 # For VBTS
         # m_cell = 52.45e9 # YIG, Fe3+ only
         # idk how to set this for magnons tbh, just a max magnon energy * 4
-        max_delta_E = 4 * 90e-3  # Should be a material property
-        max_delta_E = 2 * 30e-3  # For VBTS
-        max_bin_num = math.ceil((max_delta_E) / energy_bin_width)
+        # max_delta_E = 4 * 90e-3  # Should be a material property
+        # max_delta_E = 2 * 30e-3  # For VBTS
+        max_bin_num = math.ceil(self.material.max_dE / self.numerics.bin_width)
 
         n_modes = self.material.n_modes
-
         n_q = len(self.q_cart)
 
         diff_rate = np.zeros(max_bin_num, dtype=complex)
@@ -129,7 +124,7 @@ class MagnonCalculation:
             omegas[iq, :], epsilons[iq, :, :] = self.material.get_eig(k, G)
 
         # Along with omega and epsilons, these are all q*nu arrays
-        bin_num = np.floor((omegas) / energy_bin_width).astype(int)
+        bin_num = np.floor((omegas) / self.numerics.bin_width).astype(int)
         g0_val = matrix_g0(self.q_cart, omegas, self.m_chi, self.v_e)
         if model_name == "mdm":
             sigma_nu_q = sigma_mdm(self.q_cart, epsilons)
@@ -142,8 +137,8 @@ class MagnonCalculation:
             (2 * np.pi) ** 3 * np.prod(self.numerics.N_abc)
         ) ** (-1)
         deltaR = (
-            (1 / m_cell)
-            * (const.RHO_DM / self.m_chi)
+            (1 / self.material.m_cell)
+            * (const.rho_chi / self.m_chi)
             * vol_element
             * sigma_nu_q
             * g0_val

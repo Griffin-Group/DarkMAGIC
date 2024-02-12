@@ -24,7 +24,7 @@ def matrix_g0(q, omega, m_chi, v_e):
     """
 
     v_minus = matrix_vminus(q, omega, m_chi, v_e)
-    c1 = 2 * const.PI**2 * const.V0**2 / (np.linalg.norm(q, axis=1) * const.N0)
+    c1 = 2 * np.pi**2 * const.V0**2 / (np.linalg.norm(q, axis=1) * const.N0)
     c1 = np.tile(c1, (omega.shape[1], 1)).T
 
     return c1 * (
