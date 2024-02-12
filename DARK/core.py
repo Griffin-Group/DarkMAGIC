@@ -97,7 +97,7 @@ class PhononMaterial(Material):
             eigenvectors = None
 
         return omega, eigenvectors
-    
+
     @property
     def max_dE(self):
         """
@@ -109,12 +109,12 @@ class PhononMaterial(Material):
                 mesh_dict = self.phonopy_file.get_mesh_dict()
                 weights = mesh_dict["weights"]
                 omega = const.THz_to_eV * mesh_dict["frequencies"]
-                self._max_dE = 2*np.mean(np.average(omega, axis=0, weights=weights))
+                self._max_dE = 2 * np.mean(np.average(omega, axis=0, weights=weights))
             else:
                 omega, _ = self.get_eig([[0, 0, 0]], with_eigenvectors=False)
-                self._max_dE = 1.5*np.amax(omega)
+                self._max_dE = 1.5 * np.amax(omega)
         return self._max_dE
-    
+
     @property
     def q_cut(self):
         """
@@ -125,6 +125,7 @@ class PhononMaterial(Material):
         if self._q_cut is None:
             self._q_cut = 10.0 * np.sqrt(np.amax(self.m_atoms) * self.max_dE)
         return self._q_cut
+
 
 class MagnonMaterial(Material):
     def __init__(self, name, hamiltonian, m_cell):
@@ -161,7 +162,7 @@ class MagnonMaterial(Material):
         m_atoms = [m_cell / n_atoms] * n_atoms
         super().__init__(name, structure, None, None, None, m_atoms)
 
-    def get_eig(self, k, G=[0,0,0]):
+    def get_eig(self, k, G=[0, 0, 0]):
         """
         k: single k-point, cartesian coordinates (units of eV)
         G: single G-point, cartesian coordinates (units of eV)
@@ -208,18 +209,18 @@ class MagnonMaterial(Material):
         T = np.linalg.inv(K) @ U @ np.sqrt(E)
 
         return omega, T
-    
+
     @property
     def max_dE(self):
         """
         Returns the maximum dE possible for the material.
-        For magnons, we estimate this as roughly 1.5 * the highest magnon frequency 
+        For magnons, we estimate this as roughly 1.5 * the highest magnon frequency
         at the Gamma point.
         """
         if self._max_dE is None:
             # Add 1e-5 to ensure positive definiteness
-            omega, _ = self.get_eig(np.ones(3)*1e-5)
-            self._max_dE = 1.5*np.amax(omega)
+            omega, _ = self.get_eig(np.ones(3) * 1e-5)
+            self._max_dE = 1.5 * np.amax(omega)
         return self._max_dE
 
     @property
@@ -251,7 +252,7 @@ class Model:
 class Numerics:
     def __init__(
         self,
-        N_abc: ArrayLike = [50, 25, 25],
+        N_abc: ArrayLike = [20, 10, 10],
         power_abc: ArrayLike = [2, 1, 1],
         n_DW_xyz: ArrayLike = [20, 20, 20],
         bin_width: float = 1e-3,

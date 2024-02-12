@@ -41,12 +41,12 @@ m_n = constants.m_n * kg_to_eV
 m_e = constants.m_e * kg_to_eV
 
 # g-factors
-g_e = 2.00231930436256 # Electron g-factor
+g_e = 2.00231930436256  # Electron g-factor
 mu_tilde_e = g_e / 2  # Half the lande g-factor of the electron
-g_p = 5.5856946893 # Proton g-factor
-mu_tilde_p = g_p / 2 # Half the lande g-factor of the proton
-g_n = -3.82608545 # Neutron g-factor
-mu_tilde_n = g_n / 2 # Half the lande g-factor of the neutron
+g_p = 5.5856946893  # Proton g-factor
+mu_tilde_p = g_p / 2  # Half the lande g-factor of the proton
+g_n = -3.82608545  # Neutron g-factor
+mu_tilde_n = g_n / 2  # Half the lande g-factor of the neutron
 
 # Maxwell-Boltzmann Distribution
 # These are the values in the magnon paper
