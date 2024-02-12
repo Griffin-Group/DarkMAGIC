@@ -201,7 +201,12 @@ class Numerics:
         power_abc: ArrayLike = [2, 1, 1],
         n_DW_xyz: ArrayLike = [20, 20, 20],
         bin_width: float = 1e-3,
-        q_cut: bool = True,
-        special_mesh: bool = True,
+        use_q_cut: bool = True,
+        use_special_mesh: bool = True,
     ):
         self.N_abc = np.array(N_abc)
+        self.power_abc = np.array(power_abc)
+        self.n_DW_xyz = np.array(n_DW_xyz)
+        self.bin_width = bin_width
+        self.use_q_cut = use_q_cut
+        self.use_special_mesh = use_special_mesh
