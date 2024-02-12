@@ -244,6 +244,8 @@ class Model:
         self.Fmed_power = Fmed_power
         self.power_V = power_V
         self.s_chi = s_chi
+        self.c_dict = c_dict
+        self.c_dict_form = c_dict_form
 
 
 class Numerics:
