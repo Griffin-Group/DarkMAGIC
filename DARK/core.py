@@ -28,6 +28,8 @@ class Material:
         self.m_atoms = m_atoms
         self.m_cell = np.sum(m_atoms)
         self.xj = structure.cart_coords
+        self._max_dE = None
+        self._q_cut = None
 
 
 class PhononMaterial(Material):
@@ -81,18 +83,48 @@ class PhononMaterial(Material):
 
         # Need to reshape the eigenvectors from (n_k, n_modes, n_modes)
         # to (n_k, n_atoms, n_modes, 3)
-        eigenvectors = np.zeros(
-            (len(k_points), self.n_modes, self.n_atoms, 3), dtype=complex
-        )
-        # TODO: Should rewrite this with a reshape...
-        for q in range(n_k):
-            for nu in range(self.n_modes):
-                eigenvectors[q, nu] = np.array_split(
-                    eigenvectors_pre[q].T[nu], self.n_atoms
-                )
+        if with_eigenvectors:
+            eigenvectors = np.zeros(
+                (len(k_points), self.n_modes, self.n_atoms, 3), dtype=complex
+            )
+            # TODO: Should rewrite this with a reshape...
+            for q in range(n_k):
+                for nu in range(self.n_modes):
+                    eigenvectors[q, nu] = np.array_split(
+                        eigenvectors_pre[q].T[nu], self.n_atoms
+                    )
+        else:
+            eigenvectors = None
 
         return omega, eigenvectors
-
+    
+    @property
+    def max_dE(self):
+        """
+        Returns omega_ph_max = max(omega_ph) if there are optical modes, otherwise returns the average over the entire Brillouin zone. The quantities are obviously not the same but should be the same order. See theoretical framework paper, paragraph in middle of page 24 (of published version).
+        """
+        if self._max_dE is None:
+            if self.phonopy_file.primitive.get_number_of_atoms() == 1:
+                self.phonopy_file.run_mesh([20, 20, 20], with_eigenvectors=False)
+                mesh_dict = self.phonopy_file.get_mesh_dict()
+                weights = mesh_dict["weights"]
+                omega = const.THz_to_eV * mesh_dict["frequencies"]
+                self._max_dE = 2*np.mean(np.average(omega, axis=0, weights=weights))
+            else:
+                omega, _ = self.get_eig([[0, 0, 0]], with_eigenvectors=False)
+                self._max_dE = 1.5*np.amax(omega)
+        return self._max_dE
+    
+    @property
+    def q_cut(self):
+        """
+        The Debye-Waller factor supresses the rate at larger q beyond
+        q ~ np.sqrt(m_atom * omega_ph). This is an estimate for that
+        cutoff.
+        """
+        if self._q_cut is None:
+            self._q_cut = 10.0 * np.sqrt(np.amax(self.m_atoms) * self.max_dE)
+        return self._q_cut
 
 class MagnonMaterial(Material):
     def __init__(self, name, hamiltonian, m_cell):
@@ -129,7 +161,7 @@ class MagnonMaterial(Material):
         m_atoms = [m_cell / n_atoms] * n_atoms
         super().__init__(name, structure, None, None, None, m_atoms)
 
-    def get_eig(self, k, G):
+    def get_eig(self, k, G=[0,0,0]):
         """
         k: single k-point, cartesian coordinates (units of eV)
         G: single G-point, cartesian coordinates (units of eV)
@@ -176,6 +208,26 @@ class MagnonMaterial(Material):
         T = np.linalg.inv(K) @ U @ np.sqrt(E)
 
         return omega, T
+    
+    @property
+    def max_dE(self):
+        """
+        Returns the maximum dE possible for the material.
+        For magnons, we estimate this as roughly 1.5 * the highest magnon frequency 
+        at the Gamma point.
+        """
+        if self._max_dE is None:
+            # Add 1e-5 to ensure positive definiteness
+            omega, _ = self.get_eig(np.ones(3)*1e-5)
+            self._max_dE = 1.5*np.amax(omega)
+        return self._max_dE
+
+    @property
+    def q_cut(self):
+        """
+        For magnons there is no q_cut so we set this to a very large number.
+        """
+        return 1e10
 
 
 # TODO: c_dict and c_dict_form should prob just be merged?
