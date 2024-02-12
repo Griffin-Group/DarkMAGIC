@@ -21,12 +21,13 @@ def write_group_from_dict(hdf5_file, group_name, data_dict):
             hdf5_file.create_dataset(f"{group_name}/{index}", data=data)
 
 
-def hdf5_write_output_parallel(
+def write_hdf5(
     out_file,
-    numerics_parameters,
-    physics_parameters,
-    dm_properties_dict,
-    c_dict,
+    material,
+    numerics,
+    model,
+    masses,
+    times,
     all_total_rate_list,
     all_diff_rate_list,
     all_binned_rate_list,
@@ -54,6 +55,46 @@ def hdf5_write_output_parallel(
     This format is temporary, just for backwards compatibility with PhonoDark.
     """
 
+    def get_dicts(model, numerics, masses, times):
+        physics_parameters = {
+            # energy threshold
+            "threshold": 0,
+            # time of days (hr)
+            "times": times,
+            # - d log FDM / d log q. q dependence of mediator propagator
+            "Fmed_power": model.Fmed_power,
+            # power of q in the potential, used to find optimal integration mesh
+            "power_V": model.power_V,
+            # flag to compute for a specific model
+            # SI computes using the algorithm presented in 1910.08092
+            "special_model": False,
+            "model_name": "mdm",
+        }
+        dm_properties_dict = {
+            "spin": model.s_chi,
+            "mass_list": masses,
+        }
+        c_dict = model.c_dict
+        numerics_parameters = {
+            "n_a": numerics.N_abc[0],
+            "n_b": numerics.N_abc[1],
+            "n_c": numerics.N_abc[2],
+            "power_a": numerics.power_abc[0],
+            "power_b": numerics.power_abc[1],
+            "power_c": numerics.power_abc[2],
+            "n_DW_x": numerics.n_DW_xyz[0],
+            "n_DW_y": numerics.n_DW_xyz[1],
+            "n_DW_z": numerics.n_DW_xyz[2],
+            "energy_bin_width": numerics.bin_width,
+            "q_cut": numerics.use_q_cut,
+            "special_mesh": numerics.use_special_mesh,
+        }
+        return physics_parameters, dm_properties_dict, c_dict, numerics_parameters
+
+    physics_parameters, dm_properties_dict, c_dict, numerics_parameters = get_dicts(
+        model, numerics, masses, times
+    )
+
     # Get appropriate context manager for serial/parallel
     if comm is None:
         cm = h5py.File(out_file, "w")
@@ -64,7 +105,7 @@ def hdf5_write_output_parallel(
         # Create groups/datasets and write out input parameters
         write_group_from_dict(out_f, "numerics", numerics_parameters)
         write_group_from_dict(out_f, "particle_physics", physics_parameters)
-        out_f.create_dataset("version", data=np.array(["1.1.0"], dtype="S"))
+        out_f.create_dataset("version", data=np.array(["0.0.1"], dtype="S"))
         write_group_from_dict(
             out_f, "particle_physics/dm_properties", dm_properties_dict
         )
