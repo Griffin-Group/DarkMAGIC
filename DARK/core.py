@@ -135,11 +135,13 @@ class MagnonMaterial(Material):
         So m_cell needs to be specified separately
         """
         # Ensure the hamiltonian is in the correct units
-        hamiltonian.cell *= const.Ang_to_inveV
+        # hamiltonian.cell *= const.Ang_to_inveV
+        # In the future we should have a check that it comes in in units of A
+        # And convert it here
         self.hamiltonian = hamiltonian
         n_atoms = len(hamiltonian.magnetic_atoms)
         self.n_modes = n_atoms
-        self.dispersion = MagnonDispersion(hamiltonian, phase_convention="tanner")
+        self.dispersion = MagnonDispersion(hamiltonian)
 
         n_atoms = len(hamiltonian.magnetic_atoms)  # Number of magnetic atoms
         # Atom positions in cartesian coordinates (units of 1/eV)
@@ -216,13 +218,14 @@ class MagnonMaterial(Material):
     def max_dE(self):
         """
         Returns the maximum dE possible for the material.
-        For magnons, we estimate this as roughly 1.5 * the highest magnon frequency
-        at the Gamma point.
+        For magnons, we estimate this as roughly 3 * the highest magnon frequency
+        at the BZ boundary. (At gamma point will be 0 if there are no gapped modes).
         """
+        # TODO: this should be an average over the BZ
         if self._max_dE is None:
-            # Add 1e-5 to ensure positive definiteness
-            omega, _ = self.get_eig(np.ones(3) * 1e-5)
-            self._max_dE = 1.5 * np.amax(omega)
+            k = [1 / 2, 0, 0]
+            omega, _ = self.get_eig(self.recip_frac_to_cart @ k)
+            self._max_dE = 3 * np.amax(omega)
         return self._max_dE
 
     @property

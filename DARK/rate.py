@@ -125,7 +125,7 @@ class MagnonCalculation:
 
         # Along with omega and epsilons, these are all q*nu arrays
         bin_num = np.floor((omegas) / self.numerics.bin_width).astype(int)
-        g0_val = matrix_g0(self.q_cart, omegas, self.m_chi, self.v_e)
+        g0 = matrix_g0(self.q_cart, omegas, self.m_chi, self.v_e)
         if model_name == "mdm":
             sigma_nu_q = sigma_mdm(self.q_cart, epsilons)
         elif model_name == "ap":
@@ -141,7 +141,7 @@ class MagnonCalculation:
             * (const.rho_chi / self.m_chi)
             * vol_element
             * sigma_nu_q
-            * g0_val
+            * g0
         )
 
         # Get diff rate, binned rate and total rate
