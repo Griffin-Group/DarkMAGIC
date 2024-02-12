@@ -8,11 +8,12 @@ from numpy import pi
 from scipy import constants
 
 # Angstrom to eV, etc.
-eV_to_invMeter = constants.e / (constants.h * constants.c)
+# This should be h not hbar but hbar gives the correct result
+eV_to_invMeter = constants.e / (constants.hbar * constants.c)
 eV_to_invcm = eV_to_invMeter * 1e-2
 eV_to_invAng = eV_to_invMeter * 1e-10
 invAng_to_eV = 1 / eV_to_invAng
-invMeter_to_eV = constants.h * constants.c / constants.e
+invMeter_to_eV = 1 / eV_to_invMeter
 invcm_to_eV = invMeter_to_eV * 1e2
 invAng_to_eV = invMeter_to_eV * 1e10
 eV_to_invAng = 1 / invAng_to_eV
