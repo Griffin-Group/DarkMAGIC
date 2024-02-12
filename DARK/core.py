@@ -141,7 +141,7 @@ class MagnonMaterial(Material):
         self.hamiltonian = hamiltonian
         n_atoms = len(hamiltonian.magnetic_atoms)
         self.n_modes = n_atoms
-        self.dispersion = MagnonDispersion(hamiltonian)
+        self.dispersion = MagnonDispersion(hamiltonian, phase_convention="tanner")
 
         n_atoms = len(hamiltonian.magnetic_atoms)  # Number of magnetic atoms
         # Atom positions in cartesian coordinates (units of 1/eV)
