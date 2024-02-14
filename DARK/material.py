@@ -11,43 +11,102 @@ from radtools import MagnonDispersion
 import DARK.constants as const
 
 
+class MaterialProperties:
+    def __init__(
+        self,
+        n_atoms,
+        N: dict = None,
+        S: dict = None,
+        L: dict = None,
+        L_dot_S: dict = None,
+        L_tens_S: dict = None,
+    ):
+        N, S, L, L_dot_S, L_tens_S = self.validate_input(
+            n_atoms, N, S, L, L_dot_S, L_tens_S
+        )
+
+        self.N = N
+        self.S = S
+        self.L = L
+        self.L_dot_S = L_dot_S
+        self.L_tens_S = L_tens_S
+
+    @staticmethod
+    def _validate_input(n_atoms, N, S, L, L_dot_S, L_tens_S):
+        """
+        Validates the input to the MaterialProperties class
+        """
+
+        # TODO: need proper exceptions
+        # Make sure some kind of response is defined, and zero out the rest
+        psi = ["e", "p", "n"]
+        assert any([N, S, L, L_dot_S, L_tens_S])
+        N = N or {k: np.zeros(n_atoms) for k in psi}
+        L_dot_S = L_dot_S or {k: np.zeros(n_atoms) for k in psi}
+        S = S or {k: np.zeros((n_atoms, 3)) for k in psi}
+        L = L or {k: np.zeros((n_atoms, 3)) for k in psi}
+        L_tens_S = L_tens_S or {k: np.zeros((n_atoms, 3, 3)) for k in psi}
+
+        # Validate that each dict has "e", "p" and "n" keys
+        for d in [N, S, L, L_dot_S, L_tens_S]:
+            assert set(d.keys()) == psi
+        # Validate that the N and L_S dicts, each key is array of length num_atoms
+        for d in [N, L_dot_S]:
+            assert all(len(v) == n_atoms for v in d.values())
+        # Assert that the S and L dicts, each key is array of length 3*num_atoms
+        for d in [S, L]:
+            assert all(len(v) == 3 * n_atoms for v in d.values())
+        assert all(len(v) == 3 * 3 * n_atoms for v in L_tens_S.values())
+
+        return N, S, L, L_dot_S, L_tens_S
+
+
+# TODO: make this an abstract class and define Phonon/MagnonMaterial as children
 class Material:
-    def __init__(self, name, structure, num_e, num_p, num_n, m_atoms):
+    def __init__(
+        self,
+        name: str,
+        properties: MaterialProperties,
+        structure: Structure,
+        m_atoms: ArrayLike,
+    ):
+        # Material properties
         self.name = name
-        self.structure = structure
-        self.num_e = num_e
-        self.num_p = num_p
-        self.num_n = num_n
-        self.n_atoms = len(structure.species)
+        self.properties = properties
 
         # Define transformation matrices
-        # Transpose is to keep up with original PhonoDark convention
         self.real_frac_to_cart = structure.lattice.matrix.T
         self.real_cart_to_frac = LA.inv(self.real_frac_to_cart)
         self.recip_frac_to_cart = structure.lattice.reciprocal_lattice.matrix.T
         self.recip_cart_to_frac = LA.inv(self.recip_frac_to_cart)
 
+        # Atomic and structural properties
         self.m_atoms = m_atoms
         self.m_cell = np.sum(m_atoms)
         self.xj = structure.cart_coords
+        self.structure = structure
+        self.n_atoms = len(structure.species)
+
+        # Internal variables
         self._max_dE = None
         self._q_cut = None
 
 
 class PhononMaterial(Material):
-    def __init__(self, name, phonopy_yaml_path):
+    # TODO: path should be "PathLike" (does that exist?)
+    def __init__(self, name: str, phonopy_yaml_path: str):
         # TODO: Need a check for when phonopy_yaml does not have NAC
         phonopy_file = phonopy.load(phonopy_yaml=phonopy_yaml_path, is_nac=True)
         self.phonopy_file = phonopy_file
         n_atoms = phonopy_file.primitive.get_number_of_atoms()
         self.n_modes = 3 * n_atoms
 
-        A = phonopy_file.primitive.get_masses()  # Mass numbers
-        Z = phonopy_file.primitive.get_atomic_numbers()  # Atomic numbers
-        num_e = Z
-        num_p = Z
-        num_n = A - Z
-        m_atoms = A * const.amu_to_eV
+        # A = phonopy_file.primitive.get_masses()  # Mass numbers
+        # Z = phonopy_file.primitive.get_atomic_numbers()  # Atomic numbers
+        # num_e = Z
+        # num_p = Z
+        # num_n = A - Z
+        m_atoms = phonopy_file.primitive.get_masses() * const.amu_to_eV
 
         # NAC parameters (born effective charges and dielectric tensor)
         self.born = np.array(
@@ -66,9 +125,9 @@ class PhononMaterial(Material):
 
         structure = Structure(lattice, species, positions)
 
-        super().__init__(name, structure, num_e, num_p, num_n, m_atoms)
+        super().__init__(name, structure, m_atoms)
 
-    def get_eig(self, k_points, with_eigenvectors=True):
+    def get_eig(self, k_points: ArrayLike, with_eigenvectors: bool = True):
         """
         k_points: numpy arrays of k-points, fractional coordinates
         """
@@ -166,7 +225,7 @@ class MagnonMaterial(Material):
         structure = Structure(lattice, species, positions)
 
         m_atoms = [m_cell / n_atoms] * n_atoms
-        super().__init__(name, structure, None, None, None, m_atoms)
+        super().__init__(name, structure, m_atoms)
 
     def get_eig(self, k, G=[0, 0, 0]):
         """
@@ -238,21 +297,3 @@ class MagnonMaterial(Material):
         For magnons there is no q_cut so we set this to a very large number.
         """
         return 1e10
-
-
-# TODO: c_dict and c_dict_form should prob just be merged?
-class Model:
-    def __init__(self, name, c_dict, c_dict_form, Fmed_power=0, power_V=0, s_chi=0.5):
-        """
-        name: string
-        Fmed_power: float, negative power of q in the Fmed term
-        power_V: float, power of q in the V term (for special mesh)
-        s_chi float, spin of DM particle
-        """
-        self.name = name
-
-        self.Fmed_power = Fmed_power
-        self.power_V = power_V
-        self.s_chi = s_chi
-        self.c_dict = c_dict
-        self.c_dict_form = c_dict_form
