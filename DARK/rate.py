@@ -10,30 +10,11 @@ import DARK.constants as const
 from DARK.v_integrals import matrix_g0
 
 
-def sigma_mdm(q, epsilons):
-    # Eq (65) in arXiv:2009.13534
-    qhat = q / np.linalg.norm(q, axis=1)[:, None]
-    n_q, n_modes = epsilons.shape[0], epsilons.shape[1]
-    identity = np.tile(np.eye(3)[None, :, :], (n_q, n_modes, 1, 1))
-    id_minus_qq = identity - np.tile(
-        np.einsum("ij,ik->ijk", qhat, qhat)[:, None, :, :], (1, n_modes, 1, 1)
-    )
-    sigma = (
-        LA.norm(
-            np.matmul(id_minus_qq, 2 * const.mu_tilde_e * epsilons[..., None]), axis=-2
-        )
-        ** 2
-    )
-    return sigma[:, :, 0]
+class Calculation:
+    """
+    Generic class for calculating the differential rate
+    """
 
-
-def sigma_ap(q, epsilons):
-    # Eq (66) in arXiv:2009.13534
-    tiled_q = np.tile(q[None, :, :], (epsilons.shape[1], 1, 1)).swapaxes(0, 1)
-    return LA.norm(np.cross(tiled_q, 2 * const.mu_tilde_e * epsilons), axis=2) ** 2
-
-
-class MagnonCalculation:
     def __init__(
         self,
         m_chi: float,
@@ -73,6 +54,36 @@ class MagnonCalculation:
             ]
         )
 
+
+class MagnonCalculation(Calculation):
+    """
+    Class for calculating the differential rate for magnon scattering
+    """
+
+    @staticmethod
+    def sigma_mdm(q, epsilons):
+        # Eq (65) in arXiv:2009.13534
+        qhat = q / np.linalg.norm(q, axis=1)[:, None]
+        n_q, n_modes = epsilons.shape[0], epsilons.shape[1]
+        identity = np.tile(np.eye(3)[None, :, :], (n_q, n_modes, 1, 1))
+        id_minus_qq = identity - np.tile(
+            np.einsum("ij,ik->ijk", qhat, qhat)[:, None, :, :], (1, n_modes, 1, 1)
+        )
+        sigma = (
+            LA.norm(
+                np.matmul(id_minus_qq, 2 * const.mu_tilde_e * epsilons[..., None]),
+                axis=-2,
+            )
+            ** 2
+        )
+        return sigma[:, :, 0]
+
+    @staticmethod
+    def sigma_ap(q, epsilons):
+        # Eq (66) in arXiv:2009.13534
+        tiled_q = np.tile(q[None, :, :], (epsilons.shape[1], 1, 1)).swapaxes(0, 1)
+        return LA.norm(np.cross(tiled_q, 2 * const.mu_tilde_e * epsilons), axis=2) ** 2
+
     def calculate_rate(
         self,
     ):
@@ -102,9 +113,9 @@ class MagnonCalculation:
         bin_num = np.floor((omegas) / self.numerics.bin_width).astype(int)
         g0 = matrix_g0(self.grid.q_cart, omegas, self.m_chi, self.v_e)
         if model_name == "mdm":
-            sigma_nu_q = sigma_mdm(self.grid.q_cart, epsilons)
+            sigma_nu_q = self.sigma_mdm(self.grid.q_cart, epsilons)
         elif model_name == "ap":
-            sigma_nu_q = sigma_ap(self.grid.q_cart, epsilons)
+            sigma_nu_q = self.sigma_ap(self.grid.q_cart, epsilons)
         tiled_jacobian = np.tile(self.grid.jacobian, (n_modes, 1)).T
 
         # Integrate to get deltaR
