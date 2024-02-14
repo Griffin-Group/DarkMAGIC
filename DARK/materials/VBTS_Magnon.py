@@ -2,7 +2,7 @@ import numpy as np
 from pymatgen.core.structure import Structure
 from copy import deepcopy
 from DARK import constants as const
-from DARK.core import MagnonMaterial
+from DARK import MagnonMaterial, MaterialProperties
 
 from radtools import (
     SpinHamiltonian,
@@ -169,4 +169,6 @@ def get_material():
     spin = 3 / 2
     hamiltonian = get_MVBT_hamiltonian("data/VBTS.vasp", J, spin_direction, spin)
     m_cell = 2749.367e9  # YIG mass, all ions
+    n_atoms = len(hamiltonian.magnetic_atoms)
+    properties = MaterialProperties(lambda_S = np.ones(n_atoms))
     return MagnonMaterial("VBTS", hamiltonian, m_cell)

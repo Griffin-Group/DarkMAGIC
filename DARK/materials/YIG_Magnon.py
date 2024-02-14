@@ -3,7 +3,7 @@ from radtools import SpinHamiltonian, Crystal, Lattice, Atom, ExchangeParameter
 from pymatgen.core.structure import Structure
 
 import DARK.constants as const
-from DARK.core import MagnonMaterial
+from DARK import MagnonMaterial, MaterialProperties
 from copy import deepcopy
 
 
@@ -100,4 +100,6 @@ def get_material():
 
     hamiltonian = get_YIG_hamiltonian("data/YIG.vasp")
     m_cell = 2749.367e9  # YIG mass, all ions
+    n_atoms = len(hamiltonian.magnetic_atoms)
+    properties = MaterialProperties(lambda_S = np.ones(n_atoms))
     return MagnonMaterial("YIG", hamiltonian, m_cell)
