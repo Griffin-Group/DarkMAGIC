@@ -3,10 +3,10 @@ import math
 import numpy as np
 import numpy.linalg as LA
 from numpy.typing import ArrayLike
-from DARK.core import MagnonMaterial, Model
+from DARK import MagnonMaterial, Model
 from DARK.numerics import Numerics
 import DARK.constants as const
-from DARK.velocity_g import matrix_g0
+from DARK import matrix_g0
 
 
 def sigma_mdm(q, epsilons):
@@ -18,7 +18,9 @@ def sigma_mdm(q, epsilons):
         np.einsum("ij,ik->ijk", qhat, qhat)[:, None, :, :], (1, n_modes, 1, 1)
     )
     sigma = (
-        LA.norm(np.matmul(id_minus_qq, 2 * const.mu_tilde_e * epsilons[..., None]), axis=-2)
+        LA.norm(
+            np.matmul(id_minus_qq, 2 * const.mu_tilde_e * epsilons[..., None]), axis=-2
+        )
         ** 2
     )
     return sigma[:, :, 0]
