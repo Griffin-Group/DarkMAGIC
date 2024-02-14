@@ -31,6 +31,7 @@ def matrix_g0(q, omega, m_chi, v_e):
         np.exp(-(v_minus**2) / const.V0**2) - np.exp(-const.VESC**2 / const.V0**2)
     )
 
+
 def matrix_g1(q, omega, m_chi, v_e):
     """
     Computes the g1 integral for each (q, omega) pair
