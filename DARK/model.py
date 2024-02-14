@@ -70,20 +70,25 @@ class Potential:
         self.full_coeff = model.full_coeff
 
     def eval_V(self, q, material, m_chi, S_chi):
+        # TODO: expand this to work for arrays of q (needs to change all the way down)
         full_V = self._get_full_V()
         expansions = set(
             key for alpha in self.operators for key in full_V[alpha].keys()
         )
-        V = {
-            exp_id: self.get_zeros(exp_id, material.n_atoms)
-            for exp_id in expansions
-        }
+
+        # Determine which velocity integrals are needed
+        self.needs_g1 = True if "01" or "10" in expansions else False
+        self.needs_g2 = True if "11" in expansions else False
+
+        V = {exp_id: self.get_zeros(exp_id, material.n_atoms) for exp_id in expansions}
         # TODO: write this nicer
         for psi in self.particles:
             for alpha in self.operators:
-                C = self.coeff[alpha][psi] * self.full_coeff(alpha, psi, q, m_chi, S_chi) 
+                C = self.coeff[alpha][psi] * self.full_coeff(
+                    alpha, psi, q, m_chi, S_chi
+                )
                 for exp_id, V_func in full_V[alpha].items():
-                    #print(f"V^({psi})_{alpha}_{exp_id}")
+                    # print(f"V^({psi})_{alpha}_{exp_id}")
                     V[exp_id] += C * V_func(q, psi, material, m_chi, S_chi)
         return V
 
@@ -108,23 +113,6 @@ class Potential:
             V[op_id][exp_id] = methods.pop(0)
         return V
 
-    #def Valpha_mn(
-    #    self,
-    #    alpha,
-    #    exp_id,  # TODO: need better name...
-    #    q,
-    #    psi,
-    #    material,
-    #    m_chi,
-    #    S_chi,
-    #):
-    #    assert exp_id in ["00", "01", "10", "11"]
-    #    if alpha not in self._full_V:
-    #        raise KeyError(f"Potential V{alpha} not found")
-    #    return self._full_V[alpha].get(exp_id, self.get_zeros(exp_id))(
-    #        q, psi, material, m_chi, S_chi
-    #    )
-
     @staticmethod
     def get_zeros(exp_id, n_atoms):
         if exp_id == "00":
@@ -133,22 +121,6 @@ class Potential:
             return np.zeros((n_atoms, 3), dtype=complex)
         elif exp_id == "11":
             return np.zeros((n_atoms, 3, 3), dtype=complex)
-        ## TODO: something more clear than this
-        #def zeros_00(*args):
-        #    return np.zeros(args[2].n_atoms)
-
-        #def zeros_01(*args):
-        #    return np.zeros((args[2].n_atoms, 3))
-
-        #def zeros_11(*args):
-        #    return np.zeros((args[2].n_atoms, 3, 3))
-
-        #if exp_id == "00":
-        #    return zeros_00
-        #elif exp_id == "01" or exp_id == "10":
-        #    return zeros_01
-        #elif exp_id == "11":
-        #    return zeros_11
 
     @staticmethod
     def V1_00(q, psi, material, m_chi, S_chi):
