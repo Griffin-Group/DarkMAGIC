@@ -2,6 +2,13 @@ import numpy as np
 import DARK.constants as const
 
 
+class MBIntegrals:
+    """
+    Class for truncated Maxwell-Boltzmann integrals
+    """
+    def __init__(self) -> None:
+        pass
+
 def matrix_vminus(q, omega, m_chi, v_e):
     """
     Computes v_minus = min(|v_star|, Vesc) for each (q, omega) pair
