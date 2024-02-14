@@ -1,6 +1,55 @@
 import h5py
 import numpy as np
 
+from DARK.parallel import ROOT_PROCESS
+
+
+def write_output(
+    out_filename,
+    material,
+    model,
+    numerics,
+    masses,
+    times,
+    all_total_rate_list,
+    all_diff_rate_list,
+    all_binned_rate_list,
+    proc_id,
+    comm,
+    parallel=False,
+):
+    # Write to file
+    print(f"Writing to file {out_filename}{' in parallel' if parallel else ""}...")
+    if not parallel and proc_id == ROOT_PROCESS:
+        print("Done gathering!!!")
+        print("----------")
+
+        write_hdf5(
+            out_filename,
+            material,
+            model,
+            numerics,
+            masses,
+            times,
+            all_total_rate_list,
+            all_diff_rate_list,
+            all_binned_rate_list,
+            comm=None,
+        )
+    else:
+        write_hdf5(
+            out_filename,
+            material,
+            model,
+            numerics,
+            masses,
+            times,
+            all_total_rate_list,
+            all_diff_rate_list,
+            all_binned_rate_list,
+            comm=comm,
+        )
+
 
 def write_group_from_dict(hdf5_file, group_name, data_dict):
     """
@@ -10,7 +59,6 @@ def write_group_from_dict(hdf5_file, group_name, data_dict):
 
     for index in data_dict:
         if type(data_dict[index]) is dict:
-            # This should probably be write_dict_parallel?
             write_group_from_dict(hdf5_file, f"{group_name}/{index}", data_dict[index])
         else:
             data = (
@@ -21,11 +69,12 @@ def write_group_from_dict(hdf5_file, group_name, data_dict):
             hdf5_file.create_dataset(f"{group_name}/{index}", data=data)
 
 
+# TODO: should be a method of the future "Full Calculation" class
 def write_hdf5(
     out_file,
     material,
-    numerics,
     model,
+    numerics,
     masses,
     times,
     all_total_rate_list,
