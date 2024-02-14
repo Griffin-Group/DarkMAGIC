@@ -1,5 +1,6 @@
-from material import Material, MaterialProperties
-from model import Model
-from numerics import Numerics
-from rate import MagnonCalculation
-from v_integrals import MBIntegrals
+from DARK.material import Material, MaterialProperties
+from DARK.model import Model
+from DARK.model import Model
+from DARK.numerics import Numerics
+from DARK.rate import MagnonCalculation
+from DARK.v_integrals import MBIntegrals

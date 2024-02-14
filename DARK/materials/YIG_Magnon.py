@@ -101,5 +101,5 @@ def get_material():
     hamiltonian = get_YIG_hamiltonian("data/YIG.vasp")
     m_cell = 2749.367e9  # YIG mass, all ions
     n_atoms = len(hamiltonian.magnetic_atoms)
-    properties = MaterialProperties(lambda_S = np.ones(n_atoms))
-    return MagnonMaterial("YIG", hamiltonian, m_cell)
+    properties = MaterialProperties(lambda_S=np.ones(n_atoms))
+    return MagnonMaterial("YIG", properties, hamiltonian, m_cell)

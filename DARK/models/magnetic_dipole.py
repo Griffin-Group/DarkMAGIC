@@ -1,4 +1,4 @@
-from DARK.core import Model
+from DARK import Model
 import numpy as np
 import DARK.constants as const
 
