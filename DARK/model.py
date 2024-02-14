@@ -48,40 +48,57 @@ class Model:
 
 
 class Potential:
-    def __init__(self):
-        self.full_V = {}
+    def __init__(self, c_dict):
+        self._full_V = self._get_full_V()
 
-    def pot(self, f, a, b):
-        # If full_V[a] doesn't exist, make it a dictionary
-        if a not in self.full_V:
-            self.full_V[a] = {}
-        self.full_V[a][b] = f
+    @classmethod
+    def _get_full_V(cls):
 
-    def get_V(
+        # TODO: I don't like that this requires carefully naming the methods
+        # Can we do this with a decorator so that the function name doesn't matter?
+        # The decorator would need arguments to specify the operator id and expansion id
+
+        # Get all the methods that start with V
+        methods = [
+            getattr(cls, method) for method in dir(cls) if method.startswith("V")
+        ]
+
+        # Extract ids from the name (e.g. V3b_10 -> 3b, 10)
+        operators = list(method.__name__.split("_") for method in methods)
+        operators = [(op[0].lstrip("V"), op[1]) for op in operators]
+
+        V = {op_id: {} for op_id in set(op[0] for op in operators)}
+        for op_id, exp_id in operators:
+            V[op_id][exp_id] = methods.pop(0)
+        return V
+
+    def get_Valpha_mn(
         self,
         q,
-        op_id,
-        exp_id,
+        alpha,
+        mn,
         psi,
         material,
         m_chi,
         S_chi,
     ):
-        try:
-            V = self.full_V[op_id]
-        except KeyError:
-            print(f"Potential V_{op_id} not found")
-        return V.get(exp_id, self.get_zeros(exp_id))(q, psi, material, m_chi, S_chi)
+        assert mn in ["00", "01", "10", "11"]
+        if alpha not in self._full_V:
+            raise KeyError(f"Potential V{alpha} not found")
+        return self._full_V[alpha].get(mn, self.get_zeros(mn))(
+            q, psi, material, m_chi, S_chi
+        )
 
     def get_zeros(self, exp_id):
+        # TODO: something more clear than this
         def zeros_00(*args):
-            return np.zeros(args[2])
+            return np.zeros(args[2].n_atoms)
 
         def zeros_01(*args):
-            return np.zeros((args[2], 3))
+            return np.zeros((args[2].n_atoms, 3))
 
         def zeros_11(*args):
-            return np.zeros((args[2], 3, 3))
+            return np.zeros((args[2].n_atoms, 3, 3))
 
         if exp_id == "00":
             return zeros_00
@@ -90,12 +107,12 @@ class Potential:
         elif exp_id == "11":
             return zeros_11
 
-    @pot("1", "00")
+    @staticmethod
     def V1_00(q, psi, material, m_chi, S_chi):
 
         return material.properties.N[psi]
 
-    @pot("3b", "00")
+    @staticmethod
     def V3b_00(q, psi, material, m_chi, S_chi):
 
         V = np.zeros(material.n_atoms, dtype=complex)
@@ -112,19 +129,19 @@ class Potential:
 
         return V
 
-    @pot("3a", "10")
+    @staticmethod
     def V3a_10(q, psi, material, m_chi, S_chi):
 
         C = 1j / material.properties.m_psi[psi]
 
         return np.array([C * np.cross(Sj, q) for Sj in material.properties.S[psi]])
 
-    @pot("4", "01")
+    @staticmethod
     def V4_01(q, psi, material, m_chi, S_chi):
 
         return material.properties.S[psi]
 
-    @pot("5b", "01")
+    @staticmethod
     def V5b_01(q, psi, material, m_chi, S_chi):
 
         C = -0.5 * np.dot(q, q) * (material.properties.m_psi[psi]) ** (-2)
@@ -135,7 +152,7 @@ class Potential:
             [L - qhat * np.dot(qhat, L) for L in material.properties.L[psi]]
         )
 
-    @pot("5a", "11")
+    @staticmethod
     def V5a_11(q, psi, material, m_chi, S_chi):
 
         C = 1j / material.properties.m_psi[psi]
@@ -145,9 +162,7 @@ class Potential:
             for N in material.properties.N[psi]
         )
 
-        return V
-
-    @pot("6", "01")
+    @staticmethod
     def V6_01(q, psi, material, m_chi, S_chi):
 
         C = np.dot(q, q) * (material.properties.m_psi[psi]) ** (-2)
@@ -158,14 +173,14 @@ class Potential:
             [qhat * np.dot(qhat, S) for S in material.properties.S[psi]]
         )
 
-    @pot("7a", "00")
+    @staticmethod
     def V7a_00(q, psi, material, m_chi, S_chi):
 
         C = -(0.5) * (m_chi) ** (-1.0)
 
         return C * np.array([np.dot(q, S) for S in material.properties.S[psi]])
 
-    @pot("7b", "00")
+    @staticmethod
     def V7b_00(q, psi, material, m_chi, S_chi):
 
         C = -(0.5) * (m_chi) ** (-1.0) * 1j
@@ -177,56 +192,56 @@ class Potential:
             ]
         )
 
-    @pot("8a", "01")
+    @staticmethod
     def V8a_01(q, psi, material, m_chi, S_chi):
 
         C = 0.5
 
         return C * np.array([(-N * (q / m_chi)) for N in material.properties.N[psi]])
 
-    @pot("8a", "11")
+    @staticmethod
     def V8a_11(q, psi, material, m_chi, S_chi):
 
         C = 1
 
         return C * np.array([N * np.identity(3) for N in material.properties.N[psi]])
 
-    @pot("8b", "01")
+    @staticmethod
     def V8b_01(q, psi, material, m_chi, S_chi):
 
         C = -0.5 * (1j / material.properties.m_psi[psi])
 
         return C * np.array([np.cross(q, L) for L in material.properties.L[psi]])
 
-    @pot("9", "01")
+    @staticmethod
     def V9_01(q, psi, material, m_chi, S_chi):
 
         C = -(1j / material.properties.m_psi[psi])
 
         return C * np.array([np.cross(q, S) for S in material.properties.S[psi]])
 
-    @pot("10", "00")
+    @staticmethod
     def V10_00(q, psi, material, m_chi, S_chi):
 
         C = 1j / material.properties.m_psi[psi]
 
         return C * np.array([np.dot(q, S) for S in material.properties.S[psi]])
 
-    @pot("11", "01")
+    @staticmethod
     def V11_01(q, psi, material, m_chi, S_chi):
 
         C = 1j / material.properties.m_psi[psi]
 
         return C * np.array([N * q for N in material.properties.N[psi]])
 
-    @pot("12a", "01")
+    @staticmethod
     def V12a_01(q, psi, material, m_chi, S_chi):
 
         C = -m_chi / 2
 
         return C * np.array([np.cross(S, q) for S in material.properties.S[psi]])
 
-    @pot("12a", "11")
+    @staticmethod
     def V12a_11(q, psi, material, m_chi, S_chi):
 
         C = 1
@@ -235,7 +250,7 @@ class Potential:
             [np.einsum("jki,k->ij", levi_civita, S) for S in material.properties.S[psi]]
         )
 
-    @pot("12b", "01")
+    @staticmethod
     def V12b_01(q, psi, material, m_chi, S_chi):
 
         C = -0.5 * (1j / material.properties.m_psi[psi])
@@ -247,14 +262,14 @@ class Potential:
             ]
         )
 
-    @pot("13a", "01")
+    @staticmethod
     def V13a_01(q, psi, material, m_chi, S_chi):
 
         C = -0.5 * (1j / material.properties.m_psi[psi]) / m_chi
 
         return C * np.array([np.dot(q, S) * q for S in material.properties.S[psi]])
 
-    @pot("13a", "11")
+    @staticmethod
     def V13a_11(q, psi, material, m_chi, S_chi):
 
         C = 1j / material.properties.m_psi[psi]
@@ -263,7 +278,7 @@ class Potential:
             [np.dot(q, S) * np.identity(3) for S in material.properties.S[psi]]
         )
 
-    @pot("13b", "01")
+    @staticmethod
     def V13b_01(q, psi, material, m_chi, S_chi):
 
         C = -0.5 * material.properties.m_psi[psi] ** (-2)
@@ -275,7 +290,7 @@ class Potential:
             ]
         )
 
-    @pot("14a", "01")
+    @staticmethod
     def V14a_11(q, psi, material, m_chi, S_chi):
 
         C = 1j / material.properties.m_psi[psi]
@@ -284,7 +299,7 @@ class Potential:
             [np.einsum("i,j->ij", S, q) for S in material.properties.S[psi]]
         )
 
-    @pot("14b", "01")
+    @staticmethod
     def V14b_01(q, psi, material, m_chi, S_chi):
 
         C = 0.5 * material.properties.m_psi[psi] ** (-2)
@@ -296,21 +311,19 @@ class Potential:
             ]
         )
 
-        return V
-
-    @pot("15a", "11")
+    @staticmethod
     def V15a_11(q, psi, material, m_chi, S_chi):
 
         C = -material.properties.m_psi[psi] ** (-2)
 
         return C * np.array(
             [
-                np.dot(q, S) * np.einsum("jki,k->ij", levi_civita, S, q)
+                np.dot(q, S) * np.einsum("jki,k->ij", levi_civita, q)
                 for S in material.properties.S[psi]
             ]
         )
 
-    @pot("15b", "01")
+    @staticmethod
     def V15b_01(q, psi, material, m_chi, S_chi):
 
         C = -0.5 * 1j * material.properties.m_psi[psi] ** (-3)
@@ -319,6 +332,9 @@ class Potential:
             C
             * np.dot(q, q)
             * np.array(
-                [x @ q - q * (q @ x @ q) for x in material.properties.L_tens_S[psi]]
+                [
+                    LxS @ q - q * (q @ LxS @ q)
+                    for LxS in material.properties.L_tens_S[psi]
+                ]
             )
         )
