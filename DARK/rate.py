@@ -3,10 +3,11 @@ import math
 import numpy as np
 import numpy.linalg as LA
 from numpy.typing import ArrayLike
-from DARK import MagnonMaterial, Model
+from DARK.material import MagnonMaterial
+from DARK.model import Model
 from DARK.numerics import Numerics
 import DARK.constants as const
-from DARK import matrix_g0
+from DARK.v_integrals import matrix_g0
 
 
 def sigma_mdm(q, epsilons):

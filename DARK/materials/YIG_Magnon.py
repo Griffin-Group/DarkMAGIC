@@ -3,7 +3,7 @@ from radtools import SpinHamiltonian, Crystal, Lattice, Atom, ExchangeParameter
 from pymatgen.core.structure import Structure
 
 import DARK.constants as const
-from DARK import MagnonMaterial, MaterialProperties
+from DARK.material import MagnonMaterial, MaterialProperties
 from copy import deepcopy
 
 

@@ -6,8 +6,10 @@ class MBIntegrals:
     """
     Class for truncated Maxwell-Boltzmann integrals
     """
+
     def __init__(self) -> None:
         pass
+
 
 def matrix_vminus(q, omega, m_chi, v_e):
     """

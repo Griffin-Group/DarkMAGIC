@@ -1,8 +1,8 @@
 import numpy as np
 from pymatgen.core.structure import Structure
 from copy import deepcopy
-from DARK import constants as const
-from DARK import MagnonMaterial, MaterialProperties
+import DARK.constants as const
+from DARK.material import MagnonMaterial, MaterialProperties
 
 from radtools import (
     SpinHamiltonian,
