@@ -14,11 +14,11 @@ def sigma_mdm(q, epsilons):
     qhat = q / np.linalg.norm(q, axis=1)[:, None]
     n_q, n_modes = epsilons.shape[0], epsilons.shape[1]
     identity = np.tile(np.eye(3)[None, :, :], (n_q, n_modes, 1, 1))
-    matrix = identity - np.tile(
+    id_minus_qq = identity - np.tile(
         np.einsum("ij,ik->ijk", qhat, qhat)[:, None, :, :], (1, n_modes, 1, 1)
     )
     sigma = (
-        LA.norm(np.matmul(matrix, 2 * const.mu_tilde_e * epsilons[..., None]), axis=-2)
+        LA.norm(np.matmul(id_minus_qq, 2 * const.mu_tilde_e * epsilons[..., None]), axis=-2)
         ** 2
     )
     return sigma[:, :, 0]
