@@ -26,7 +26,7 @@ class Model:
     def __init__(
         self,
         name: str,
-        c_dict: dict,
+        coeff: dict,
         c_dict_form: dict,
         Fmed_power: int = 0,
         power_V: int = 0,
@@ -36,26 +36,62 @@ class Model:
         name: string
         Fmed_power: float, negative power of q in the Fmed term
         power_V: float, power of q in the V term (for special mesh)
-        s_chi float, S_chi of DM particle
+        s_chi float, spin of DM particle
         """
         self.name = name
 
         self.Fmed_power = Fmed_power
         self.power_V = power_V
         self.s_chi = S_chi
-        self.c_dict = c_dict
-        self.c_dict_form = c_dict_form
+        self.coeff = coeff
+        self.full_coeff = c_dict_form
+        self.operators, self.particles = self.get_operators_and_particles(coeff)
+
+    @staticmethod
+    def get_operators_and_particles(coeff):
+        """
+        Gets the non-zero operators and particles (psi) from the c_dict
+        """
+
+        nonzero_pairs = [
+            (alpha, psi)
+            for alpha, c_alpha in coeff.items()
+            for psi, c_psi in c_alpha.items()
+            if c_psi != 0
+        ]
+        return {pair[0] for pair in nonzero_pairs}, {pair[1] for pair in nonzero_pairs}
 
 
 class Potential:
-    def __init__(self, c_dict):
-        self._full_V = self._get_full_V()
+    def __init__(self, model):
+        self.operators = model.operators
+        self.particles = model.particles
+        self.coeff = model.coeff
+        self.full_coeff = model.full_coeff
+
+    def eval_V(self, q, material, m_chi, S_chi):
+        full_V = self._get_full_V()
+        expansions = set(
+            key for alpha in self.operators for key in full_V[alpha].keys()
+        )
+        V = {
+            exp_id: self.get_zeros(exp_id, material.n_atoms)
+            for exp_id in expansions
+        }
+        # TODO: write this nicer
+        for psi in self.particles:
+            for alpha in self.operators:
+                C = self.coeff[alpha][psi] * self.full_coeff(alpha, psi, q, m_chi, S_chi) 
+                for exp_id, V_func in full_V[alpha].items():
+                    #print(f"V^({psi})_{alpha}_{exp_id}")
+                    V[exp_id] += C * V_func(q, psi, material, m_chi, S_chi)
+        return V
 
     @classmethod
     def _get_full_V(cls):
 
-        # TODO: I don't like that this requires carefully naming the methods
-        # Can we do this with a decorator so that the function name doesn't matter?
+        # TODO: I don't like that this requires specifically naming the methods
+        # Can this be done with a decorator so that the function name doesn't matter?
         # The decorator would need arguments to specify the operator id and expansion id
 
         # Get all the methods that start with V
@@ -72,40 +108,47 @@ class Potential:
             V[op_id][exp_id] = methods.pop(0)
         return V
 
-    def get_Valpha_mn(
-        self,
-        q,
-        alpha,
-        mn,
-        psi,
-        material,
-        m_chi,
-        S_chi,
-    ):
-        assert mn in ["00", "01", "10", "11"]
-        if alpha not in self._full_V:
-            raise KeyError(f"Potential V{alpha} not found")
-        return self._full_V[alpha].get(mn, self.get_zeros(mn))(
-            q, psi, material, m_chi, S_chi
-        )
+    #def Valpha_mn(
+    #    self,
+    #    alpha,
+    #    exp_id,  # TODO: need better name...
+    #    q,
+    #    psi,
+    #    material,
+    #    m_chi,
+    #    S_chi,
+    #):
+    #    assert exp_id in ["00", "01", "10", "11"]
+    #    if alpha not in self._full_V:
+    #        raise KeyError(f"Potential V{alpha} not found")
+    #    return self._full_V[alpha].get(exp_id, self.get_zeros(exp_id))(
+    #        q, psi, material, m_chi, S_chi
+    #    )
 
-    def get_zeros(self, exp_id):
-        # TODO: something more clear than this
-        def zeros_00(*args):
-            return np.zeros(args[2].n_atoms)
-
-        def zeros_01(*args):
-            return np.zeros((args[2].n_atoms, 3))
-
-        def zeros_11(*args):
-            return np.zeros((args[2].n_atoms, 3, 3))
-
+    @staticmethod
+    def get_zeros(exp_id, n_atoms):
         if exp_id == "00":
-            return zeros_00
+            return np.zeros(n_atoms, dtype=complex)
         elif exp_id == "01" or exp_id == "10":
-            return zeros_01
+            return np.zeros((n_atoms, 3), dtype=complex)
         elif exp_id == "11":
-            return zeros_11
+            return np.zeros((n_atoms, 3, 3), dtype=complex)
+        ## TODO: something more clear than this
+        #def zeros_00(*args):
+        #    return np.zeros(args[2].n_atoms)
+
+        #def zeros_01(*args):
+        #    return np.zeros((args[2].n_atoms, 3))
+
+        #def zeros_11(*args):
+        #    return np.zeros((args[2].n_atoms, 3, 3))
+
+        #if exp_id == "00":
+        #    return zeros_00
+        #elif exp_id == "01" or exp_id == "10":
+        #    return zeros_01
+        #elif exp_id == "11":
+        #    return zeros_11
 
     @staticmethod
     def V1_00(q, psi, material, m_chi, S_chi):
@@ -158,8 +201,10 @@ class Potential:
         C = 1j / material.properties.m_psi[psi]
 
         return C * np.array(
-            N * np.einsum("jki,k->ij", levi_civita, q)
-            for N in material.properties.N[psi]
+            [
+                N * np.einsum("jki,k->ij", levi_civita, q)
+                for N in material.properties.N[psi]
+            ]
         )
 
     @staticmethod
