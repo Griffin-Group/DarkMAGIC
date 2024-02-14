@@ -30,3 +30,21 @@ def matrix_g0(q, omega, m_chi, v_e):
     return c1 * (
         np.exp(-(v_minus**2) / const.V0**2) - np.exp(-const.VESC**2 / const.V0**2)
     )
+
+def matrix_g1(q, omega, m_chi, v_e):
+    """
+    Computes the g1 integral for each (q, omega) pair
+    See Eq. C11 in EFT paper (2009.13534)
+
+    The result is a 3D array of shape (n_q, n_modes, 3)
+    (i.e., for each q-point and mode, we get a 3-vector)
+
+    TODO: this is a little off, fix it
+    """
+
+    g0 = matrix_g0(q, omega, m_chi, v_e)
+    qhat = q / np.linalg.norm(q, axis=1)[:, None]
+
+    matrix1 = (omega / np.linalg.norm(q, axis=1)[:, None])[:, :, None] * qhat[:, None]
+    matrix2 = (np.eye(3) - np.einsum("ij,ik->ijk", qhat, qhat)) @ v_e
+    return (matrix1 - matrix2[:, None, :]) * g0[:, :, None]
