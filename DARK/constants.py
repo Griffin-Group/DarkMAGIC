@@ -7,6 +7,10 @@ import numpy as np
 from numpy import pi
 from scipy import constants
 
+levi_civita = np.zeros((3, 3, 3))
+levi_civita[0, 1, 2] = levi_civita[1, 2, 0] = levi_civita[2, 0, 1] = 1
+levi_civita[0, 2, 1] = levi_civita[2, 1, 0] = levi_civita[1, 0, 2] = -1
+
 # Angstrom to eV, etc.
 # This should be h not hbar but hbar gives the correct result
 eV_to_invMeter = constants.e / (constants.hbar * constants.c)
