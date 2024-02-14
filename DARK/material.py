@@ -21,6 +21,7 @@ class MaterialProperties:
         L_tens_S: dict = None,
         lambda_S: ArrayLike = None,
         lambda_L: ArrayLike = None,
+        m_psi: dict = None,
     ):
         # Phonons
         self.N = N
@@ -31,6 +32,8 @@ class MaterialProperties:
         # Magnons
         self.lambda_S = lambda_S
         self.lambda_L = lambda_L
+        # Mass of the particles
+        self.m_psi = m_psi
 
     def validate_for_phonons(self, n_atoms: int):
         """
@@ -64,15 +67,18 @@ class MaterialProperties:
         self.lambda_S = self.lambda_S or np.zeros(n_atoms)
 
         # Validate that each dict has "e", "p" and "n" keys
-        for d in [self.N, self.S, self.L, self.L_dot_S, self.L_tens_S]:
+        for d in [self.N, self.S, self.L, self.L_dot_S, self.L_tens_S, self.m_psi]:
             assert set(d.keys()) == psi
         # Validate that the N and L_S dicts, each key is array of length num_atoms
         for d in [self.N, self.L_dot_S]:
-            assert all(len(v) == self.n_atoms for v in d.values())
+            assert all(len(v) == n_atoms for v in d.values())
         # Assert that the S and L dicts, each key is array of length 3*num_atoms
         for d in [self.S, self.L]:
-            assert all(len(v) == 3 * self.n_atoms for v in d.values())
-        assert all(len(v) == 3 * 3 * self.n_atoms for v in self.L_tens_S.values())
+            assert all(len(v) == 3 * n_atoms for v in d.values())
+        assert all(len(v) == 3 * 3 * n_atoms for v in self.L_tens_S.values())
+
+        self.m_psi = self.m_psi or {"e": const.m_e, "p": const.m_p, "n": const.m_n} 
+
 
 
 # TODO: make this an abstract class and define Phonon/MagnonMaterial as children
