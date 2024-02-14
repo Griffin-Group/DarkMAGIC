@@ -5,7 +5,7 @@ from numpy.typing import ArrayLike
 from numpy import linalg as LA
 from pymatgen.core.structure import Structure
 import phonopy
-from radtools import MagnonDispersion
+from radtools import SpinHamiltonian, MagnonDispersion
 
 
 import DARK.constants as const
@@ -14,51 +14,65 @@ import DARK.constants as const
 class MaterialProperties:
     def __init__(
         self,
-        n_atoms,
         N: dict = None,
         S: dict = None,
         L: dict = None,
         L_dot_S: dict = None,
         L_tens_S: dict = None,
+        lambda_S: ArrayLike = None,
+        lambda_L: ArrayLike = None,
     ):
-        N, S, L, L_dot_S, L_tens_S = self.validate_input(
-            n_atoms, N, S, L, L_dot_S, L_tens_S
-        )
-
+        # Phonons
         self.N = N
         self.S = S
         self.L = L
         self.L_dot_S = L_dot_S
         self.L_tens_S = L_tens_S
+        # Magnons
+        self.lambda_S = lambda_S
+        self.lambda_L = lambda_L
 
-    @staticmethod
-    def _validate_input(n_atoms, N, S, L, L_dot_S, L_tens_S):
+    def validate_for_phonons(self, n_atoms: int):
+        """
+        Validates that the material properties are suitable for phonons
+        """
+        assert any([self.N, self.S, self.L, self.L_dot_S, self.L_tens_S])
+        self._validate_input(n_atoms)
+
+    def validate_for_magnons(self, n_atoms: int):
+        """
+        Validates that the material properties are suitable for magnons
+        """
+        assert any([np.any(self.lambda_S), np.any(self.lambda_L)])
+        # TODO: not nice to have so many return values
+        self._validate_input(n_atoms)
+
+    def _validate_input(self, n_atoms):
         """
         Validates the input to the MaterialProperties class
         """
 
-        # TODO: need proper exceptions
-        # Make sure some kind of response is defined, and zero out the rest
         psi = ["e", "p", "n"]
-        assert any([N, S, L, L_dot_S, L_tens_S])
-        N = N or {k: np.zeros(n_atoms) for k in psi}
-        L_dot_S = L_dot_S or {k: np.zeros(n_atoms) for k in psi}
-        S = S or {k: np.zeros((n_atoms, 3)) for k in psi}
-        L = L or {k: np.zeros((n_atoms, 3)) for k in psi}
-        L_tens_S = L_tens_S or {k: np.zeros((n_atoms, 3, 3)) for k in psi}
+
+        # TODO: need proper exceptions
+        self.N = self.N or {k: np.zeros(n_atoms) for k in psi}
+        self.L_dot_S = self.L_dot_S or {k: np.zeros(n_atoms) for k in psi}
+        self.S = self.S or {k: np.zeros((n_atoms, 3)) for k in psi}
+        self.L = self.L or {k: np.zeros((n_atoms, 3)) for k in psi}
+        self.L_tens_S = self.L_tens_S or {k: np.zeros((n_atoms, 3, 3)) for k in psi}
+        self.lambda_L = self.lambda_L or np.zeros(n_atoms)
+        self.lambda_S = self.lambda_S or np.zeros(n_atoms)
 
         # Validate that each dict has "e", "p" and "n" keys
-        for d in [N, S, L, L_dot_S, L_tens_S]:
+        for d in [self.N, self.S, self.L, self.L_dot_S, self.L_tens_S]:
             assert set(d.keys()) == psi
         # Validate that the N and L_S dicts, each key is array of length num_atoms
-        for d in [N, L_dot_S]:
-            assert all(len(v) == n_atoms for v in d.values())
+        for d in [self.N, self.L_dot_S]:
+            assert all(len(v) == self.n_atoms for v in d.values())
         # Assert that the S and L dicts, each key is array of length 3*num_atoms
-        for d in [S, L]:
-            assert all(len(v) == 3 * n_atoms for v in d.values())
-        assert all(len(v) == 3 * 3 * n_atoms for v in L_tens_S.values())
-
-        return N, S, L, L_dot_S, L_tens_S
+        for d in [self.S, self.L]:
+            assert all(len(v) == 3 * self.n_atoms for v in d.values())
+        assert all(len(v) == 3 * 3 * self.n_atoms for v in self.L_tens_S.values())
 
 
 # TODO: make this an abstract class and define Phonon/MagnonMaterial as children
@@ -94,18 +108,17 @@ class Material:
 
 class PhononMaterial(Material):
     # TODO: path should be "PathLike" (does that exist?)
-    def __init__(self, name: str, phonopy_yaml_path: str):
+    def __init__(
+        self, name: str, properties: MaterialProperties, phonopy_yaml_path: str
+    ):
         # TODO: Need a check for when phonopy_yaml does not have NAC
         phonopy_file = phonopy.load(phonopy_yaml=phonopy_yaml_path, is_nac=True)
         self.phonopy_file = phonopy_file
         n_atoms = phonopy_file.primitive.get_number_of_atoms()
         self.n_modes = 3 * n_atoms
 
-        # A = phonopy_file.primitive.get_masses()  # Mass numbers
-        # Z = phonopy_file.primitive.get_atomic_numbers()  # Atomic numbers
-        # num_e = Z
-        # num_p = Z
-        # num_n = A - Z
+        properties.validate_for_phonons(n_atoms)
+
         m_atoms = phonopy_file.primitive.get_masses() * const.amu_to_eV
 
         # NAC parameters (born effective charges and dielectric tensor)
@@ -125,7 +138,7 @@ class PhononMaterial(Material):
 
         structure = Structure(lattice, species, positions)
 
-        super().__init__(name, structure, m_atoms)
+        super().__init__(name, properties, structure, m_atoms)
 
     def get_eig(self, k_points: ArrayLike, with_eigenvectors: bool = True):
         """
@@ -189,7 +202,13 @@ class PhononMaterial(Material):
 
 
 class MagnonMaterial(Material):
-    def __init__(self, name, hamiltonian, m_cell):
+    def __init__(
+        self,
+        name: str,
+        properties: MaterialProperties,
+        hamiltonian: SpinHamiltonian,
+        m_cell: float,
+    ):
         """
         In the current implementation, the hamiltonian only
         contains the magnetic atoms and their interactions.
@@ -205,6 +224,7 @@ class MagnonMaterial(Material):
         self.dispersion = MagnonDispersion(hamiltonian, phase_convention="tanner")
 
         n_atoms = len(hamiltonian.magnetic_atoms)  # Number of magnetic atoms
+        properties.validate_for_magnons(n_atoms)
         # Atom positions in cartesian coordinates (units of 1/eV)
         self.xj = np.array(
             [
@@ -225,7 +245,7 @@ class MagnonMaterial(Material):
         structure = Structure(lattice, species, positions)
 
         m_atoms = [m_cell / n_atoms] * n_atoms
-        super().__init__(name, structure, m_atoms)
+        super().__init__(name, properties, structure, m_atoms)
 
     def get_eig(self, k, G=[0, 0, 0]):
         """
