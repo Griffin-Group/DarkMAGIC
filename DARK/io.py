@@ -76,9 +76,9 @@ def write_hdf5(
         }
         c_dict = model.c_dict
         numerics_parameters = {
-            "n_a": numerics.N_abc[0],
-            "n_b": numerics.N_abc[1],
-            "n_c": numerics.N_abc[2],
+            "n_a": numerics.N_grid[0],
+            "n_b": numerics.N_grid[1],
+            "n_c": numerics.N_grid[2],
             "power_a": numerics.power_abc[0],
             "power_b": numerics.power_abc[1],
             "power_c": numerics.power_abc[2],
