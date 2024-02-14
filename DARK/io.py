@@ -19,7 +19,8 @@ def write_output(
     parallel=False,
 ):
     # Write to file
-    print(f"Writing to file {out_filename}{' in parallel' if parallel else ""}...")
+    # TODO: is there a more succinct way to do this?
+    print(f"Writing to file {out_filename}{' in parallel' if parallel else ''}...")
     if not parallel and proc_id == ROOT_PROCESS:
         print("Done gathering!!!")
         print("----------")
