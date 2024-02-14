@@ -1,10 +1,12 @@
+import itertools
+
 import numpy as np
+from numpy.typing import ArrayLike
 from numpy import linalg as LA
 from pymatgen.core.structure import Structure
 import phonopy
 from radtools import MagnonDispersion
 
-from numpy.typing import ArrayLike
 
 import DARK.constants as const
 
@@ -201,7 +203,9 @@ class MagnonMaterial(Material):
         # And last N are negatives of the first N
         # (see Eq. I4 in Tanner's Dissertation)
         sort_order = np.argsort(L)[::-1]
-        sort_order = np.concatenate((sort_order[:N], sort_order[2 * N : N - 1 : -1]))
+        # Note: Testing shows that the exact sort order (Tanner's Eq. I4) is not necessary
+        # The SpinW (Lake and Toth) sort order works just fine
+        # sort_order = np.concatenate((sort_order[:N], sort_order[2 * N : N - 1 : -1]))
         U = U[:, sort_order]
         L = np.diag(L[sort_order])
 
@@ -252,21 +256,3 @@ class Model:
         self.s_chi = s_chi
         self.c_dict = c_dict
         self.c_dict_form = c_dict_form
-
-
-class Numerics:
-    def __init__(
-        self,
-        N_abc: ArrayLike = [20, 10, 10],
-        power_abc: ArrayLike = [2, 1, 1],
-        n_DW_xyz: ArrayLike = [20, 20, 20],
-        bin_width: float = 1e-3,
-        use_q_cut: bool = True,
-        use_special_mesh: bool = True,
-    ):
-        self.N_abc = np.array(N_abc)
-        self.power_abc = np.array(power_abc)
-        self.n_DW_xyz = np.array(n_DW_xyz)
-        self.bin_width = bin_width
-        self.use_q_cut = use_q_cut
-        self.use_special_mesh = use_special_mesh
