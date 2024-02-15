@@ -109,9 +109,12 @@ class MagnonCalculation(Calculation):
                 print(f"* m_chi = {self.m_chi:13.4f}, q-point: {iq:6d}/{n_q:6d})")
             omegas[iq, :], epsilons[iq, :, :] = self.material.get_eig(k, G)
 
+        v_dist = MBDistribution(self.grid, omegas, self.m_chi, self.v_e)
+
         # Along with omega and epsilons, these are all q*nu arrays
         bin_num = np.floor((omegas) / self.numerics.bin_width).astype(int)
-        g0 = matrix_g0(self.grid.q_cart, omegas, self.m_chi, self.v_e)
+        g0 = v_dist.g0
+
         if model_name == "mdm":
             sigma_nu_q = self.sigma_mdm(self.grid.q_cart, epsilons)
         elif model_name == "ap":
