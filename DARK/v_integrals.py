@@ -1,60 +1,137 @@
 import numpy as np
 import DARK.constants as const
+from numpy.typing import ArrayLike
+import numpy.linalg as LA
 
-
-class MBIntegrals:
+class MBDistribution:
     """
-    Class for truncated Maxwell-Boltzmann integrals
-    """
-
-    def __init__(self) -> None:
-        pass
-
-
-def matrix_vminus(q, omega, m_chi, v_e):
-    """
-    Computes v_minus = min(|v_star|, Vesc) for each (q, omega) pair
-    q: numpy array of shape (n_q, 3), momentum transfer
-    omega: 2D numpy array of shape (n_q, n_modes), eigenmodes
-    m_chi: float, DM mass
-    v_e: vector, lab frame velocity of earth
-    """
-    n_modes = omega.shape[1]
-    tiled_q = np.tile(q[None, :, :], (n_modes, 1, 1)).swapaxes(0, 1)
-    q_norm = np.linalg.norm(tiled_q, axis=2)
-    v_star = 1 / q_norm * (np.dot(tiled_q, v_e) + q_norm**2 / 2 / m_chi + omega)
-    return np.minimum(np.abs(v_star), const.VESC)
-
-
-def matrix_g0(q, omega, m_chi, v_e):
-    """
-    Computes the g0 integral for each (q, omega) pair
-    See Eq. C9 in EFT paper (2009.13534)
+    Class for truncated Maxwell-Boltzmann distribution
     """
 
-    v_minus = matrix_vminus(q, omega, m_chi, v_e)
-    c1 = 2 * np.pi**2 * const.V0**2 / (np.linalg.norm(q, axis=1) * const.N0)
-    c1 = np.tile(c1, (omega.shape[1], 1)).T
+    def __init__(self, grid, omega, m_chi, v_e) -> None:
+        self.grid = grid
+        self.omega = omega
+        self.m_chi = m_chi
+        self.v_e = np.array(v_e)
 
-    return c1 * (
-        np.exp(-(v_minus**2) / const.V0**2) - np.exp(-const.VESC**2 / const.V0**2)
-    )
+        # Internal variables
+        self._v_minus = None
+        self._g0 = None
+        self._g1 = None
+        self._g2 = None
+        self._F = None
+        self._X = None
+        self._eye_minus_qhat_qhat = None
 
+    @property
+    def v_minus(self):
+        """
+        Computes v_minus = min(|v_star|, Vesc) for each (q, omega) pair
+        q: numpy array of shape (n_q, 3), momentum transfer
+        omega: 2D numpy array of shape (n_q, n_modes), eigenmodes
+        m_chi: float, DM mass
+        v_e: vector, lab frame velocity of earth
+        """
+        if self._v_minus is None:
+            q = self.grid.q_cart
+            n_modes = self.omega.shape[1]
+            tiled_q = np.tile(q[None, :, :], (n_modes, 1, 1)).swapaxes(0, 1)
+            q_norm = LA.norm(tiled_q, axis=2)
+            v_star = (
+                1
+                / q_norm
+                * (np.dot(tiled_q, self.v_e) + q_norm**2 / 2 / self.m_chi + self.omega)
+            )
+            self._v_minus = np.minimum(np.abs(v_star), const.VESC)
+        return self._v_minus
 
-def matrix_g1(q, omega, m_chi, v_e):
-    """
-    Computes the g1 integral for each (q, omega) pair
-    See Eq. C11 in EFT paper (2009.13534)
+    @property
+    def g0(self):
+        """
+        Computes the g0 integral for each (q, omega) pair
+        See Eq. C9 in EFT paper (2009.13534)
+        """
+        if self._g0 is None:
+            c1 = 2 * np.pi**2 * const.V0**2 / self.grid.q_norm / const.N0
+            c1 = np.tile(c1, (self.omega.shape[1], 1)).T
 
-    The result is a 3D array of shape (n_q, n_modes, 3)
-    (i.e., for each q-point and mode, we get a 3-vector)
+            self._g0 = c1 * (
+                np.exp(-(self.v_minus / const.V0)**2)
+                - np.exp(-(const.VESC / const.V0)**2)
+            )
+        return self._g0
 
-    TODO: this is a little off, fix it
-    """
+    @property
+    def g1(self):
+        """
+        Computes the g1 integral for each (q, omega) pair
+        See Eq. C11 in EFT paper (2009.13534)
 
-    g0 = matrix_g0(q, omega, m_chi, v_e)
-    qhat = q / np.linalg.norm(q, axis=1)[:, None]
+        The result is a 3D array of shape (n_q, n_modes, 3)
+        (i.e., for each q-point and mode, we get a 3-vector)
+        """
+        if self._g1 is None:
+            self._g1 = self.X * self.g0[:, :, None]
+        return self._g1
 
-    matrix1 = (omega / np.linalg.norm(q, axis=1)[:, None])[:, :, None] * qhat[:, None]
-    matrix2 = (np.eye(3) - np.einsum("ij,ik->ijk", qhat, qhat)) @ v_e
-    return (matrix1 - matrix2[:, None, :]) * g0[:, :, None]
+    @property
+    def g2(self):
+        """
+        Computes the g2 integral for each (q, omega) pair
+        See Eq. C14 in EFT paper (2009.13534)
+
+        The result is a 4D array of shape (n_q, n_modes, 3, 3)
+        (i.e., for each q-point and mode, we get a 3x3 matrix)
+        """
+        if self._g2 is None:
+            term1 = (
+                np.einsum("...i,...j->...ij", self.X, self.X) * self.g0[..., None, None]
+            )
+            term2 = self.eye_minus_qhat_qhat[:, None, :, :] * self.F[..., None, None]
+            self._g2 = term1 + term2
+        return self._g2
+
+    @property
+    def F(self):
+        """
+        Computes the very last term of Eq. (C14) in the EFT paper (2009.13534)
+        This is the term that multiplies (1 - qhat \otimes qhat) in the g2 integral
+        """
+        if self._F is None:
+            v_minus = self.v_minus
+            C = np.pi**2 * const.V0**2 / const.N0 / self.grid.q_norm  # nq x 1
+            self._F = C[:, None] * (
+                const.V0**2 * np.exp(-((v_minus / const.V0) ** 2))
+                - (const.V0**2 - v_minus**2 + const.VESC**2)
+                * np.exp(-((const.VESC / const.V0) ** 2))
+            )
+        return self._F
+
+    @property
+    def X(self):
+        """
+        Computes the X vector for each (q, omega) pair
+
+        X = (\omega / |q|) \hat{q} - (\mathbb{1} - \hat{q} \otimes \hat{q}) v_e
+
+        The result is a 3D array of shape (n_q, n_modes, 3)
+        """
+        if self._X is None:
+            term1 = (self.omega / self.grid.q_norm[:, None])[
+                :, :, None
+            ] * self.grid.q_hat[:, None]
+            term2 = self.eye_minus_qhat_qhat @ self.v_e
+            self._X = term1 - term2[:, None, :]
+        return self._X
+
+    @property
+    def eye_minus_qhat_qhat(self):
+        """
+        Computes the (3x3) matrix (1 - qhat \otimes qhat) for each q-point
+        The result is a 3D array of shape (n_q, 3, 3)
+        """
+        if self._eye_minus_qhat_qhat is None:
+            self._eye_minus_qhat_qhat = np.eye(3) - np.einsum(
+                "ij,ik->ijk", self.grid.q_hat, self.grid.q_hat
+            )
+        return self._eye_minus_qhat_qhat
