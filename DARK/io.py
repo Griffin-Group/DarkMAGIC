@@ -124,7 +124,7 @@ def write_hdf5(
             "spin": model.s_chi,
             "mass_list": masses,
         }
-        c_dict = model.c_dict
+        coeff = model.coeff
         numerics_parameters = {
             "n_a": numerics.N_grid[0],
             "n_b": numerics.N_grid[1],
@@ -139,7 +139,7 @@ def write_hdf5(
             "q_cut": numerics.use_q_cut,
             "special_mesh": numerics.use_special_mesh,
         }
-        return physics_parameters, dm_properties_dict, c_dict, numerics_parameters
+        return physics_parameters, dm_properties_dict, coeff, numerics_parameters
 
     physics_parameters, dm_properties_dict, c_dict, numerics_parameters = get_dicts(
         model, numerics, masses, times
