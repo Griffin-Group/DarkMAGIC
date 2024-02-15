@@ -40,7 +40,11 @@ class Grid:
         self.q_cart, self.q_frac = self._get_q_points(
             numerics.N_grid, m_chi, v_e, material.recip_cart_to_frac
         )
+        # These show up in many so it's efficient to compute them only once
         self.q_norm = LA.norm(self.q_cart, axis=1)
+        self.q_hat = self.q_cart / self.q_norm[:, None]
+
+        # Get G-vectors
         self.G_cart, self.G_frac = self._get_G_vectors(material.recip_frac_to_cart)
         # Deriving this is straightforward, remember we're sampling
         # with a power of 2 in the q direction, hence the square roots on |q|
@@ -119,80 +123,3 @@ class Grid:
 
         # Get rid of duplicates due to periodicity
         return qpoints  # np.unique(qpoints, axis=0)
-
-
-def get_kinematic_qkG(
-    filename,
-    m_chi,
-    threshold,
-    vE_vec,
-    mesh=[9, 9, 9],
-    shift=[0, 0, 0],
-    G_upper=6,
-    q_cart=True,
-    k_cart=False,
-    G_cart=False,
-):
-    """
-    Generate a mesh of q,K,G points in the BZ that satisfy the kinematic constraints
-    Args:
-        filename (str): Path to the POSCAR/CIF/etc. file for the structure
-        m_chi (float): Dark matter mass in eV
-        threshold (float): Minimum energy threshold in eV
-        vE_vec (list): Earth velocity vector in units of c
-        mesh (list): Number of k-points in each direction
-        shift (list): Shift of the mesh from the origin (0,0,0) for unshifted, (1, 1, 1) for half-shifted
-        G_upper (int): Maximum G vector considered is [G_upper, G_upper, G_upper]
-        q_cart (bool): Return q points in cartesian coordinates, false is fractional
-        k_cart (bool): Return k points in cartesian coordinates, false is fractional
-        G_cart (bool): Return G points in cartesian coordinates, false is fractional
-    Returns:
-        q (np.array): Array of q vectors that satisfy kinematic constraints. By default,
-                      in cartesian coordinates in units of eV
-        k (np.array): Array of k vectors that satisfy kinematic constraints. By default,
-                      in fractional coordinates.
-        G (np.array): Array of G vectors that satisfy kinematic constraints. By default,
-                      in fractional coordinates.
-    """
-    # Generate a full mesh spanning entire BZ in fractional coords
-    struct = Structure.from_file(filename)
-    sga = SpacegroupAnalyzer(struct)
-    kmesh_frac, _ = sga.get_ir_reciprocal_mesh_map(mesh=mesh, is_shift=shift)
-    # Define transformatin matrix from fractional to cartesian coordinates in BZ
-    frac_to_cart = struct.lattice.reciprocal_lattice.matrix / const.Ang_To_inveV
-    # Need a better way to automatically determine the maximum G value
-    # See blue notebook P. 21 for attempt
-    G_candidates = np.array(list(itertools.product(np.arange(G_upper), repeat=3)))
-    # Where does this expression come from?
-    # q_max = 2*m_chi/(VESC + VE) # Maximum q value
-    # Generate all possible q, k, G combinations in fractional and cartesian coordinates
-    qkG_frac = np.array(
-        [
-            (k_frac + G_frac, k_frac, G_frac)
-            for G_frac in G_candidates
-            for k_frac in kmesh_frac
-        ]
-    )
-    qkG_cart = np.array(
-        [
-            (
-                np.dot(q_frac, frac_to_cart),
-                np.dot(k_frac, frac_to_cart),
-                np.dot(G_frac, frac_to_cart),
-            )
-            for q_frac, k_frac, G_frac in qkG_frac
-        ]
-    )
-    # Apply kinematic constraints
-    q_norm = LA.norm(qkG_cart[:, 0], axis=1)
-    v_star = (1 / q_norm) * np.abs(
-        np.dot(qkG_cart[:, 0], vE_vec) + q_norm**2 / (2 * m_chi)
-    )
-    mask = np.array(
-        (q_norm > (threshold / (const.VE + const.VESC))) & (v_star < const.VESC)
-    )
-
-    q = qkG_cart[mask][:, 0] if q_cart else qkG_frac[mask][:, 0]
-    k = qkG_cart[mask][:, 1] if k_cart else qkG_frac[mask][:, 1]
-    G = qkG_cart[mask][:, 2] if G_cart else qkG_frac[mask][:, 2]
-    return q, k, G
