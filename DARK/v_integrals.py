@@ -1,7 +1,7 @@
 import numpy as np
 import DARK.constants as const
-from numpy.typing import ArrayLike
 import numpy.linalg as LA
+
 
 class MBDistribution:
     """
@@ -56,8 +56,8 @@ class MBDistribution:
             c1 = np.tile(c1, (self.omega.shape[1], 1)).T
 
             self._g0 = c1 * (
-                np.exp(-(self.v_minus / const.V0)**2)
-                - np.exp(-(const.VESC / const.V0)**2)
+                np.exp(-((self.v_minus / const.V0) ** 2))
+                - np.exp(-((const.VESC / const.V0) ** 2))
             )
         return self._g0
 
@@ -69,6 +69,17 @@ class MBDistribution:
 
         The result is a 3D array of shape (n_q, n_modes, 3)
         (i.e., for each q-point and mode, we get a 3-vector)
+
+        This integral is equivalent to
+
+        g1 = (v_star \hat{q} - v_e - \vec{q}/2/m_chi) * g0
+
+        Note: this is defined slightly differently in the original
+              phonodark. Specifically,
+
+        g1 = (v_star R[:,2] - v_e) * g0
+
+        where R is a matrix that rotates \hat{q} to lie along the z-axis
         """
         if self._g1 is None:
             self._g1 = self.X * self.g0[:, :, None]
@@ -82,6 +93,12 @@ class MBDistribution:
 
         The result is a 4D array of shape (n_q, n_modes, 3, 3)
         (i.e., for each q-point and mode, we get a 3x3 matrix)
+
+        This suffers from a similar problem to g1, the definition
+        in PhonoDark is quite different from the paper (including 
+        the definition of what I call F below) and I don't know
+        how to reconcile them. It also invovles a rotation,
+        like in g1.
         """
         if self._g2 is None:
             term1 = (
