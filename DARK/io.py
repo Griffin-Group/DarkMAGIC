@@ -121,7 +121,7 @@ def write_hdf5(
             "model_name": "mdm",
         }
         dm_properties_dict = {
-            "spin": model.s_chi,
+            "spin": model.S_chi,
             "mass_list": masses,
         }
         coeff = model.coeff
