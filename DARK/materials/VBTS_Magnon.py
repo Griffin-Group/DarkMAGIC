@@ -16,12 +16,12 @@ from radtools import (
 def get_material():
     def prepare_MVBT_structure(filename):
         struct = Structure.from_file(filename)
-        struct.remove_species(["Bi", "Te"])
+        struct.remove_species(["Bi", "Te", "Se"])
         # struct.sites[0].species = struct.sites[0].species + "1"
         # struct.sites[1].species = struct.sites[0].species + "2"
         return struct
 
-    def get_MVBT_neighbors(struct, neighbor_cutoff=25):
+    def get_MVBT_neighbors(struct, neighbor_cutoff=23):
         indices = [{"inter": [], "intra": []} for i in range(struct.num_sites)]
         distances = [{"inter": [], "intra": []} for i in range(struct.num_sites)]
         R = [{"inter": [], "intra": []} for i in range(struct.num_sites)]
@@ -96,8 +96,9 @@ def get_material():
             "intra": [ExchangeParameter(iso=JJ) for JJ in J["intra"]],
         }
 
+        # The paper is very unclear about their hamiltonian convention unfortunately
         hamiltonian.double_counting = True  # Really not sure about this...
-        hamiltonian.spin_normalized = False  # I don't think it's normalized??
+        hamiltonian.spin_normalized = True  # I don't think it's normalized??
         hamiltonian.factor = -1 / 2  # Really not sure about this eitehr...
 
         # Add all pairs
@@ -169,6 +170,7 @@ def get_material():
     spin = 3 / 2
     hamiltonian = get_MVBT_hamiltonian("data/VBTS.vasp", J, spin_direction, spin)
     m_cell = 2749.367e9  # YIG mass, all ions
+    m_cell = 1643.2017317087846e9 # VBTS mass, magnetic cell
     n_atoms = len(hamiltonian.magnetic_atoms)
     properties = MaterialProperties(lambda_S=np.ones(n_atoms))
     return MagnonMaterial("VBTS", properties, hamiltonian, m_cell)
