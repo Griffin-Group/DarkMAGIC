@@ -1,24 +1,22 @@
-from DARK import Model
 import numpy as np
+
+from DARK import Model
 import DARK.constants as const
+
+from numpy import linalg as LA
 
 
 def get_model():
 
-    c_dict = {
-        "1": {
-            "e": 0.25,  # factor of 1/4 in paper
-            "p": -0.25,  # Factor of 1/4 in paper * (-1)
-            "n": 0,
-            "screened": True,
-        },
-        "4": {"e": 1, "p": -2.8, "n": 0},  # mu_tilde_e  # mu_tilde_p * (-1)
-        "5a": {"e": 1, "p": -1, "n": 0, "screened": True},
+    coeff = {
+        "1": {"e": 1 / 4, "p": -1 / 4, "n": 0},
+        "4": {"e": const.mu_tilde_e, "p": -const.mu_tilde_p, "n": 0},
+        "5a": {"e": 1, "p": -1, "n": 0},
         "5b": {"e": 1, "p": -1, "n": 0},
-        "6": {"e": -1, "p": 2.8, "n": 0},  # -mu_tilde_e  # -mu_tilde_p * (-1)
+        "6": {"e": -const.mu_tilde_e, "p": const.mu_tilde_p, "n": 0},
     }
 
-    def c_dict_form(op_id, particle_id, q_vec, mass, spin):
+    def coeff_qmS(op_id, particle_id, q, m_chi, S_chi):
         """
         q/m_chi dependence of the c coefficients.
 
@@ -43,13 +41,13 @@ def get_model():
             return 1.0
 
         def q_sq_on_mchi_sq(q, m_chi, spin):
-            return np.dot(q, q) / m_chi**2
+            return LA.norm(q, axis=1) / m_chi**2
 
         def q_sq_on_mchi_me(q, m_chi, spin):
-            return np.dot(q, q) / (m_chi * const.m_e)
+            return LA.norm(q, axis=1) / (m_chi * const.m_e)
 
         def q_sq_on_mchi_mp(q, m_chi, spin):
-            return np.dot(q, q) / (m_chi * const.m_p)
+            return LA.norm(q, axis=1) / (m_chi * const.m_p)
 
         def me_on_mchi(q, m_chi, spin):
             return const.m_e / m_chi
@@ -63,6 +61,6 @@ def get_model():
             "5a": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
             "5b": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
             "6": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-        }[op_id][particle_id](q_vec, mass, spin)
+        }[op_id][particle_id](q, m_chi, S_chi)
 
-    return Model("mdm", c_dict, c_dict_form)
+    return Model("mdm", coeff, coeff_qmS)
