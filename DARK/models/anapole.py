@@ -4,12 +4,11 @@ import DARK.constants as const
 
 
 def get_model():
-    c_dict = {
+    coeff = {
         "8a": {
             "e": 1 / 2,  # factor of 1/2 in paper
             "p": -1 / 2,  # Factor of 1/2 in paper * (-1)
             "n": 0,
-            "screened": True,
         },
         "8b": {
             "e": 1 / 2,  # factor of 1/2 in paper
@@ -17,14 +16,13 @@ def get_model():
             "n": 0,
         },
         "9": {
-            "e": -1 / 2,  # -mu_tilde_e/2
-            "p": 2.8 / 2,  # -mu_tilde_p/2 * (-1)
+            "e": -const.mu_tilde_e / 2,  # -mu_tilde_e/2
+            "p": const.mu_tilde_p / 2,  # -mu_tilde_p/2 * (-1)
             "n": 0,
-            "screened": True,
         },
     }
 
-    def c_dict_form(op_id, particle_id, q_vec, mass, spin):
+    def coeff_qmS(op_id, particle_id, q_vec, mass, spin):
         def one_func(q_vec, mass, spin):
             return 1.0
 
@@ -49,4 +47,4 @@ def get_model():
             "9": {"e": q_sq_on_mchi_sq, "p": q_sq_on_mchi_sq, "n": one_func},
         }[op_id][particle_id](q_vec, mass, spin)
 
-    return Model("ap", c_dict, c_dict_form)
+    return Model("ap", coeff, coeff_qmS)

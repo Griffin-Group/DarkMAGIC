@@ -17,26 +17,6 @@ def get_model():
     }
 
     def coeff_qmS(op_id, particle_id, q, m_chi, S_chi):
-        """
-        q/m_chi dependence of the c coefficients.
-
-        Input:
-            op_id : integer, operator id number
-            particle_id : string, {"e", "p", "n"} for electron, proton, neutron resp.
-
-            q_vec : (real, real, real), momentum vector in XYZ coordinates
-            mass : dark matter mass
-            spin : dark matter spin
-
-        Output:
-            real, the q/m_chi dependence of the c coefficients that isn't stored above in
-            c_dict
-
-
-        Note: To add different operators simply add more functions inside of here, and replace
-            one_func in the output dict
-        """
-
         def one_func(q, m_chi, spin):
             return 1.0
 

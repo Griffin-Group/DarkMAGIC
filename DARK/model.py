@@ -58,9 +58,9 @@ class Model:
                 "p": c_alpha.get("p", 0) + (1 - q2_qepsq) * c_alpha.get("e", 0),
             }
             for psi in c_alpha.keys():
-                screened_coeff_qmS[alpha][psi] = screened_c[
-                    psi
-                ] * self.coeff_qmS(alpha, psi, q, m_chi, self.S_chi)
+                screened_coeff_qmS[alpha][psi] = screened_c[psi] * self.coeff_qmS(
+                    alpha, psi, q, m_chi, self.S_chi
+                )
 
     @staticmethod
     def get_operators_and_fermions(coeff):
@@ -74,9 +74,7 @@ class Model:
             for psi, c_psi in c_alpha.items()
             if c_psi != 0
         ]
-        return {pair[0] for pair in nonzero_pairs}, {
-            pair[1] for pair in nonzero_pairs
-        }
+        return {pair[0] for pair in nonzero_pairs}, {pair[1] for pair in nonzero_pairs}
 
 
 class Potential:
@@ -97,10 +95,7 @@ class Potential:
         self.needs_g1 = True if "01" or "10" in expansions else False
         self.needs_g2 = True if "11" in expansions else False
 
-        V = {
-            exp_id: self.get_zeros(exp_id, material.n_atoms)
-            for exp_id in expansions
-        }
+        V = {exp_id: self.get_zeros(exp_id, material.n_atoms) for exp_id in expansions}
         # TODO: write this nicer
         for psi in self.particles:
             for alpha in self.operators:
@@ -121,9 +116,7 @@ class Potential:
 
         # Get all the methods that start with V
         methods = [
-            getattr(cls, method)
-            for method in dir(cls)
-            if method.startswith("V")
+            getattr(cls, method) for method in dir(cls) if method.startswith("V")
         ]
 
         # Extract ids from the name (e.g. V3b_10 -> 3b, 10)
@@ -174,9 +167,7 @@ class Potential:
 
         C = 1j / material.properties.m_psi[psi]
 
-        return np.array(
-            [C * np.cross(Sj, q) for Sj in material.properties.S[psi]]
-        )
+        return np.array([C * np.cross(Sj, q) for Sj in material.properties.S[psi]])
 
     @staticmethod
     def V4_11(q, psi, material, m_chi, S_chi):
@@ -246,25 +237,19 @@ class Potential:
 
         C = 1
 
-        return C * np.array(
-            [N * np.identity(3) for N in material.properties.N[psi]]
-        )
+        return C * np.array([N * np.identity(3) for N in material.properties.N[psi]])
 
     @staticmethod
     def V8b_01(q, psi, material, m_chi, S_chi):
         C = 0.5 * (1j / material.properties.m_psi[psi])
 
-        return C * np.array(
-            [np.cross(L, q) for L in material.properties.L[psi]]
-        )
+        return C * np.array([np.cross(L, q) for L in material.properties.L[psi]])
 
     @staticmethod
     def V9_11(q, psi, material, m_chi, S_chi):
         C = 1j / material.properties.m_psi[psi]
 
-        return C * np.array(
-            [np.cross(S, q) for S in material.properties.S[psi]]
-        )
+        return C * np.array([np.cross(S, q) for S in material.properties.S[psi]])
 
     @staticmethod
     def V10_00(q, psi, material, m_chi, S_chi):
@@ -284,9 +269,7 @@ class Potential:
 
         C = -m_chi / 2
 
-        return C * np.array(
-            [np.cross(S, q) for S in material.properties.S[psi]]
-        )
+        return C * np.array([np.cross(S, q) for S in material.properties.S[psi]])
 
     @staticmethod
     def V12a_20(q, psi, material, m_chi, S_chi):
@@ -294,10 +277,7 @@ class Potential:
         C = 1
 
         return C * np.array(
-            [
-                np.einsum("jki,k->ij", levi_civita, S)
-                for S in material.properties.S[psi]
-            ]
+            [np.einsum("jki,k->ij", levi_civita, S) for S in material.properties.S[psi]]
         )
 
     @staticmethod
@@ -317,9 +297,7 @@ class Potential:
 
         C = -0.5 * (1j / material.properties.m_psi[psi]) / m_chi
 
-        return C * np.array(
-            [np.dot(q, S) * q for S in material.properties.S[psi]]
-        )
+        return C * np.array([np.dot(q, S) * q for S in material.properties.S[psi]])
 
     @staticmethod
     def V13a_20(q, psi, material, m_chi, S_chi):
