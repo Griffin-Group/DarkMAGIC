@@ -4,3 +4,4 @@ darkmagic/grids.py
 *.out
 *.egg*
 dist/**
+site/**
