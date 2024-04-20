@@ -1,14 +1,11 @@
-import itertools
-
 import numpy as np
-from numpy.typing import ArrayLike
-from numpy import linalg as LA
-from pymatgen.core.structure import Structure
 import phonopy
-from radtools import SpinHamiltonian, MagnonDispersion
+from numpy import linalg as LA
+from numpy.typing import ArrayLike
+from pymatgen.core.structure import Structure
+from radtools import MagnonDispersion, SpinHamiltonian
 
-
-import DARK.constants as const
+import DarkMAGIC.constants as const
 
 
 class MaterialProperties:
@@ -57,20 +54,31 @@ class MaterialProperties:
 
         psi = ["e", "p", "n"]
 
-        self.N = self.N or {k: np.zeros(n_atoms) for k in psi}
-        self.L_dot_S = self.L_dot_S or {k: np.zeros(n_atoms) for k in psi}
-        self.S = self.S or {k: np.zeros((n_atoms, 3)) for k in psi}
-        self.L = self.L or {k: np.zeros((n_atoms, 3)) for k in psi}
-        self.L_tens_S = self.L_tens_S or {k: np.zeros((n_atoms, 3, 3)) for k in psi}
+        self.N = self.N or {p: np.zeros(n_atoms) for p in psi}
+        self.L_dot_S = self.L_dot_S or {p: np.zeros(n_atoms) for p in psi}
+        self.S = self.S or {p: np.zeros((n_atoms, 3)) for p in psi}
+        self.L = self.L or {p: np.zeros((n_atoms, 3)) for p in psi}
+        self.L_tens_S = self.L_tens_S or {p: np.zeros((n_atoms, 3, 3)) for p in psi}
         self.lambda_L = np.zeros(n_atoms) if self.lambda_L is None else self.lambda_L
         self.lambda_S = np.zeros(n_atoms) if self.lambda_S is None else self.lambda_S
 
         # Populate default masses if necessary
-        self.m_psi = self.m_psi or {"e": const.m_e, "p": const.m_p, "n": const.m_n}
+        self.m_psi = self.m_psi or {
+            "e": const.m_e,
+            "p": const.m_p,
+            "n": const.m_n,
+        }
 
         # TODO: need proper exceptions
         # Validate that each dict has "e", "p" and "n" keys
-        for d in [self.N, self.S, self.L, self.L_dot_S, self.L_tens_S, self.m_psi]:
+        for d in [
+            self.N,
+            self.S,
+            self.L,
+            self.L_dot_S,
+            self.L_tens_S,
+            self.m_psi,
+        ]:
             assert set(d.keys()) == set(psi)
         # Validate that the N and L_S dicts, each key is array of length num_atoms
         for d in [self.N, self.L_dot_S]:
@@ -159,8 +167,6 @@ class PhononMaterial(Material):
         # convert frequencies to correct units
         omega = const.THz_to_eV * mesh_dict["frequencies"]
 
-        n_k = len(k_points)
-
         # Need to reshape the eigenvectors from (n_k, n_modes, n_modes)
         # to (n_k, n_atoms, n_modes, 3)
         if with_eigenvectors:
@@ -168,7 +174,7 @@ class PhononMaterial(Material):
                 (len(k_points), self.n_modes, self.n_atoms, 3), dtype=complex
             )
             # TODO: Should rewrite this with a reshape...
-            for q in range(n_k):
+            for q in range(len(k_points)):
                 for nu in range(self.n_modes):
                     eigenvectors[q, nu] = np.array_split(
                         eigenvectors_pre[q].T[nu], self.n_atoms
@@ -229,7 +235,9 @@ class MagnonMaterial(Material):
         self.hamiltonian = hamiltonian
         n_atoms = len(hamiltonian.magnetic_atoms)
         self.n_modes = n_atoms
-        self.dispersion = MagnonDispersion(hamiltonian, phase_convention="tanner", nodmi=nodmi, noaniso=noaniso)
+        self.dispersion = MagnonDispersion(
+            hamiltonian, phase_convention="tanner", nodmi=nodmi, noaniso=noaniso
+        )
 
         n_atoms = len(hamiltonian.magnetic_atoms)  # Number of magnetic atoms
         properties.validate_for_magnons(n_atoms)
@@ -255,11 +263,13 @@ class MagnonMaterial(Material):
         m_atoms = [m_cell / n_atoms] * n_atoms
         super().__init__(name, properties, structure, m_atoms)
 
-    def get_eig(self, k, G=[0, 0, 0]):
+    def get_eig(self, k, G=None):
         """
         k: single k-point, cartesian coordinates (units of eV)
         G: single G-point, cartesian coordinates (units of eV)
         """
+        if G is None:
+            G = np.array([0, 0, 0])
         # Calculate the prefactor
         prefactor = self.sqrt_spins_2 * np.exp(1j * np.dot(self.xj, G))
 

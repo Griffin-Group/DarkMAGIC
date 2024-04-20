@@ -2,7 +2,6 @@ import itertools
 
 import numpy as np
 
-
 ROOT_PROCESS = 0  # Root MPI process global
 JOB_SENTINEL = -99999
 
@@ -34,7 +33,7 @@ def distribute_load(n_proc, masses, times):
 
     if n_jobs > n_proc:
         print("Number of jobs exceeds the number of processors.")
-        print("Baseline number of jobs per processor: " + str(base_jobs_per_proc))
+        print(f"Baseline number of jobs per processor: {str(base_jobs_per_proc)}")
         print(
             "Remaining processors with one extra job: "
             + str(n_jobs - n_proc * base_jobs_per_proc)
@@ -42,7 +41,7 @@ def distribute_load(n_proc, masses, times):
     elif n_jobs < n_proc:
         print("Number of jobs is fewer than the number of processors.")
         print("Consider reducing the number of processors for more efficiency.")
-        print("Total number of jobs: " + str(n_jobs))
+        print(f"Total number of jobs: {n_jobs}")
     else:
         print("Number of jobs matches the number of processors. Maximally parallized.")
 

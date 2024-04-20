@@ -1,23 +1,28 @@
 import itertools
 
 import numpy as np
-from numpy.typing import ArrayLike
 from numpy import linalg as LA
-from pymatgen.core.structure import Structure
+from numpy.typing import ArrayLike
 
-import DARK.constants as const
+import DarkMAGIC.constants as const
 
 
 class Numerics:
     def __init__(
         self,
-        N_grid: ArrayLike = [20, 10, 10],
-        power_abc: ArrayLike = [2, 1, 1],
-        n_DW_xyz: ArrayLike = [20, 20, 20],
+        N_grid: ArrayLike = None,
+        power_abc: ArrayLike = None,
+        n_DW_xyz: ArrayLike = None,
         bin_width: float = 1e-3,
         use_q_cut: bool = True,
         use_special_mesh: bool = False,
     ):
+        if N_grid is None:
+            N_grid = [20, 10, 10]
+        if power_abc is None:
+            power_abc = [2, 1, 1]
+        if n_DW_xyz is None:
+            n_DW_xyz = [20, 20, 20]
         self.N_grid = np.array(N_grid)
         self.power_abc = np.array(power_abc)
         self.n_DW_xyz = np.array(n_DW_xyz)
@@ -103,11 +108,11 @@ class Grid:
         """
         # Using physicists' convention for theta and phi
         delta_r = 1 / (2 * n_r)
-        a = np.linspace(delta_r, 1 - delta_r, n_r)
+        #a = np.linspace(delta_r, 1 - delta_r, n_r)
         r = radius * np.linspace(delta_r, 1 - delta_r, n_r) ** 2
         # print(np.sqrt(r/radius), r)
         delta_phi = 1 / (2 * n_phi)
-        c = np.linspace(delta_phi, 1 - delta_phi, n_phi)
+        #c = np.linspace(delta_phi, 1 - delta_phi, n_phi)
         phi = 2 * np.pi * np.linspace(delta_phi, 1 - delta_phi, n_phi)  # Azimuthal
         delta_theta = 1 / (2 * n_theta)
         # theta = np.pi * np.linspace(delta_theta, 1 - delta_theta, n_theta)  # Polar
@@ -119,7 +124,4 @@ class Grid:
         y = np.outer(r, np.outer(np.sin(theta), np.sin(phi))).flatten()
         z = np.outer(r, np.outer(np.cos(theta), np.ones_like(phi))).flatten()
 
-        qpoints = np.array([x, y, z]).T
-
-        # Get rid of duplicates due to periodicity
-        return qpoints  # np.unique(qpoints, axis=0)
+        return np.array([x, y, z]).T

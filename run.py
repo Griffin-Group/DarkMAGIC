@@ -1,15 +1,14 @@
-from mpi4py.MPI import COMM_WORLD as comm
 import numpy as np
+from mpi4py.MPI import COMM_WORLD as comm
 
-
-from DARK.parallel import distribute_load, ROOT_PROCESS, JOB_SENTINEL
-from DARK.rate import MagnonCalculation
-from DARK.numerics import Numerics
-from DARK.io import write_output
+from DarkMAGIC.io import write_output
 
 # Get the example material and model
-from DARK.materials.VBTS_Magnon import get_material
-from DARK.models.magnetic_dipole import get_model
+from DarkMAGIC.materials.FeGe_Magnon import get_material
+from DarkMAGIC.models.magnetic_dipole import get_model
+from DarkMAGIC.numerics import Numerics
+from DarkMAGIC.parallel import JOB_SENTINEL, ROOT_PROCESS, distribute_load
+from DarkMAGIC.rate import MagnonCalculation
 
 
 def main(material, model, numerics, masses, times, hdf5_filename):
@@ -86,12 +85,11 @@ def main(material, model, numerics, masses, times, hdf5_filename):
 
 
 if __name__ == "__main__":
-    masses = np.logspace(4, 7, 30)
+    masses = np.logspace(4, 7, 90)
     times = [0]
     material = get_material()
-    print(material.name)
     model = get_model()
-    numerics = Numerics(N_grid=[20, 10, 10], use_special_mesh=False)
-    hdf5_filename = f"out/DARK_{material.name}_{model.name}.hdf5"
+    numerics = Numerics(N_grid=[40, 20, 20], use_special_mesh=False)
+    hdf5_filename = f"out/DarkMAGIC_{material.name}_{model.name}.hdf5"
 
     main(material, model, numerics, masses, times, hdf5_filename)

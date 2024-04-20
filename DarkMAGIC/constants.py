@@ -1,11 +1,11 @@
 """
-    Constants in natural units (unless otherwise specified).
+Constants in natural units (unless otherwise specified).
 """
 
-from scipy.special import erf
 import numpy as np
 from numpy import pi
 from scipy import constants
+from scipy.special import erf
 
 levi_civita = np.zeros((3, 3, 3))
 levi_civita[0, 1, 2] = levi_civita[1, 2, 0] = levi_civita[2, 0, 1] = 1

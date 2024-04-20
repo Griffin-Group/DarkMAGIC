@@ -3,11 +3,12 @@ import math
 import numpy as np
 import numpy.linalg as LA
 from numpy.typing import ArrayLike
-from DARK.material import MagnonMaterial
-from DARK.model import Model
-from DARK.numerics import Numerics
-import DARK.constants as const
-from DARK.v_integrals import MBDistribution
+
+import DarkMAGIC.constants as const
+from DarkMAGIC.material import MagnonMaterial
+from DarkMAGIC.model import Model
+from DarkMAGIC.numerics import Numerics
+from DarkMAGIC.v_integrals import MBDistribution
 
 
 class Calculation:
@@ -29,11 +30,7 @@ class Calculation:
             raise ValueError("Either time or v_e must be provided")
         if time is not None and v_e is not None:
             raise ValueError("Only one of time or v_e should be provided")
-        if time is not None:
-            self.v_e = self.compute_ve(time)
-        else:
-            self.v_e = v_e
-
+        self.v_e = self.compute_ve(time) if time is not None else v_e
         self.material = material
         self.model = model
         self.numerics = numerics

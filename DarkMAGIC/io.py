@@ -1,7 +1,7 @@
 import h5py
 import numpy as np
 
-from DARK.parallel import ROOT_PROCESS
+from DarkMAGIC.parallel import ROOT_PROCESS
 
 
 def write_output(
@@ -59,7 +59,7 @@ def write_group_from_dict(hdf5_file, group_name, data_dict):
     """
 
     for index in data_dict:
-        if type(data_dict[index]) is dict:
+        if isinstance(data_dict[index], dict):
             write_group_from_dict(hdf5_file, f"{group_name}/{index}", data_dict[index])
         else:
             data = (
