@@ -1,10 +1,11 @@
-import numpy as np
-from radtools import SpinHamiltonian, Crystal, Lattice, Atom, ExchangeParameter
-from pymatgen.core.structure import Structure
-
-import DARK.constants as const
-from DARK.material import MagnonMaterial, MaterialProperties
 from copy import deepcopy
+
+import numpy as np
+from pymatgen.core.structure import Structure
+from radtools import Atom, Crystal, ExchangeParameter, Lattice, SpinHamiltonian
+
+import DarkMAGIC.constants as const
+from DarkMAGIC.material import MagnonMaterial, MaterialProperties
 
 
 def get_material():
@@ -19,7 +20,10 @@ def get_material():
 
     def get_YIG_hamiltonian(filename):
         struct = prepare_YIG_structure(filename)
-        site_type = lambda i: "d" if i < 12 else "a"
+
+        def site_type(i):
+            return "d" if i < 12 else "a"
+
         # See blue notebook notes page 31 regarding why this is frac_coords
         # Even though documentation says it should be cartesian ("absolute")
         atoms = [
@@ -28,11 +32,7 @@ def get_material():
         ]
 
         for atom in atoms:
-            if atom.index < 13:
-                atom.spin_direction = [0, 0, 1]
-            else:
-                atom.spin_direction = [0, 0, -1]
-
+            atom.spin_direction = [0, 0, 1] if atom.index < 13 else [0, 0, -1]
         # Convert everything to eV and inverse eV
         scaled_struct = deepcopy(struct)
         scaled_struct.scale_lattice(struct.volume * (const.Ang_to_inveV) ** 3)

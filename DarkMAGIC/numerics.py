@@ -108,11 +108,11 @@ class Grid:
         """
         # Using physicists' convention for theta and phi
         delta_r = 1 / (2 * n_r)
-        #a = np.linspace(delta_r, 1 - delta_r, n_r)
+        # a = np.linspace(delta_r, 1 - delta_r, n_r)
         r = radius * np.linspace(delta_r, 1 - delta_r, n_r) ** 2
         # print(np.sqrt(r/radius), r)
         delta_phi = 1 / (2 * n_phi)
-        #c = np.linspace(delta_phi, 1 - delta_phi, n_phi)
+        # c = np.linspace(delta_phi, 1 - delta_phi, n_phi)
         phi = 2 * np.pi * np.linspace(delta_phi, 1 - delta_phi, n_phi)  # Azimuthal
         delta_theta = 1 / (2 * n_theta)
         # theta = np.pi * np.linspace(delta_theta, 1 - delta_theta, n_theta)  # Polar

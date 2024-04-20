@@ -1,5 +1,3 @@
-import numpy as np
-
 from DARK import Model
 import DARK.constants as const
 
@@ -7,7 +5,6 @@ from numpy import linalg as LA
 
 
 def get_model():
-
     coeff = {
         "1": {"e": 1 / 4, "p": -1 / 4, "n": 0},
         "4": {"e": const.mu_tilde_e, "p": -const.mu_tilde_p, "n": 0},
