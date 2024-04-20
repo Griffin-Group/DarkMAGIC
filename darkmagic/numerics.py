@@ -4,7 +4,7 @@ import numpy as np
 from numpy import linalg as LA
 from numpy.typing import ArrayLike
 
-import DarkMAGIC.constants as const
+import darkmagic.constants as const
 
 
 class Numerics:

@@ -1,7 +1,7 @@
 import h5py
 import numpy as np
 
-from DarkMAGIC.parallel import ROOT_PROCESS
+from darkmagic.parallel import ROOT_PROCESS
 
 
 def write_output(

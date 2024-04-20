@@ -1,6 +1,6 @@
 import numpy as np
 
-from DarkMAGIC.constants import levi_civita
+from darkmagic.constants import levi_civita
 
 
 # TODO: c_dict and c_dict_form should prob just be merged?

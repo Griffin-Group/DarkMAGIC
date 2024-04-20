@@ -1,7 +1,7 @@
 import numpy as np
 import numpy.linalg as LA
 
-import DarkMAGIC.constants as const
+import darkmagic.constants as const
 
 
 class MBDistribution:

@@ -5,7 +5,7 @@ from numpy.typing import ArrayLike
 from pymatgen.core.structure import Structure
 from radtools import MagnonDispersion, SpinHamiltonian
 
-import DarkMAGIC.constants as const
+import darkmagic.constants as const
 
 
 class MaterialProperties:

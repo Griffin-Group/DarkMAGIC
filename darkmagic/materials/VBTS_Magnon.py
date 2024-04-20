@@ -10,8 +10,8 @@ from radtools import (
     SpinHamiltonian,
 )
 
-import DarkMAGIC.constants as const
-from DarkMAGIC.material import MagnonMaterial, MaterialProperties
+import darkmagic.constants as const
+from darkmagic.material import MagnonMaterial, MaterialProperties
 
 
 def get_material():

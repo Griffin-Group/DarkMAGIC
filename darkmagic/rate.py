@@ -4,11 +4,11 @@ import numpy as np
 import numpy.linalg as LA
 from numpy.typing import ArrayLike
 
-import DarkMAGIC.constants as const
-from DarkMAGIC.material import MagnonMaterial
-from DarkMAGIC.model import Model
-from DarkMAGIC.numerics import Numerics
-from DarkMAGIC.v_integrals import MBDistribution
+import darkmagic.constants as const
+from darkmagic.material import MagnonMaterial
+from darkmagic.model import Model
+from darkmagic.numerics import Numerics
+from darkmagic.v_integrals import MBDistribution
 
 
 class Calculation:
