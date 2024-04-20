@@ -2,3 +2,5 @@
 out/*
 darkmagic/grids.py
 *.out
+*.egg*
+dist/**

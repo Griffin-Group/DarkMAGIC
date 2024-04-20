@@ -1,3 +1,43 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dark-magic"
+version = "0.0.1"
+authors = [
+  { name="Omar A. Ashour", email="ashour@berkeley.edu" },
+]
+description = "Dark Matter Ab initio maGnon/phonon Interaction Calculator (DarkMAGIC) is a python package for computing DM interaction rates with collective excitations based on ab initio calculations of material properties."
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "mpi4py",
+    "phonopy",
+    "pymatgen",
+    "rad-tools",
+]
+classifiers=[
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+
+[project.urls]
+Homepage = "https://github.com/oashour/DarkMAGIC"
+Issues = "https://github.com/oashour/DarkMAGIC/issues"
+
+[tool.setuptools.packages]
+find = {}  # Scan the project directory with the default parameters
+
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.
 exclude = [
