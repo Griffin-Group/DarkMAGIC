@@ -170,7 +170,7 @@ def get_material():
     spin = 3 / 2
     hamiltonian = get_MVBT_hamiltonian("data/VBTS.vasp", J, spin_direction, spin)
     m_cell = 2749.367e9  # YIG mass, all ions
-    m_cell = 1643.2017317087846e9 # VBTS mass, magnetic cell
+    m_cell = 1643.2017317087846e9  # VBTS mass, magnetic cell
     n_atoms = len(hamiltonian.magnetic_atoms)
     properties = MaterialProperties(lambda_S=np.ones(n_atoms))
     return MagnonMaterial("VBTS", properties, hamiltonian, m_cell)

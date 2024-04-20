@@ -95,7 +95,7 @@ class MBDistribution:
         (i.e., for each q-point and mode, we get a 3x3 matrix)
 
         This suffers from a similar problem to g1, the definition
-        in PhonoDark is quite different from the paper (including 
+        in PhonoDark is quite different from the paper (including
         the definition of what I call F below) and I don't know
         how to reconcile them. It also invovles a rotation,
         like in g1.
