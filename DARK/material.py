@@ -214,6 +214,8 @@ class MagnonMaterial(Material):
         properties: MaterialProperties,
         hamiltonian: SpinHamiltonian,
         m_cell: float,
+        nodmi=False,
+        noaniso=False,
     ):
         """
         In the current implementation, the hamiltonian only
@@ -227,7 +229,7 @@ class MagnonMaterial(Material):
         self.hamiltonian = hamiltonian
         n_atoms = len(hamiltonian.magnetic_atoms)
         self.n_modes = n_atoms
-        self.dispersion = MagnonDispersion(hamiltonian, phase_convention="tanner")
+        self.dispersion = MagnonDispersion(hamiltonian, phase_convention="tanner", nodmi=nodmi, noaniso=noaniso)
 
         n_atoms = len(hamiltonian.magnetic_atoms)  # Number of magnetic atoms
         properties.validate_for_magnons(n_atoms)
@@ -290,7 +292,7 @@ class MagnonMaterial(Material):
         sort_order = np.argsort(L)[::-1]
         # Note: Testing shows that the exact sort order (Tanner's Eq. I4) is not necessary
         # The SpinW (Lake and Toth) sort order works just fine
-        # sort_order = np.concatenate((sort_order[:N], sort_order[2 * N : N - 1 : -1]))
+        sort_order = np.concatenate((sort_order[:N], sort_order[2 * N : N - 1 : -1]))
         U = U[:, sort_order]
         L = np.diag(L[sort_order])
 
