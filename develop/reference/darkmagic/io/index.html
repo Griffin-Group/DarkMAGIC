@@ -999,6 +999,19 @@ num_bins and num_modes respectively.</p>
     ...
 ]
 This format is temporary, just for backwards compatibility with PhonoDark.</p>
+<p>Args:
+- out_file: Path to the output HDF5 file.
+- material: Material object.
+- model: Model object.
+- numerics: Numerics object.
+- masses: List of masses for the jobs.
+- times: List of times for the jobs.
+- all_total_rate_list: List of total rate data.
+- all_diff_rate_list: List of differential rate data.
+- all_binned_rate_list: List of binned rate data.
+- comm: MPI communicator for parallel writing (default is None).</p>
+<p>Returns:
+- None</p>
 
           <details class="quote">
             <summary>Source code in <code>darkmagic/io.py</code></summary>
@@ -1120,7 +1133,22 @@ This format is temporary, just for backwards compatibility with PhonoDark.</p>
 <span class="normal">189</span>
 <span class="normal">190</span>
 <span class="normal">191</span>
-<span class="normal">192</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">write_hdf5</span><span class="p">(</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">write_hdf5</span><span class="p">(</span>
     <span class="n">out_file</span><span class="p">,</span>
     <span class="n">material</span><span class="p">,</span>
     <span class="n">model</span><span class="p">,</span>
@@ -1152,6 +1180,21 @@ This format is temporary, just for backwards compatibility with PhonoDark.</p>
 <span class="sd">        ...</span>
 <span class="sd">    ]</span>
 <span class="sd">    This format is temporary, just for backwards compatibility with PhonoDark.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    - out_file: Path to the output HDF5 file.</span>
+<span class="sd">    - material: Material object.</span>
+<span class="sd">    - model: Model object.</span>
+<span class="sd">    - numerics: Numerics object.</span>
+<span class="sd">    - masses: List of masses for the jobs.</span>
+<span class="sd">    - times: List of times for the jobs.</span>
+<span class="sd">    - all_total_rate_list: List of total rate data.</span>
+<span class="sd">    - all_diff_rate_list: List of differential rate data.</span>
+<span class="sd">    - all_binned_rate_list: List of binned rate data.</span>
+<span class="sd">    - comm: MPI communicator for parallel writing (default is None).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    - None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">get_dicts</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">numerics</span><span class="p">,</span> <span class="n">masses</span><span class="p">,</span> <span class="n">times</span><span class="p">):</span>

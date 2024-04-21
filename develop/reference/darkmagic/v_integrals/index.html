@@ -1157,12 +1157,16 @@ See Eq. C11 in EFT paper (2009.13534)</p>
 <p>The result is a 3D array of shape (n_q, n_modes, 3)
 (i.e., for each q-point and mode, we get a 3-vector)</p>
 <p>This integral is equivalent to</p>
-<p>g1 = (v_star \hat{q} - v_e - ec{q}/2/m_chi) * g0</p>
+<div class="arithmatex">\[
+g1 = (v_star \hat{q} - v_e - ec{q}/2/m_chi) * g0
+\]</div>
 
 <details class="note" open>
   <summary>this is defined slightly differently in the original</summary>
   <p>phonodark. Specifically,</p>
-</details>      <p>g1 = (v_star R[:,2] - v_e) * g0</p>
+</details>      <div class="arithmatex">\[
+g1 = (v_star R[:,2] - v_e) * g0
+\]</div>
 <p>where R is a matrix that rotates \hat{q} to lie along the z-axis</p>
   </div>
 
@@ -1236,7 +1240,9 @@ This is the term that multiplies (1 - qhat \otimes qhat) in the g2 integral</p>
   <div class="doc doc-contents ">
   
       <p>Computes the X vector for each (q, omega) pair</p>
-<p>X = (\omega / |q|) \hat{q} - (\mathbb{1} - \hat{q} \otimes \hat{q}) v_e</p>
+<div class="arithmatex">\[
+X = (\omega / |q|) \hat{q} - (\mathbb{1} - \hat{q} \otimes \hat{q}) v_e
+\]</div>
 <p>The result is a 3D array of shape (n_q, n_modes, 3)</p>
   </div>
 
