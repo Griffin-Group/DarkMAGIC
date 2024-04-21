@@ -16,13 +16,13 @@ class MaterialProperties:
 
 
     Attributes:
-        N (dict): Dictionary of number densities for different particles.
-        S (dict): Dictionary of spin vectors for different particles.
-        L (dict): Dictionary of orbital angular momentum vectors for different particles.
-        L_dot_S (dict): Dictionary of dot products of orbital angular momentum and spin vectors for different particles.
-        L_tens_S (dict): Dictionary of tensor products of orbital angular momentum and spin vectors for different particles.
-        lambda_S (ArrayLike): Array-like object representing the spin-spin interaction strength.
-        lambda_L (ArrayLike): Array-like object representing the orbital-orbital interaction strength.
+        N (dict): Fermion numbers.
+        S (dict): Spin vectors.
+        L (dict): Orbital angular momentum vectors.
+        L_dot_S (dict): $L \cdot S$
+        L_tens_S (dict): Spin orbit coupling tensor $L \otimes S$
+        lambda_S (ArrayLike): spin-coefficient for magnons
+        lambda_L (ArrayLike): orbital angular mom.-coefficient for magnons
         m_psi (dict): Dictionary of masses for different particles.
 
     Methods:

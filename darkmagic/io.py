@@ -103,6 +103,21 @@ def write_hdf5(
         ...
     ]
     This format is temporary, just for backwards compatibility with PhonoDark.
+
+    Args:
+    - out_file: Path to the output HDF5 file.
+    - material: Material object.
+    - model: Model object.
+    - numerics: Numerics object.
+    - masses: List of masses for the jobs.
+    - times: List of times for the jobs.
+    - all_total_rate_list: List of total rate data.
+    - all_diff_rate_list: List of differential rate data.
+    - all_binned_rate_list: List of binned rate data.
+    - comm: MPI communicator for parallel writing (default is None).
+
+    Returns:
+    - None
     """
 
     def get_dicts(model, numerics, masses, times):

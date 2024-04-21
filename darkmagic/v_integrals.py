@@ -73,12 +73,16 @@ class MBDistribution:
 
         This integral is equivalent to
 
+        $$
         g1 = (v_star \hat{q} - v_e - \vec{q}/2/m_chi) * g0
+        $$
 
         Note: this is defined slightly differently in the original
               phonodark. Specifically,
 
+        $$
         g1 = (v_star R[:,2] - v_e) * g0
+        $$
 
         where R is a matrix that rotates \hat{q} to lie along the z-axis
         """
@@ -130,7 +134,9 @@ class MBDistribution:
         """
         Computes the X vector for each (q, omega) pair
 
+        $$
         X = (\omega / |q|) \hat{q} - (\mathbb{1} - \hat{q} \otimes \hat{q}) v_e
+        $$
 
         The result is a 3D array of shape (n_q, n_modes, 3)
         """
