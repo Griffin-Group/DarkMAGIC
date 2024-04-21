@@ -14,14 +14,13 @@ for path in sorted(src.rglob("*.py")):
     doc_path = path.relative_to(src).with_suffix(".md")
     full_doc_path = Path("reference", doc_path)
 
-    print(module_path)
     parts = tuple(module_path.parts)
 
     if parts[-1] == "__init__":
         parts = parts[:-1]
         doc_path = doc_path.with_name("index.md")
         full_doc_path = full_doc_path.with_name("index.md")
-    elif parts[-1] == "__main__":
+    elif parts[-1] in ("__main__", "run"):
         continue
 
     nav[parts] = doc_path.as_posix()
