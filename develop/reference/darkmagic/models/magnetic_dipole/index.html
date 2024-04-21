@@ -8,28 +8,28 @@
       
       
       
-        <link rel="canonical" href="https://oashour.github.io/DarkMAGIC/develop/formalism/">
+        <link rel="canonical" href="https://oashour.github.io/DarkMAGIC/develop/reference/darkmagic/models/magnetic_dipole/">
       
       
-        <link rel="prev" href="..">
+        <link rel="prev" href="../anapole/">
       
       
-        <link rel="next" href="../reference/darkmagic/">
+        <link rel="next" href="../../numerics/">
       
       
-      <link rel="icon" href="../assets/images/favicon.png">
+      <link rel="icon" href="../../../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.18">
     
     
       
-        <title>Formalism - DarkMAGIC</title>
+        <title>magnetic_dipole - DarkMAGIC</title>
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.66ac8b77.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.66ac8b77.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.06af60db.min.css">
       
       
 
@@ -48,13 +48,13 @@
       
     
     
-      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../../../../assets/_mkdocstrings.css">
     
-      <link rel="stylesheet" href="../css/code_select.css">
+      <link rel="stylesheet" href="../../../../css/code_select.css">
     
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.css">
     
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -79,6 +79,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#darkmagic.models.magnetic_dipole" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -95,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="DarkMAGIC" class="md-header__button md-logo" aria-label="DarkMAGIC" data-md-component="logo">
+    <a href="../../../.." title="DarkMAGIC" class="md-header__button md-logo" aria-label="DarkMAGIC" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
@@ -115,7 +120,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Formalism
+              magnetic_dipole
             
           </span>
         </div>
@@ -243,7 +248,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="DarkMAGIC" class="md-nav__button md-logo" aria-label="DarkMAGIC" data-md-component="logo">
+    <a href="../../../.." title="DarkMAGIC" class="md-nav__button md-logo" aria-label="DarkMAGIC" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
@@ -273,7 +278,7 @@
   
   
     <li class="md-nav__item">
-      <a href=".." class="md-nav__link">
+      <a href="../../../.." class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -290,17 +295,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../../../formalism/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -309,7 +307,6 @@
   
 
       </a>
-      
     </li>
   
 
@@ -318,17 +315,19 @@
       
   
   
+    
   
   
+  
     
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
           <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
@@ -342,7 +341,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             Code Reference
@@ -353,22 +352,24 @@
                 
   
   
+    
   
   
+  
     
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" checked>
         
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../reference/darkmagic/" class="md-nav__link ">
+            <a href="../../" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -385,7 +386,7 @@
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3_1">
             <span class="md-nav__icon md-icon"></span>
             darkmagic
@@ -399,7 +400,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/darkmagic/constants/" class="md-nav__link">
+      <a href="../../constants/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -420,7 +421,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/darkmagic/io/" class="md-nav__link">
+      <a href="../../io/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -441,7 +442,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/darkmagic/material/" class="md-nav__link">
+      <a href="../../material/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -474,7 +475,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../reference/darkmagic/materials/" class="md-nav__link ">
+            <a href="../../materials/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -505,7 +506,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/darkmagic/materials/VBTS_Magnon/" class="md-nav__link">
+      <a href="../../materials/VBTS_Magnon/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -526,7 +527,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/darkmagic/materials/YIG_Magnon/" class="md-nav__link">
+      <a href="../../materials/YIG_Magnon/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -555,7 +556,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/darkmagic/model/" class="md-nav__link">
+      <a href="../../model/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -573,22 +574,24 @@
                 
   
   
+    
   
   
+  
     
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1_6" checked>
         
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../reference/darkmagic/models/" class="md-nav__link ">
+            <a href="../" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -605,7 +608,7 @@
             
           </div>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_1_6_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_1_6_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3_1_6">
             <span class="md-nav__icon md-icon"></span>
             models
@@ -619,7 +622,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/darkmagic/models/anapole/" class="md-nav__link">
+      <a href="../anapole/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -637,10 +640,28 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../reference/darkmagic/models/magnetic_dipole/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    magnetic_dipole
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -649,6 +670,33 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#darkmagic.models.magnetic_dipole" class="md-nav__link">
+    <span class="md-ellipsis">
+      magnetic_dipole
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -669,7 +717,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/darkmagic/numerics/" class="md-nav__link">
+      <a href="../../numerics/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -690,7 +738,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/darkmagic/parallel/" class="md-nav__link">
+      <a href="../../parallel/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -711,7 +759,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/darkmagic/rate/" class="md-nav__link">
+      <a href="../../rate/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -732,7 +780,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/darkmagic/v_integrals/" class="md-nav__link">
+      <a href="../../v_integrals/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -796,7 +844,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/docs/gen_ref_pages/" class="md-nav__link">
+      <a href="../../../docs/gen_ref_pages/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -843,6 +891,23 @@
   
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#darkmagic.models.magnetic_dipole" class="md-nav__link">
+    <span class="md-ellipsis">
+      magnetic_dipole
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -859,9 +924,34 @@
   
 
 
-  <h1>Formalism</h1>
+  <h1>magnetic_dipole</h1>
+
+<div class="doc doc-object doc-module">
 
 
+
+<a id="darkmagic.models.magnetic_dipole"></a>
+  <div class="doc doc-contents first">
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
 
 
 
@@ -912,12 +1002,12 @@
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "..", "features": ["search.highlight", "search.share"], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "../../../..", "features": ["search.highlight", "search.share"], "search": "../../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.3220b9d7.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.3220b9d7.min.js"></script>
       
-        <script src="../js/katex.js"></script>
+        <script src="../../../../js/katex.js"></script>
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js"></script>
       
