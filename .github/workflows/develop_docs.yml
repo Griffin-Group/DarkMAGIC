@@ -18,7 +18,8 @@ jobs:
       - name: Install Dependencies
         run: |
           pip install mkdocs-material
-          pip install mike
+          pip install mike mkdocstrings mkdocstrings-python
+          pip install mkdocs-literate-nav mkdocs-gen-files mkdocs-section-index
       - name: Setup Docs Deploy
         run: |
           git config --global user.name "Docs Deploy"
