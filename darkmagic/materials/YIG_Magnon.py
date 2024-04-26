@@ -5,7 +5,7 @@ from pymatgen.core.structure import Structure
 from radtools import Atom, Crystal, ExchangeParameter, Lattice, SpinHamiltonian
 
 import darkmagic.constants as const
-from darkmagic.material import MagnonMaterial, MaterialProperties
+from darkmagic.material import MagnonMaterial, MaterialParameters
 
 
 def get_material():
@@ -119,7 +119,7 @@ def get_material():
         "n": np.zeros((n_atoms, 3, 3)),
     }
 
-    properties = MaterialProperties(
+    properties = MaterialParameters(
         N=N, L=L, L_tens_S=L_tens_S, lambda_S=np.ones(n_atoms)
     )
     return MagnonMaterial("YIG", properties, hamiltonian, m_cell)

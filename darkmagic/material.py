@@ -8,9 +8,10 @@ from pymatgen.core.structure import Structure
 from radtools import MagnonDispersion, SpinHamiltonian
 
 import darkmagic.constants as const
+from darkmagic.numerics import MonkhorstPackGrid
 
 
-class MaterialProperties:
+class MaterialParameters:
     r"""
     Class for DM-relevant material properties, such as the number of fermions, spin, orbital angular momentum, etc.
 
@@ -177,7 +178,7 @@ class Material:
     def __init__(
         self,
         name: str,
-        properties: MaterialProperties,
+        properties: MaterialParameters,
         structure: Structure,
         m_atoms: ArrayLike,
     ):
@@ -224,7 +225,7 @@ class PhononMaterial(Material):
     """
 
     def __init__(
-        self, name: str, properties: MaterialProperties, phonopy_yaml_path: str
+        self, name: str, properties: MaterialParameters, phonopy_yaml_path: str
     ):
         """
         Constructor for PhononMaterial objects.
@@ -348,6 +349,19 @@ class PhononMaterial(Material):
             self._q_cut = 10.0 * np.sqrt(np.amax(self.m_atoms) * self.max_dE)
         return self._q_cut
 
+    def get_W_tensor(self, grid: MonkhorstPackGrid) -> np.ndarray:
+        """
+        Computes the W tensor for the given Monkhorst-Pack grid.
+
+        Args:
+            grid (MonkhorstPackGrid): The Monkhorst-Pack grid.
+
+        Returns:
+            np.ndarray: The W tensor.
+
+        """
+        pass
+
 
 class MagnonMaterial(Material):
     """
@@ -362,7 +376,7 @@ class MagnonMaterial(Material):
     def __init__(
         self,
         name: str,
-        properties: MaterialProperties,
+        properties: MaterialParameters,
         hamiltonian: SpinHamiltonian,
         m_cell: float,
         nodmi: bool = False,

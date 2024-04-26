@@ -1,3 +1,4 @@
+*.swp
 **/__pycache__/*
 out/*
 darkmagic/grids.py
@@ -6,3 +7,8 @@ darkmagic/grids.py
 dist/**
 site/**
 build/**
+test.ipynb
+FeGe_Magnon.py
+MnO_Magnon.py
+*.pickle
+VBT.vasp

@@ -5,7 +5,7 @@ import pytest
 from pytest_parametrize_cases import Case, parametrize_cases
 
 import darkmagic.constants as const
-from darkmagic.material import MaterialProperties, PhononMaterial
+from darkmagic.material import MaterialParameters, PhononMaterial
 
 TEST_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -37,10 +37,10 @@ def create_test_dict(n_atoms, rank, zeros=False):
         n_atoms=5,
     )
 )
-def test_material_properties_initialization(
+def test_material_parameters_initialization(
     N, S, L, L_dot_S, L_tens_S, lambda_S, lambda_L, m_psi, n_atoms
 ):
-    props = MaterialProperties(N, S, L, L_dot_S, L_tens_S, lambda_S, lambda_L, m_psi)
+    props = MaterialParameters(N, S, L, L_dot_S, L_tens_S, lambda_S, lambda_L, m_psi)
     test_scalar = create_test_dict(n_atoms, 0, zeros=True)
     test_vec = create_test_dict(n_atoms, 1, zeros=True)
     test_tens = create_test_dict(n_atoms, 2, zeros=True)
@@ -141,10 +141,10 @@ def test_material_properties_initialization(
         n_atoms=5,
     ),
 )
-def test_material_properties_phonon(
+def test_material_parameters_phonon(
     N, S, L, L_dot_S, L_tens_S, lambda_S, lambda_L, m_psi, n_atoms
 ):
-    props = MaterialProperties(N, S, L, L_dot_S, L_tens_S, lambda_S, lambda_L, m_psi)
+    props = MaterialParameters(N, S, L, L_dot_S, L_tens_S, lambda_S, lambda_L, m_psi)
     props.validate_for_phonons(n_atoms)
 
 
@@ -175,10 +175,10 @@ def test_material_properties_phonon(
         n_atoms=5,
     ),
 )
-def test_material_properties_magnon(
+def test_material_parameters_magnon(
     N, S, L, L_dot_S, L_tens_S, lambda_S, lambda_L, m_psi, n_atoms
 ):
-    props = MaterialProperties(N, S, L, L_dot_S, L_tens_S, lambda_S, lambda_L, m_psi)
+    props = MaterialParameters(N, S, L, L_dot_S, L_tens_S, lambda_S, lambda_L, m_psi)
     props.validate_for_magnons(n_atoms)
 
 
@@ -268,10 +268,10 @@ def test_material_properties_magnon(
         n_atoms=7,
     ),
 )
-def test_material_properties_invalid(
+def test_material_parameters_invalid(
     N, S, L, L_dot_S, L_tens_S, lambda_S, lambda_L, m_psi, n_atoms
 ):
-    props = MaterialProperties(N, S, L, L_dot_S, L_tens_S, lambda_S, lambda_L, m_psi)
+    props = MaterialParameters(N, S, L, L_dot_S, L_tens_S, lambda_S, lambda_L, m_psi)
     with pytest.raises(AssertionError):
         props._validate_input(n_atoms)
 
@@ -304,7 +304,7 @@ def test_phonon_material(
     dE_max,
     q_cut,
 ):
-    props = MaterialProperties(N=create_test_dict(2, 0))
+    props = MaterialParameters(N=create_test_dict(2, 0))
     material = PhononMaterial("test", props, phonopy_yaml_path)
     assert material.name == "test"
     assert material.n_atoms == n_atoms

@@ -1,6 +1,6 @@
 from darkmagic.material import (
     Material as Material,
-    MaterialProperties as MaterialProperties,
+    MaterialParameters as MaterialParameters,
 )
 from darkmagic.model import Model as Model
 from darkmagic.numerics import Numerics as Numerics
