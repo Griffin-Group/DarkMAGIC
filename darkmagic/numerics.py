@@ -17,15 +17,29 @@ if TYPE_CHECKING:
 
 
 class MonkhorstPackGrid:
+    """
+    A class representing a Monkhorst-Pack grid for Brillouin zone sampling.
+
+    Parameters:
+    """
+
     def __init__(
         self,
         N_grid: ArrayLike,
         material: Material,
         shift: ArrayLike | None = None,
-        use_sym: bool = True,
+        use_sym: bool = False,
     ):
+        """
+        Constructor for the MonkhorstPackGrid class.
+
+        N_grid (ArrayLike): The number of grid points along each reciprocal lattice vector.
+        material (Material): The material for which the grid is generated.
+        shift (ArrayLike | None, optional): The shift applied to the grid. Defaults to a shifted grid, since that's necessary for the DWF.
+        use_sym (bool, optional): Whether to use symmetry to reduce the number of grid points. Defaults to False. The W tensor is only calculated once so this isn't necessary to use and causes issues.
+        """
         if shift is None:
-            shift = [0, 0, 0]
+            shift = [1, 1, 1]
         self.N_grid = N_grid
         # SGA struggles with the struct in 1/eV, so we scale back to ang
         struct = deepcopy(material.structure)
