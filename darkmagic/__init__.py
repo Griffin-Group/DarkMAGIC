@@ -1,5 +1,6 @@
 from darkmagic.material import (
-    Material as Material,
+    PhononMaterial as PhononMaterial,
+    MagnonMaterial as MagnonMaterial,
     MaterialParameters as MaterialParameters,
 )
 from darkmagic.model import Model as Model

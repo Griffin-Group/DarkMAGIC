@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import itertools
 from copy import deepcopy
-from typing import Tuple
+from typing import TYPE_CHECKING, Tuple
 
 import numpy as np
 from numpy import linalg as LA
@@ -8,7 +10,10 @@ from numpy.typing import ArrayLike
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 
 import darkmagic.constants as const
-from darkmagic.material import Material
+
+# Avoid cyclic imports
+if TYPE_CHECKING:
+    from darkmagic.material import Material
 
 
 class MonkhorstPackGrid:
@@ -28,12 +33,10 @@ class MonkhorstPackGrid:
         sga = SpacegroupAnalyzer(struct)
         if use_sym:
             points = sga.get_ir_reciprocal_mesh(N_grid, is_shift=shift)
-            self.grid_points, self.weights = map(np.array, zip(*points))
+            self.k_frac, self.weights = map(np.array, zip(*points))
         else:
-            self.grid_points, _ = sga.get_ir_reciprocal_mesh_map(N_grid, is_shift=shift)
-            self.weights = np.ones_like(self.grid_points[:, 0])
-
-        print(self.grid_points, self.weights)
+            self.k_frac, _ = sga.get_ir_reciprocal_mesh_map(N_grid, is_shift=shift)
+            self.weights = np.ones_like(self.k_frac[:, 0])
 
 
 class SphericalGrid:

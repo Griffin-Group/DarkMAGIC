@@ -280,7 +280,7 @@ class PhononMaterial(Material):
 
                 * The phonon frequencies are represented as a numpy array of shape (n_k,n_modes)
 
-                * The eigenvectors are represented as a numpy array of shape (n_k, n_modes, n_atoms, 3)
+                * The eigenvectors are represented as a numpy array of shape (n_k, n_atoms, n_modes, 3)
 
                 where n_k is the number of k-points, n_modes is the number of modes,
                 n_atoms is the number of atoms, and the last index is
@@ -300,7 +300,7 @@ class PhononMaterial(Material):
             (len(k_points), self.n_modes, self.n_atoms, 3), dtype=complex
         )
         # Need to reshape the eigenvectors from (n_k, n_modes, n_modes)
-        # to (n_k, n_atoms, n_modes, 3) # TODO: is this correct?
+        # to (n_k, n_modes, n_atoms, 3) # TODO: is this correct?
         if with_eigenvectors:
             # TODO: Should rewrite this with a reshape...
             for q in range(len(k_points)):
@@ -351,7 +351,17 @@ class PhononMaterial(Material):
 
     def get_W_tensor(self, grid: MonkhorstPackGrid) -> np.ndarray:
         """
-        Computes the W tensor for the given Monkhorst-Pack grid.
+        Computes the W tensor for the given Monkhorst-Pack grid. The W tensor for atom $j$ is given by:
+        $$
+        \mathbf{W}_j = \frac{\Omega}{4 m_j} \sum_\nu \int_\text{1BZ} \frac{d^3k}{(2\pi)^3} \frac{\epsilon_{\nu j \bm{k}} \otimes \epsilon_{\nu j \bm{k}}^*}{\omega_{\nu \bm{k}}}
+        $$
+
+        The Debye-Waller factor can be computed from the W tensor as:
+        $$
+        W_j(\bm{q}) = \bm{q} \cdot (\mathbf{W}_j \bm{q})
+        $$
+
+        From the full definition of the DWF it is clear that is real, and since $q$ is real, the W tensor must also be real, although it is not immediately obvious from the definition (which in general will only have a zero imaginary part on the diagonal).
 
         Args:
             grid (MonkhorstPackGrid): The Monkhorst-Pack grid.
@@ -360,7 +370,21 @@ class PhononMaterial(Material):
             np.ndarray: The W tensor.
 
         """
-        pass
+        omega, epsilon = self.get_eig(grid.k_frac)
+        # epsilon is (n_k, n_modes, n_atoms, 3)
+        eps_tensor = np.einsum("...i,...j->...ij", epsilon, np.conj(epsilon))
+
+        # Sum over all modes and divide by the frequency
+        W = (
+            # self.structure.volume
+            1
+            / (4 * self.m_atoms[None, :, None, None])
+            * np.sum(eps_tensor / omega[..., None, None, None], axis=1)
+        )
+        # Integrate over the BZ
+        return np.real(
+            np.sum(W * grid.weights[:, None, None, None], axis=0) / np.sum(grid.weights)
+        )
 
 
 class MagnonMaterial(Material):
