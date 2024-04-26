@@ -374,7 +374,6 @@ class PhononMaterial(Material):
 
         # Sum over all modes and divide by the frequency
         W = (
-            # self.structure.volume
             1
             / (4 * self.m_atoms[None, :, None, None])
             * np.sum(eps_tensor / omega[..., None, None, None], axis=1)

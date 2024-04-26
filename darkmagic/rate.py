@@ -36,6 +36,7 @@ class Calculation:
         self.numerics = numerics
         self.grid = numerics.grid(m_chi, self.v_e, material)
 
+    # TODO: Should take this outside the class and make v_e required
     def compute_ve(self, t: float):
         """
         Returns the earth's velocity in the lab frame at time t (in hours)
@@ -120,6 +121,63 @@ class MagnonCalculation(Calculation):
             raise ValueError(
                 f"Unknown model: {model_name}. Generic magnon models not yet implemented, only mdm and ap."
             )
+        tiled_jacobian = np.tile(self.grid.jacobian, (n_modes, 1)).T
+
+        # Integrate to get deltaR
+        vol_element = tiled_jacobian * (
+            (2 * np.pi) ** 3 * np.prod(self.numerics.N_grid)
+        ) ** (-1)
+        deltaR = (
+            (1 / self.material.m_cell)
+            * (const.rho_chi / self.m_chi)
+            * vol_element
+            * sigma_nu_q
+            * g0
+        )
+
+        # Get diff rate, binned rate and total rate
+        diff_rate = np.zeros(max_bin_num)
+        np.add.at(diff_rate, bin_num, deltaR)
+        binned_rate = np.sum(deltaR, axis=0)
+        total_rate = sum(diff_rate)
+
+        return [diff_rate, binned_rate, total_rate]
+
+class PhononCalculation(Calculation):
+    """
+    Class for calculating the differential rate for phonon scattering
+    """
+
+    def calculate_rate(
+        self,
+    ):
+        """
+        Computes the differential rate
+        """
+
+        max_bin_num = math.ceil(self.material.max_dE / self.numerics.bin_width)
+
+        n_modes = self.material.n_modes
+        n_q = len(self.grid.q_cart)
+
+        diff_rate = np.zeros(max_bin_num, dtype=complex)
+        binned_rate = np.zeros(n_modes, dtype=complex)
+        omegas = np.zeros((n_q, n_modes))
+        epsilons = np.zeros((n_q, n_modes, 3), dtype=complex)
+
+        model_name = self.model.name
+
+        omegas, epsilons = self.material.get_eig(self.grid.k_frac)
+        # epsilons is (n_k, n_modes, n_atoms, 3)
+        xj = self.material.structure.cart_coords
+        W_tensor = self.material.get_W_tensor(self.numerics._dwf_grid)
+        DWF = np.dot(self.grid.q_cart, W_tensor @ self.grid.q_cart.T)
+        v_dist = MBDistribution(self.grid, omegas, self.m_chi, self.v_e)
+
+        # Along with omega and epsilons, these are all q*nu arrays
+        bin_num = np.floor((omegas) / self.numerics.bin_width).astype(int)
+        g0 = v_dist.g0
+
         tiled_jacobian = np.tile(self.grid.jacobian, (n_modes, 1)).T
 
         # Integrate to get deltaR
