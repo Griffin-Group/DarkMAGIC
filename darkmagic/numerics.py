@@ -1,51 +1,84 @@
 import itertools
+from copy import deepcopy
+from typing import Tuple
 
 import numpy as np
 from numpy import linalg as LA
 from numpy.typing import ArrayLike
+from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 
 import darkmagic.constants as const
+from darkmagic.material import Material
 
 
-class Numerics:
+class MonkhorstPackGrid:
     def __init__(
         self,
-        N_grid: ArrayLike = None,
-        power_abc: ArrayLike = None,
-        n_DW_xyz: ArrayLike = None,
-        bin_width: float = 1e-3,
-        use_q_cut: bool = True,
-        use_special_mesh: bool = False,
+        N_grid: ArrayLike,
+        material: Material,
+        shift: ArrayLike | None = None,
+        use_sym: bool = True,
     ):
-        if N_grid is None:
-            N_grid = [20, 10, 10]
-        if power_abc is None:
-            power_abc = [2, 1, 1]
-        if n_DW_xyz is None:
-            n_DW_xyz = [20, 20, 20]
-        self.N_grid = np.array(N_grid)
-        self.power_abc = np.array(power_abc)
-        self.n_DW_xyz = np.array(n_DW_xyz)
-        self.bin_width = bin_width
-        self.use_q_cut = use_q_cut
-        self.use_special_mesh = use_special_mesh
-        self._grid = None
+        if shift is None:
+            shift = [0, 0, 0]
+        self.N_grid = N_grid
+        # SGA struggles with the struct in 1/eV, so we scale back to ang
+        struct = deepcopy(material.structure)
+        struct.scale_lattice(struct.volume * (const.inveV_to_Ang) ** 3)
+        sga = SpacegroupAnalyzer(struct)
+        if use_sym:
+            points = sga.get_ir_reciprocal_mesh(N_grid, is_shift=shift)
+            self.grid_points, self.weights = map(np.array, zip(*points))
+        else:
+            self.grid_points, _ = sga.get_ir_reciprocal_mesh_map(N_grid, is_shift=shift)
+            self.weights = np.ones_like(self.grid_points[:, 0])
 
-    def get_grid(self, m_chi, v_e, material):
-        if self._grid is None:
-            self._grid = Grid(m_chi, v_e, self, material)
-        return self._grid
+        print(self.grid_points, self.weights)
 
 
-class Grid:
-    def __init__(self, m_chi, v_e, numerics, material):
+class SphericalGrid:
+    """
+    Represents a spherical grid used for numerical calculations in DarkMAGIC.
+
+
+    Attributes:
+        q_max (float): The maximum value of the q vector (eV).
+        q_cart (ndarray): The Cartesian coordinates of the q vectors (eV).
+        q_frac (ndarray): The fractional coordinates of the q vectors.
+        q_norm (ndarray): The norms of the q vectors (eV).
+        q_hat (ndarray): The unit vectors of the q vectors.
+        G_cart (ndarray): The Cartesian coordinates of the G vectors (eV).
+        G_frac (ndarray): The fractional coordinates of the G vectors.
+        jacobian (ndarray): The Jacobian determinant for the spherical grid.
+        k_frac (ndarray): The fractional coordinates of the k vectors.
+        k_cart (ndarray): The Cartesian coordinates of the k vectors.
+    """
+
+    def __init__(
+        self,
+        m_chi: float,
+        v_e: ArrayLike,
+        use_q_cut: bool,
+        N_grid: ArrayLike,
+        material: Material,
+    ):
+        """
+        Spherical grid constructor.
+
+        Args:
+            m_chi: The mass of the dark matter particle.
+            v_e: The velocity of the Earth.
+            use_q_cut: Whether to use the q_cut value.
+            N_grid: The number of grid points (radial, azimuthal, polar)
+            material: A Material object containing the material properties.
+        """
         # Get q and G vectors
-        q_cut = material.q_cut if numerics.use_q_cut else 1e10
+        q_cut = material.q_cut if use_q_cut else 1e10
         self.q_max = min(2 * m_chi * (const.VESC + const.VE), q_cut)
         self.q_cart, self.q_frac = self._get_q_points(
-            numerics.N_grid, m_chi, v_e, material.recip_cart_to_frac
+            N_grid, m_chi, v_e, material.recip_cart_to_frac
         )
-        # These show up in many so it's efficient to compute them only once
+        # These show up often so it's efficient to compute them only once
         self.q_norm = LA.norm(self.q_cart, axis=1)
         self.q_hat = self.q_cart / self.q_norm[:, None]
 
@@ -59,7 +92,25 @@ class Grid:
         self.k_frac = self.q_frac - self.G_frac
         self.k_cart = np.matmul(self.k_frac, material.recip_frac_to_cart)
 
-    def _get_q_points(self, N_grid, m_chi, v_e, recip_cart_to_frac):
+    def _get_q_points(
+        self,
+        N_grid: ArrayLike,
+        m_chi: float,
+        v_e: ArrayLike,
+        recip_cart_to_frac: ArrayLike,
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Get the q points for the spherical grid.
+
+        Args:
+            N_grid (tuple): A tuple containing the number of points in each direction.
+            m_chi (float): The mass of the DM particle.
+            v_e (float): The velocity of the Earth in natural units
+            recip_cart_to_frac (ndarray): The k-space transformation matrix from Cartesian in Angstroms to fractional coordinates.
+
+        Returns:
+            tuple: A tuple containing the Cartesian and fractional coordinates of the q points.
+        """
         # Get maximum q value and generate spherical grid
         q_cart = self._generate_spherical_grid(self.q_max, *N_grid)
 
@@ -75,7 +126,19 @@ class Grid:
 
         return q_cart, q_frac
 
-    def _get_G_vectors(self, recip_frac_to_cart):
+    def _get_G_vectors(
+        self, recip_frac_to_cart: ArrayLike
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Get the G vectors for each q-point, so that each q can be written as
+        $\bm{q} = \bm{k} + \bm{G}$, for some k in the first Brillouin zone.
+
+        Args:
+            recip_cart_to_frac: The k-space transformation matrix from fractional to cartesian coordinates in Angstroms.
+
+        Returns:
+            A tuple containing the Cartesian and fractional coordinates of the G vectors.
+        """
         # Generate the 8 closest G-vectors to each q-point
         G_frac = np.array(
             [
@@ -95,16 +158,20 @@ class Grid:
         return G_cart, G_frac
 
     @staticmethod
-    def _generate_spherical_grid(radius, n_r, n_phi, n_theta):
+    def _generate_spherical_grid(radius, n_r, n_phi, n_theta) -> np.ndarray:
         """
         Generate a spherical grid inside and up to the surface of a sphere of radius `radius`
         with `n_r` points in the radial direction, `n_theta` points in the polar direction,
         and `n_phi` points in the azimuthal direction.
+
         Args:
-            radius: float, radius of the sphere
-            n_r: int, number of points in the radial direction
-            n_phi: int, number of points in the azimuthal direction
-            n_theta: int, number of points in the polar direction
+            radius (float): The radius of the sphere.
+            n_r (int): The number of points in the radial direction.
+            n_phi (int): The number of points in the azimuthal direction.
+            n_theta (int): The number of points in the polar direction.
+
+        Returns:
+            ndarray: An array containing the Cartesian coordinates of the points in the spherical grid.
         """
         # Using physicists' convention for theta and phi
         delta_r = 1 / (2 * n_r)
@@ -125,3 +192,99 @@ class Grid:
         z = np.outer(r, np.outer(np.cos(theta), np.ones_like(phi))).flatten()
 
         return np.array([x, y, z]).T
+
+
+class Numerics:
+    """
+    A class that represents the numerical parameters for DarkMAGIC calculations.
+
+    Args:
+        N_grid (ArrayLike, optional): The number of grid points in each dimension. Defaults to [20, 10, 10].
+        power_abc (ArrayLike, optional): The power of each dimension in the grid. Defaults to [2, 1, 1].
+        N_DWF_grid (ArrayLike, optional): The number of grid points in each dimension for the density-weighted Fermi grid. Defaults to [20, 20, 20].
+        bin_width (float, optional): The width of the bin. Defaults to 1e-3 (1 meV).
+        use_q_cut (bool, optional): Whether to use a cutoff in momentum space. Defaults to True.
+        use_special_mesh (bool, optional): Whether to use a special mesh for the grid. Defaults to False.
+
+    Attributes:
+        N_grid (ndarray): The number of grid points in the spherical grid used to sample the momentum transfer (radial, azimuthal, polar).
+        power_abc (ndarray): The power of each dimension in the grid (currently unsued)
+        N_DWF_grid (ndarray): The size of the Monkhorst-Pack grid used to compute the Debye-Waller factor.
+        bin_width (float): The width of the energy bin. Rebinning to larger bins is possible in postprocessing.
+        use_q_cut (bool): Whether to use a cutoff for the momentum transfer from DM. If False, the cutoff is set to the maximum possible value $2 m_{\chi} (v_{\text{esc}} + v_{\text{e}})$.
+        use_special_mesh (bool): Whether to use a special mesh for the spherical grid (currently unused)
+
+    Methods:
+        get_grid(m_chi: float, v_e: ArrayLike, material: Material) -> SphericalGrid:
+            Returns the spherical grid for the given dark matter mass, Earth velocity, and material.
+
+        get_DWF_grid(material: Material) -> MonkhorstPackGrid:
+            Returns the Monkhorst-Pack grid for computing the Debye-Waller factor.
+    """
+
+    def __init__(
+        self,
+        N_grid: ArrayLike = None,
+        power_abc: ArrayLike = None,
+        N_DWF_grid: ArrayLike = None,
+        bin_width: float = 1e-3,
+        use_q_cut: bool = True,
+        use_special_mesh: bool = False,
+    ):
+        """
+        Constructor for the Numerics class.
+
+        Args:
+            N_grid (ndarray): The number of grid points in the spherical grid used to sample the momentum transfer (radial, azimuthal, polar).
+            power_abc (ndarray): The power of each dimension in the grid (currently unsued)
+            N_DWF_grid (ndarray): The size of the Monkhorst-Pack grid used to compute the Debye-Waller factor.
+            bin_width (float): The width of the energy bin. Rebinning to larger bins is possible in postprocessing.
+            use_q_cut (bool): Whether to use a cutoff for the momentum transfer from DM. If False, the cutoff is set to the maximum possible value $2 m_{\chi} (v_{\text{esc}} + v_{\text{e}})$.
+            use_special_mesh (bool): Whether to use a special mesh for the spherical grid (currently unused)
+        """
+        if N_grid is None:
+            N_grid = [20, 10, 10]
+        if power_abc is None:
+            power_abc = [2, 1, 1]
+        if N_DWF_grid is None:
+            N_DWF_grid = [20, 20, 20]
+        self.N_grid = np.array(N_grid)
+        self.power_abc = np.array(power_abc)
+        self.N_DWF_grid = np.array(N_DWF_grid)
+        self.bin_width = bin_width
+        self.use_q_cut = use_q_cut
+        self.use_special_mesh = use_special_mesh
+        self._grid = None
+        self._dwf_grid = None
+
+    def get_grid(
+        self, m_chi: float, v_e: ArrayLike, material: Material
+    ) -> SphericalGrid:
+        """
+        Returns the spherical grid object.
+
+        Args:
+            m_chi (float): The mass of the dark matter particle.
+            v_e (ArrayLike): The velocity of the Earth.
+            material (Material): The material object.
+
+        Returns:
+            SphericalGrid: The spherical grid object.
+        """
+        if self._grid is None:
+            self._grid = SphericalGrid(m_chi, v_e, self, material)
+        return self._grid
+
+    def get_DWF_grid(self, material: Material) -> MonkhorstPackGrid:
+        """
+        Returns the density-weighted Fermi grid object.
+
+        Args:
+            material (Material): The material object.
+
+        Returns:
+            MonkhorstPackGrid: The density-weighted Fermi grid object.
+        """
+        if self._dwf_grid is None:
+            self._dwf_grid = MonkhorstPackGrid(self.N_DWF_grid, material)
+        return self._dwf_grid

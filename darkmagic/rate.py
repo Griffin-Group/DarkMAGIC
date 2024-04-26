@@ -34,7 +34,7 @@ class Calculation:
         self.material = material
         self.model = model
         self.numerics = numerics
-        self.grid = numerics.get_grid(m_chi, self.v_e, material)
+        self.grid = numerics.grid(m_chi, self.v_e, material)
 
     def compute_ve(self, t: float):
         """
