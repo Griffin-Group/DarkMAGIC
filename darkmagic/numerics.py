@@ -20,7 +20,9 @@ class MonkhorstPackGrid:
     """
     A class representing a Monkhorst-Pack grid for Brillouin zone sampling.
 
-    Parameters:
+    Attributes:
+        k_frac (ndarray): The fractional coordinates of the k vectors.
+        weights (ndarray): The weights of the k vectors.
     """
 
     def __init__(
