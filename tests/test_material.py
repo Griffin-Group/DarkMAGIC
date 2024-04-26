@@ -1,8 +1,13 @@
-import pytest
+import os
+
 import numpy as np
-from darkmagic.material import MaterialProperties
-import darkmagic.constants as const
+import pytest
 from pytest_parametrize_cases import Case, parametrize_cases
+
+import darkmagic.constants as const
+from darkmagic.material import MaterialProperties, PhononMaterial
+
+TEST_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def create_test_dict(n_atoms, rank, zeros=False):
@@ -269,3 +274,58 @@ def test_material_properties_invalid(
     props = MaterialProperties(N, S, L, L_dot_S, L_tens_S, lambda_S, lambda_L, m_psi)
     with pytest.raises(AssertionError):
         props._validate_input(n_atoms)
+
+
+@parametrize_cases(
+    Case(
+        "hcp_He",
+        phonopy_yaml_path=f"{TEST_DIR}/data/hcp_He_1GPa.phonopy.yaml",
+        n_atoms=2,
+        alat=4.852625323567155,
+        m_atom1=4.00260325415,
+        label1="He",
+        eps=np.diag([1.065579, 1.065579, 1.065579]),
+        bec1=np.zeros((3, 3)),
+        opt_freq=[2.5810436703, 2.5810436703, 6.4343430269],
+        dE_max=6.4343430269 * 1.5,  # 1.5 * max optical phonon
+        q_cut=10
+        * np.sqrt(4.00260325415 * 6.4343430269 * 1.5),  # sqrt(max mass * dE_max)
+    )
+)
+def test_phonon_material(
+    phonopy_yaml_path,
+    n_atoms,
+    alat,
+    m_atom1,
+    label1,
+    eps,
+    bec1,
+    opt_freq,
+    dE_max,
+    q_cut,
+):
+    props = MaterialProperties(N=create_test_dict(2, 0))
+    material = PhononMaterial("test", props, phonopy_yaml_path)
+    assert material.name == "test"
+    assert material.n_atoms == n_atoms
+    assert material.structure.lattice.a == alat * const.Ang_to_inveV
+    assert material.structure.sites[0].label == label1
+    assert material.m_atoms[0] == pytest.approx(m_atom1 * const.amu_to_eV)
+    assert np.all(material.epsilon == eps)
+    assert np.all(material.born[0] == bec1)
+    freq, eigvec = material.get_eig([[0, 0, 0]], with_eigenvectors=True)
+    assert freq.shape == (1, n_atoms * 3)
+    assert eigvec.shape == (1, n_atoms * 3, n_atoms, 3)
+    # Acoustic modes
+    assert np.all(np.abs(freq[0, :2]) < 1e-5)
+    # Compare against optical frequencies at gamma point
+    opt_freq = np.array(opt_freq)
+    assert np.all(np.abs(freq[0, 3:] - opt_freq * const.THz_to_eV) < 1e-5)
+    # Eigvecs should have norm 1/sqrt(2)
+    assert np.all(np.abs(np.linalg.norm(eigvec, axis=-1) - np.sqrt(2) / 2) < 1e-5)
+    assert pytest.approx(material.max_dE) == dE_max * const.THz_to_eV
+    assert pytest.approx(material.q_cut) == q_cut * np.sqrt(
+        const.amu_to_eV * const.THz_to_eV
+    )
+
+    # assert np.allclose(eigvec[0, 0, 0], eigvec11)

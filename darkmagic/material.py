@@ -243,7 +243,7 @@ class PhononMaterial(Material):
 
         properties.validate_for_phonons(n_atoms)
 
-        m_atoms = phonopy_file.primitive.get_masses() * const.amu_to_eV
+        m_atoms = phonopy_file.primitive.masses * const.amu_to_eV
 
         # NAC parameters (born effective charges and dielectric tensor)
         self.born = np.array(
@@ -256,9 +256,9 @@ class PhononMaterial(Material):
         # Create a Structure object
         # At some point should make careful assessment of primitive vs unit_cell
         # PhonoDark uses primitive, but what about when it's different from unit_cell?
-        positions = phonopy_file.primitive.get_scaled_positions()
-        lattice = np.array(phonopy_file.primitive.get_cell()) * const.Ang_to_inveV
-        species = phonopy_file.primitive.get_chemical_symbols()
+        positions = phonopy_file.primitive.scaled_positions
+        lattice = np.array(phonopy_file.primitive.cell) * const.Ang_to_inveV
+        species = phonopy_file.primitive.symbols
 
         structure = Structure(lattice, species, positions)
 
@@ -277,7 +277,7 @@ class PhononMaterial(Material):
         Returns:
             A tuple containing the phonon frequencies and eigenvectors.
 
-                * The phonon frequencies are represented as a numpy array of shape (n_modes,)
+                * The phonon frequencies are represented as a numpy array of shape (n_k,n_modes)
 
                 * The eigenvectors are represented as a numpy array of shape (n_k, n_modes, n_atoms, 3)
 
@@ -295,6 +295,7 @@ class PhononMaterial(Material):
         mesh_dict = self.phonopy_file.get_qpoints_dict()
 
         eigenvectors_pre = mesh_dict.get("eigenvectors", None)
+        # print(eigenvectors_pre)
         # convert frequencies to correct units
         omega = const.THz_to_eV * mesh_dict["frequencies"]
 
@@ -302,7 +303,7 @@ class PhononMaterial(Material):
             (len(k_points), self.n_modes, self.n_atoms, 3), dtype=complex
         )
         # Need to reshape the eigenvectors from (n_k, n_modes, n_modes)
-        # to (n_k, n_atoms, n_modes, 3)
+        # to (n_k, n_atoms, n_modes, 3) # TODO: is this correct?
         if with_eigenvectors:
             # TODO: Should rewrite this with a reshape...
             for q in range(len(k_points)):

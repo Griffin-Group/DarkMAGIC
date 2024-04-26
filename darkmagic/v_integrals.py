@@ -64,7 +64,7 @@ class MBDistribution:
 
     @property
     def g1(self):
-        """
+        r"""
         Computes the g1 integral for each (q, omega) pair
         See Eq. C11 in EFT paper (2009.13534)
 
@@ -115,7 +115,7 @@ class MBDistribution:
 
     @property
     def F(self):
-        """
+        r"""
         Computes the very last term of Eq. (C14) in the EFT paper (2009.13534)
         This is the term that multiplies (1 - qhat \otimes qhat) in the g2 integral
         """
@@ -131,7 +131,7 @@ class MBDistribution:
 
     @property
     def X(self):
-        """
+        r"""
         Computes the X vector for each (q, omega) pair
 
         $$
@@ -150,7 +150,7 @@ class MBDistribution:
 
     @property
     def eye_minus_qhat_qhat(self):
-        """
+        r"""
         Computes the (3x3) matrix (1 - qhat \otimes qhat) for each q-point
         The result is a 3D array of shape (n_q, 3, 3)
         """
