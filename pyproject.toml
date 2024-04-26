@@ -10,7 +10,7 @@ authors = [
 ]
 description = "Dark Matter Ab initio maGnon/phonon Interaction Calculator (DarkMAGIC) is a python package for computing DM interaction rates with collective excitations based on ab initio calculations of material properties."
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 dependencies = [
     "phonopy",
     "pymatgen",
