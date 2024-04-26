@@ -2300,7 +2300,7 @@ Namely, at least one of N, S, L, L_dot_S or L_tens_S must be defined.</p>
 
     <span class="n">properties</span><span class="o">.</span><span class="n">validate_for_phonons</span><span class="p">(</span><span class="n">n_atoms</span><span class="p">)</span>
 
-    <span class="n">m_atoms</span> <span class="o">=</span> <span class="n">phonopy_file</span><span class="o">.</span><span class="n">primitive</span><span class="o">.</span><span class="n">get_masses</span><span class="p">()</span> <span class="o">*</span> <span class="n">const</span><span class="o">.</span><span class="n">amu_to_eV</span>
+    <span class="n">m_atoms</span> <span class="o">=</span> <span class="n">phonopy_file</span><span class="o">.</span><span class="n">primitive</span><span class="o">.</span><span class="n">masses</span> <span class="o">*</span> <span class="n">const</span><span class="o">.</span><span class="n">amu_to_eV</span>
 
     <span class="c1"># NAC parameters (born effective charges and dielectric tensor)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">born</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
@@ -2313,9 +2313,9 @@ Namely, at least one of N, S, L, L_dot_S or L_tens_S must be defined.</p>
     <span class="c1"># Create a Structure object</span>
     <span class="c1"># At some point should make careful assessment of primitive vs unit_cell</span>
     <span class="c1"># PhonoDark uses primitive, but what about when it&#39;s different from unit_cell?</span>
-    <span class="n">positions</span> <span class="o">=</span> <span class="n">phonopy_file</span><span class="o">.</span><span class="n">primitive</span><span class="o">.</span><span class="n">get_scaled_positions</span><span class="p">()</span>
-    <span class="n">lattice</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">phonopy_file</span><span class="o">.</span><span class="n">primitive</span><span class="o">.</span><span class="n">get_cell</span><span class="p">())</span> <span class="o">*</span> <span class="n">const</span><span class="o">.</span><span class="n">Ang_to_inveV</span>
-    <span class="n">species</span> <span class="o">=</span> <span class="n">phonopy_file</span><span class="o">.</span><span class="n">primitive</span><span class="o">.</span><span class="n">get_chemical_symbols</span><span class="p">()</span>
+    <span class="n">positions</span> <span class="o">=</span> <span class="n">phonopy_file</span><span class="o">.</span><span class="n">primitive</span><span class="o">.</span><span class="n">scaled_positions</span>
+    <span class="n">lattice</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">phonopy_file</span><span class="o">.</span><span class="n">primitive</span><span class="o">.</span><span class="n">cell</span><span class="p">)</span> <span class="o">*</span> <span class="n">const</span><span class="o">.</span><span class="n">Ang_to_inveV</span>
+    <span class="n">species</span> <span class="o">=</span> <span class="n">phonopy_file</span><span class="o">.</span><span class="n">primitive</span><span class="o">.</span><span class="n">symbols</span>
 
     <span class="n">structure</span> <span class="o">=</span> <span class="n">Structure</span><span class="p">(</span><span class="n">lattice</span><span class="p">,</span> <span class="n">species</span><span class="p">,</span> <span class="n">positions</span><span class="p">)</span>
 
@@ -2507,7 +2507,7 @@ for the cutoff value of q.</p>
               <p>A tuple containing the phonon frequencies and eigenvectors.</p>
 <ul>
 <li>
-<p>The phonon frequencies are represented as a numpy array of shape (n_modes,)</p>
+<p>The phonon frequencies are represented as a numpy array of shape (n_k,n_modes)</p>
 </li>
 <li>
 <p>The eigenvectors are represented as a numpy array of shape (n_k, n_modes, n_atoms, 3)</p>
@@ -2571,7 +2571,8 @@ for the x, y, z components of the eigenvectors.</p>
 <span class="normal">311</span>
 <span class="normal">312</span>
 <span class="normal">313</span>
-<span class="normal">314</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_eig</span><span class="p">(</span>
+<span class="normal">314</span>
+<span class="normal">315</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_eig</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">k_points</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span> <span class="n">with_eigenvectors</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -2584,7 +2585,7 @@ for the x, y, z components of the eigenvectors.</p>
 <span class="sd">    Returns:</span>
 <span class="sd">        A tuple containing the phonon frequencies and eigenvectors.</span>
 
-<span class="sd">            * The phonon frequencies are represented as a numpy array of shape (n_modes,)</span>
+<span class="sd">            * The phonon frequencies are represented as a numpy array of shape (n_k,n_modes)</span>
 
 <span class="sd">            * The eigenvectors are represented as a numpy array of shape (n_k, n_modes, n_atoms, 3)</span>
 
@@ -2602,6 +2603,7 @@ for the x, y, z components of the eigenvectors.</p>
     <span class="n">mesh_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">phonopy_file</span><span class="o">.</span><span class="n">get_qpoints_dict</span><span class="p">()</span>
 
     <span class="n">eigenvectors_pre</span> <span class="o">=</span> <span class="n">mesh_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;eigenvectors&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="c1"># print(eigenvectors_pre)</span>
     <span class="c1"># convert frequencies to correct units</span>
     <span class="n">omega</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">THz_to_eV</span> <span class="o">*</span> <span class="n">mesh_dict</span><span class="p">[</span><span class="s2">&quot;frequencies&quot;</span><span class="p">]</span>
 
@@ -2609,7 +2611,7 @@ for the x, y, z components of the eigenvectors.</p>
         <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">k_points</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_modes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span>
     <span class="p">)</span>
     <span class="c1"># Need to reshape the eigenvectors from (n_k, n_modes, n_modes)</span>
-    <span class="c1"># to (n_k, n_atoms, n_modes, 3)</span>
+    <span class="c1"># to (n_k, n_atoms, n_modes, 3) # TODO: is this correct?</span>
     <span class="k">if</span> <span class="n">with_eigenvectors</span><span class="p">:</span>
         <span class="c1"># TODO: Should rewrite this with a reshape...</span>
         <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">k_points</span><span class="p">)):</span>
@@ -2803,8 +2805,7 @@ So m_cell needs to be specified separately</p>
 
                 <details class="quote">
                   <summary>Source code in <code>darkmagic/material.py</code></summary>
-                  <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">368</span>
-<span class="normal">369</span>
+                  <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">369</span>
 <span class="normal">370</span>
 <span class="normal">371</span>
 <span class="normal">372</span>
@@ -2862,7 +2863,8 @@ So m_cell needs to be specified separately</p>
 <span class="normal">424</span>
 <span class="normal">425</span>
 <span class="normal">426</span>
-<span class="normal">427</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">427</span>
+<span class="normal">428</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">properties</span><span class="p">:</span> <span class="n">MaterialProperties</span><span class="p">,</span>
@@ -3123,8 +3125,7 @@ N is the number of magnon modes.</p>
 
           <details class="quote">
             <summary>Source code in <code>darkmagic/material.py</code></summary>
-            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">429</span>
-<span class="normal">430</span>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">430</span>
 <span class="normal">431</span>
 <span class="normal">432</span>
 <span class="normal">433</span>
@@ -3151,7 +3152,8 @@ N is the number of magnon modes.</p>
 <span class="normal">454</span>
 <span class="normal">455</span>
 <span class="normal">456</span>
-<span class="normal">457</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_eig</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span> <span class="n">G</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="normal">457</span>
+<span class="normal">458</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_eig</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span> <span class="n">G</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate the eigenvalues and magnon polarization vectors for a given k-point and G-vector.</span>
 
