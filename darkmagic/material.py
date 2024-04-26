@@ -361,8 +361,6 @@ class PhononMaterial(Material):
         W_j(\bm{q}) = \bm{q} \cdot (\mathbf{W}_j \bm{q})
         $$
 
-        From the full definition of the DWF it is clear that is real, and since $q$ is real, the W tensor must also be real, although it is not immediately obvious from the definition (which in general will only have a zero imaginary part on the diagonal).
-
         Args:
             grid (MonkhorstPackGrid): The Monkhorst-Pack grid.
 
@@ -382,8 +380,8 @@ class PhononMaterial(Material):
             * np.sum(eps_tensor / omega[..., None, None, None], axis=1)
         )
         # Integrate over the BZ
-        return np.real(
-            np.sum(W * grid.weights[:, None, None, None], axis=0) / np.sum(grid.weights)
+        return np.sum(W * grid.weights[:, None, None, None], axis=0) / np.sum(
+            grid.weights
         )
 
 
