@@ -1,14 +1,14 @@
 import numpy as np
 from mpi4py.MPI import COMM_WORLD as comm
 
-from DarkMAGIC.io import write_output
+from darkmagic.io import write_output
 
 # Get the example material and model
-from DarkMAGIC.materials.FeGe_Magnon import get_material
-from DarkMAGIC.models.magnetic_dipole import get_model
-from DarkMAGIC.numerics import Numerics
-from DarkMAGIC.parallel import JOB_SENTINEL, ROOT_PROCESS, distribute_load
-from DarkMAGIC.rate import MagnonCalculation
+from darkmagic.materials.FeGe_Magnon import get_material
+from darkmagic.models.magnetic_dipole import get_model
+from darkmagic.numerics import Numerics
+from darkmagic.parallel import JOB_SENTINEL, ROOT_PROCESS, distribute_load
+from darkmagic.rate import MagnonCalculation
 
 
 def main(material, model, numerics, masses, times, hdf5_filename):

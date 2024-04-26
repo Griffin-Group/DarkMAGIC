@@ -284,10 +284,6 @@ class PhononMaterial(Material):
                 where n_k is the number of k-points, n_modes is the number of modes,
                 n_atoms is the number of atoms, and the last index is
                 for the x, y, z components of the eigenvectors.
-
-        Raises:
-            None
-
         """
         # run phonopy in mesh mode
         self.phonopy_file.run_qpoints(k_points, with_eigenvectors=with_eigenvectors)
@@ -323,9 +319,6 @@ class PhononMaterial(Material):
 
         Returns:
             float: the maximum energy deposition
-
-        Raises:
-            None
 
         """
         if self._max_dE is None:
@@ -372,8 +365,8 @@ class MagnonMaterial(Material):
         properties: MaterialProperties,
         hamiltonian: SpinHamiltonian,
         m_cell: float,
-        nodmi=False,
-        noaniso=False,
+        nodmi: bool = False,
+        noaniso: bool = False,
     ):
         """
         Constructor for a magnon material

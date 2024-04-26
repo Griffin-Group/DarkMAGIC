@@ -116,6 +116,10 @@ class MagnonCalculation(Calculation):
             sigma_nu_q = self.sigma_mdm(self.grid.q_cart, epsilons)
         elif model_name == "ap":
             sigma_nu_q = self.sigma_ap(self.grid.q_cart, epsilons)
+        else:
+            raise ValueError(
+                f"Unknown model: {model_name}. Generic magnon models not yet implemented, only mdm and ap."
+            )
         tiled_jacobian = np.tile(self.grid.jacobian, (n_modes, 1)).T
 
         # Integrate to get deltaR
