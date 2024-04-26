@@ -12,10 +12,11 @@ description = "Dark Matter Ab initio maGnon/phonon Interaction Calculator (DarkM
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
-    "mpi4py",
     "phonopy",
     "pymatgen",
     "rad-tools",
+    "h5py",
+    "mpi4py",
 ]
 classifiers=[
     "Programming Language :: Python :: 3",

@@ -5,3 +5,4 @@ darkmagic/grids.py
 *.egg*
 dist/**
 site/**
+build/**
