@@ -11,7 +11,7 @@ import darkmagic.constants as const
 
 
 class MaterialProperties:
-    """
+    r"""
     Class for DM-relevant material properties, such as the number of fermions, spin, orbital angular momentum, etc.
 
 
@@ -45,7 +45,7 @@ class MaterialProperties:
         lambda_L: ArrayLike = None,
         m_psi: dict = None,
     ):
-        """
+        r"""
         Material properties constructor. All dicts have keys "n", "p", "e" for neutron, proton and electron. Any missing values are instantiated to 0.
 
         Args:
@@ -83,6 +83,10 @@ class MaterialProperties:
 
         """
         assert any([self.N, self.S, self.L, self.L_dot_S, self.L_tens_S])
+        for d in [self.N, self.S, self.L, self.L_dot_S, self.L_tens_S]:
+            if d:
+                assert any(np.any(v) for v in d.values())
+
         self._validate_input(n_atoms)
 
     def validate_for_magnons(self, n_atoms: int) -> None:
@@ -113,7 +117,6 @@ class MaterialProperties:
         """
 
         psi = ["e", "p", "n"]
-
         self.N = self.N or {p: np.zeros(n_atoms) for p in psi}
         self.L_dot_S = self.L_dot_S or {p: np.zeros(n_atoms) for p in psi}
         self.S = self.S or {p: np.zeros((n_atoms, 3)) for p in psi}
@@ -147,6 +150,9 @@ class MaterialProperties:
         for d in [self.S, self.L]:
             assert all(v.shape == (n_atoms, 3) for v in d.values())
         assert all(v.shape == (n_atoms, 3, 3) for v in self.L_tens_S.values())
+        # Assert that the lambda_S and lambda_L are arrays of length num_atoms
+        assert len(self.lambda_S) == n_atoms
+        assert len(self.lambda_L) == n_atoms
 
 
 # TODO: make this an abstract class and define Phonon/MagnonMaterial as children
