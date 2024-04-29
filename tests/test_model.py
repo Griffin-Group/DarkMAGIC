@@ -1,193 +1,163 @@
-from numpy import linalg as LA
+import pytest
 from pytest_parametrize_cases import Case, parametrize_cases
 
-import darkmagic.constants as const
 from darkmagic import Model
+from darkmagic.model import (
+    SUPPORTED_OPERATORS,
+    ExtraCoefficientFunctionWarning,
+    MissingCoefficientFunctionException,
+    UnsupportedOperatorException,
+)
 
 
-def get_model_1():
-    coeff = {
-        "1": {"e": 1 / 4, "p": -1 / 4, "n": 1},
-        "2": {"e": 1 / 4, "p": -1 / 4, "n": 1},
-        "3": {"e": 1 / 4, "p": -1 / 4, "n": 1},
-        "4": {"e": const.mu_tilde_e, "p": -const.mu_tilde_p, "n": 1},
-        "5a": {"e": 1, "p": -1, "n": 1},
-        "5b": {"e": 1, "p": -1, "n": 1},
-        "6": {"e": -const.mu_tilde_e, "p": const.mu_tilde_p, "n": 1},
-        "7a": {"e": -const.mu_tilde_e, "p": const.mu_tilde_p, "n": 1},
-        "7b": {"e": -const.mu_tilde_e, "p": const.mu_tilde_p, "n": 1},
-        "8a": {"e": -const.mu_tilde_e, "p": const.mu_tilde_p, "n": 1},
-        "8b": {"e": -const.mu_tilde_e, "p": const.mu_tilde_p, "n": 1},
-        "9": {"e": -const.mu_tilde_e, "p": const.mu_tilde_p, "n": 1},
-        "10": {"e": -const.mu_tilde_e, "p": const.mu_tilde_p, "n": 1},
-        "11": {"e": -const.mu_tilde_e, "p": const.mu_tilde_p, "n": 1},
-        "12a": {"e": -const.mu_tilde_e, "p": const.mu_tilde_p, "n": 1},
-        "12b": {"e": -const.mu_tilde_e, "p": const.mu_tilde_p, "n": 1},
-        "13a": {"e": -const.mu_tilde_e, "p": const.mu_tilde_p, "n": 1},
-        "13b": {"e": -const.mu_tilde_e, "p": const.mu_tilde_p, "n": 1},
-        "14a": {"e": -const.mu_tilde_e, "p": const.mu_tilde_p, "n": 1},
-        "14b": {"e": -const.mu_tilde_e, "p": const.mu_tilde_p, "n": 1},
-        "15a": {"e": -const.mu_tilde_e, "p": const.mu_tilde_p, "n": 1},
-        "15b": {"e": -const.mu_tilde_e, "p": const.mu_tilde_p, "n": 1},
-    }
-
-    def coeff_qmS(op_id, particle_id, q, m_chi, S_chi):
-        def one_func(q, m_chi, spin):
-            return 1.0
-
-        def q_sq_on_mchi_sq(q, m_chi, spin):
-            return LA.norm(q, axis=1) / m_chi**2
-
-        def q_sq_on_mchi_me(q, m_chi, spin):
-            return LA.norm(q, axis=1) / (m_chi * const.m_e)
-
-        def q_sq_on_mchi_mp(q, m_chi, spin):
-            return LA.norm(q, axis=1) / (m_chi * const.m_p)
-
-        def me_on_mchi(q, m_chi, spin):
-            return const.m_e / m_chi
-
-        def mp_on_mchi(q, m_chi, spin):
-            return const.m_p / m_chi
-
-        return {
-            "1": {"e": q_sq_on_mchi_sq, "p": q_sq_on_mchi_sq, "n": one_func},
-            "2": {"e": q_sq_on_mchi_sq, "p": q_sq_on_mchi_sq, "n": one_func},
-            "3": {"e": q_sq_on_mchi_sq, "p": q_sq_on_mchi_sq, "n": one_func},
-            "4": {"e": q_sq_on_mchi_me, "p": q_sq_on_mchi_mp, "n": one_func},
-            "5a": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-            "5b": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-            "6": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-            "7a": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-            "7b": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-            "8a": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-            "8b": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-            "9": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-            "10": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-            "11": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-            "12a": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-            "12b": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-            "13a": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-            "13b": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-            "14a": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-            "14b": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-            "15a": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-            "15b": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-        }[op_id][particle_id](q, m_chi, S_chi)
-
-    return Model("test", coeff, coeff_qmS)
+def one_func(q, m_chi, spin):
+    return 1.0
 
 
-def get_model_2():
-    coeff = {
-        "2": {"p": -1 / 4, "n": 1},
-        "3": {"p": -1 / 4, "n": 1},
-        "4": {"p": -const.mu_tilde_p, "n": 1},
-        "5a": {"p": -1, "n": 1},
-        "5b": {"p": -1, "n": 1},
-        "6": {"p": const.mu_tilde_p, "n": 1},
-        "7a": {"p": const.mu_tilde_p, "n": 1},
-        "7b": {"p": const.mu_tilde_p, "n": 1},
-        "8a": {"p": const.mu_tilde_p, "n": 1},
-        "8b": {"e": 0, "p": const.mu_tilde_p, "n": 1},
-        "9": {"e": 0, "p": const.mu_tilde_p, "n": 1},
-        "10": {"e": 0, "p": const.mu_tilde_p, "n": 1},
-        "11": {"e": 0, "p": const.mu_tilde_p, "n": 1},
-        "12a": {"e": 0, "p": const.mu_tilde_p, "n": 1},
-        "12b": {"e": 0, "p": const.mu_tilde_p, "n": 1},
-        "13a": {"e": 0, "p": const.mu_tilde_p, "n": 1},
-        "13b": {"e": 0, "p": const.mu_tilde_p, "n": 1},
-        "14b": {"e": 0, "p": const.mu_tilde_p, "n": 1},
-        "15b": {"e": 0, "p": const.mu_tilde_p, "n": 1},
-    }
+def get_model(
+    particles,
+    prefactors,
+    operators,
+    zero_coeff_gets_function=False,
+    every_operator_has_function=False,
+    operators_to_remove_funcs=None,
+    particles_to_remove_funcs=None,
+):
+    """
+    Generates a model with the given particles, having certain coefficient prefactors,
+    and only including certain operators. if zero_coeff_gets_function = True, particles with a zero prefactor are assigned a coefficient function (for testing warnings).
+    """
+    coeff_prefactor = {op: {p: prefactors[p] for p in particles} for op in operators}
+    if every_operator_has_function:
+        operators = SUPPORTED_OPERATORS
+    if zero_coeff_gets_function:
+        coeff_func = {op: {p: one_func for p in particles} for op in operators}
+    else:
+        coeff_func = {
+            op: {p: one_func for p in particles if prefactors[p] != 0}
+            for op in operators
+        }
+    if particles_to_remove_funcs:
+        for p in particles_to_remove_funcs:
+            for value in coeff_func.values():
+                value.pop(p, None)
+    if operators_to_remove_funcs:
+        for op in operators_to_remove_funcs:
+            coeff_func.pop(op, None)
 
-    def coeff_qmS(op_id, particle_id, q, m_chi, S_chi):
-        def one_func(q, m_chi, spin):
-            return 1.0
-
-        def q_sq_on_mchi_sq(q, m_chi, spin):
-            return LA.norm(q, axis=1) / m_chi**2
-
-        def q_sq_on_mchi_me(q, m_chi, spin):
-            return LA.norm(q, axis=1) / (m_chi * const.m_e)
-
-        def q_sq_on_mchi_mp(q, m_chi, spin):
-            return LA.norm(q, axis=1) / (m_chi * const.m_p)
-
-        def me_on_mchi(q, m_chi, spin):
-            return const.m_e / m_chi
-
-        def mp_on_mchi(q, m_chi, spin):
-            return const.m_p / m_chi
-
-        return {
-            "1": {"e": q_sq_on_mchi_sq, "p": q_sq_on_mchi_sq, "n": one_func},
-            "2": {"e": q_sq_on_mchi_sq, "p": q_sq_on_mchi_sq, "n": one_func},
-            "3": {"e": q_sq_on_mchi_sq, "p": q_sq_on_mchi_sq, "n": one_func},
-            "4": {"e": q_sq_on_mchi_me, "p": q_sq_on_mchi_mp, "n": one_func},
-            "5a": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-            "5b": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-            "6": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-            "7a": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-            "7b": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-            "8a": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-            "8b": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-            "9": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-            "10": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-            "11": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-            "12a": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-            "12b": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-            "13a": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-            "13b": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-            "14a": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-            "14b": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-            "15a": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-            "15b": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
-        }[op_id][particle_id](q, m_chi, S_chi)
-
-    return Model("test", coeff, coeff_qmS)
-
-
-ALL_OPERATORS = {
-    "1",
-    "2",
-    "3",
-    "4",
-    "5a",
-    "5b",
-    "6",
-    "7a",
-    "7b",
-    "8a",
-    "8b",
-    "9",
-    "10",
-    "11",
-    "12a",
-    "12b",
-    "13a",
-    "13b",
-    "14a",
-    "14b",
-    "15a",
-    "15b",
-}
+    return Model("test", coeff_prefactor, coeff_func)
 
 
 @parametrize_cases(
     Case(
-        "omni_model",
-        model=get_model_1(),
+        "everything_nonzero",
         particles={"e", "p", "n"},
-        operators=ALL_OPERATORS,
+        prefactors={"e": 1, "p": 1, "n": 1},
+        operators=SUPPORTED_OPERATORS,
+        expected_particles={"e", "p", "n"},
+        expected_operators=SUPPORTED_OPERATORS,
     ),
     Case(
-        "some_missing",
-        model=get_model_2(),
-        particles={"n", "p"},
-        operators=ALL_OPERATORS - {"1", "14a", "15a"},
+        "electron_zero",
+        particles={"e", "p", "n"},
+        prefactors={"e": 0, "p": 1, "n": 1},
+        operators=SUPPORTED_OPERATORS - {"1", "2", "3"},
+        expected_particles={"p", "n"},
+        expected_operators=SUPPORTED_OPERATORS - {"1", "2", "3"},
     ),
 )
-def test_particles_operators(model, particles, operators):
-    assert model.particles == particles
-    assert model.operators == operators
+def test_good_models(
+    particles, prefactors, operators, expected_particles, expected_operators
+):
+    model = get_model(
+        particles,
+        prefactors,
+        operators,
+    )
+    assert model.particles == expected_particles
+    assert model.operators == expected_operators
+
+
+@parametrize_cases(
+    Case(
+        "warn_extra_particle_func",
+        particles={"e", "p", "n"},
+        prefactors={"e": 0, "p": 1, "n": 1},
+        operators=SUPPORTED_OPERATORS,
+        expected_particles={"p", "n"},
+        expected_operators=SUPPORTED_OPERATORS,
+    ),
+    Case(
+        "warn_extra_operator_func",
+        particles={"e", "p", "n"},
+        prefactors={"e": 1, "p": 1, "n": 1},
+        operators=SUPPORTED_OPERATORS - {"1", "2", "15a"},
+        expected_particles={"e", "p", "n"},
+        expected_operators=SUPPORTED_OPERATORS - {"1", "2", "15a"},
+    ),
+)
+def test_warning_models(
+    particles, prefactors, operators, expected_particles, expected_operators
+):
+    with pytest.warns(ExtraCoefficientFunctionWarning):
+        model = get_model(
+            particles,
+            prefactors,
+            operators,
+            zero_coeff_gets_function=True,
+            every_operator_has_function=True,
+        )
+    assert model.particles == expected_particles
+    assert model.operators == expected_operators
+
+
+@parametrize_cases(
+    Case(
+        "error_missing_particle_func",
+        particles={"e", "p", "n"},
+        prefactors={"e": 1, "p": 1, "n": 1},
+        operators=SUPPORTED_OPERATORS,
+        operators_to_remove_funcs=None,
+        particles_to_remove_funcs={"e"},
+    ),
+    Case(
+        "error_missing_operator_func",
+        particles={"e", "p", "n"},
+        prefactors={"e": 1, "p": 1, "n": 1},
+        operators=SUPPORTED_OPERATORS,
+        operators_to_remove_funcs={"1", "2", "3"},
+        particles_to_remove_funcs=None,
+    ),
+)
+def test_missing_coeff_models(
+    particles,
+    prefactors,
+    operators,
+    particles_to_remove_funcs,
+    operators_to_remove_funcs,
+):
+    with pytest.raises(MissingCoefficientFunctionException):
+        get_model(
+            particles,
+            prefactors,
+            operators,
+            operators_to_remove_funcs=operators_to_remove_funcs,
+            particles_to_remove_funcs=particles_to_remove_funcs,
+        )
+
+
+@parametrize_cases(
+    Case(
+        "unsupported_operator",
+        particles={"e", "p", "n"},
+        prefactors={"e": 1, "p": 1, "n": 1},
+        operators=SUPPORTED_OPERATORS | {"unsupported"},
+    ),
+)
+def test_unsupported_operator_models(particles, prefactors, operators):
+    with pytest.raises(UnsupportedOperatorException):
+        get_model(
+            particles,
+            prefactors,
+            operators,
+        )

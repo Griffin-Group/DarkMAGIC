@@ -2,6 +2,33 @@ import numpy as np
 
 from darkmagic.constants import levi_civita
 
+import warnings
+
+SUPPORTED_OPERATORS = {
+    "1",
+    "2",
+    "3",
+    "4",
+    "5a",
+    "5b",
+    "6",
+    "7a",
+    "7b",
+    "8a",
+    "8b",
+    "9",
+    "10",
+    "11",
+    "12a",
+    "12b",
+    "13a",
+    "13b",
+    "14a",
+    "14b",
+    "15a",
+    "15b",
+}
+
 
 # TODO: c_dict and c_dict_form should prob just be merged?
 class Model:
@@ -25,9 +52,18 @@ class Model:
         self.Fmed_power = Fmed_power
         self.power_V = power_V
         self.S_chi = S_chi
-        self.coeff_prefactor = coeff_prefactor
-        self.coeff_func = coeff_func  # Needs better name
-        self.operators, self.particles = self.get_operators_and_particles()
+        # self.coeff_prefactor = coeff_prefactor
+        # self.coeff_func = coeff_func  # Needs better name
+        self.operators, self.particles = self.get_operators_and_particles(
+            coeff_prefactor, coeff_func
+        )
+
+        def c(op_id, particle_id, q, m_chi, S_chi):
+            return coeff_prefactor[op_id][particle_id] * coeff_func[op_id][particle_id](
+                q, m_chi, S_chi
+            )
+
+        self.c = c
 
     def screen_coeff(self, q, m_chi, epsilon):
         """
@@ -48,26 +84,72 @@ class Model:
                     alpha, psi, q, m_chi, self.S_chi
                 )
 
-    def get_operators_and_particles(self):
+    @staticmethod
+    def get_operators_and_particles(coeff_prefactor, coeff_func):
         """
         Gets the non-zero operators and particles (psi) from the c_dict
         """
 
         nonzero_pairs = [
             (alpha, psi)
-            for alpha, c_alpha in self.coeff_prefactor.items()
+            for alpha, c_alpha in coeff_prefactor.items()
             for psi, c_psi in c_alpha.items()
             if c_psi != 0
         ]
-        return {pair[0] for pair in nonzero_pairs}, {pair[1] for pair in nonzero_pairs}
+        operators = {pair[0] for pair in nonzero_pairs}
+        particles = {pair[1] for pair in nonzero_pairs}
+        # Check that every operator is supported
+        for alpha in operators:
+            if alpha not in SUPPORTED_OPERATORS:
+                raise UnsupportedOperatorException(
+                    f"Operator {alpha} is not supported."
+                )
+        # Ignore operators that have coefficient function defined but
+        # no non-zero coefficient prefactor
+        for alpha in list(coeff_func.keys()):
+            if alpha not in operators:
+                warnings.warn(
+                    f"Operator {alpha} has a coefficient function defined but no "
+                    "corresponding nonzero coefficient prefactor for any particle. "
+                    "It will be ignored.",
+                    ExtraCoefficientFunctionWarning,
+                )
+                del coeff_func[alpha]
+                continue
+            for psi in list(coeff_func[alpha].keys()):
+                if psi not in particles:
+                    warnings.warn(
+                        f"Operator {alpha} has a coefficient function defined for "
+                        f"particle {psi} but no corresponding nonzero coefficient "
+                        "prefactor. It will be ignored.",
+                        ExtraCoefficientFunctionWarning,
+                    )
+                    del coeff_func[alpha][psi]
+        # Check that every operator with a non-zero coefficient prefactor has
+        # a coefficient function defined
+        if operators != set(coeff_func.keys()):
+            raise MissingCoefficientFunctionException(
+                "Some operators with non-zero coefficient prefactors have "
+                "no coefficient functions defined."
+            )
+        particles_from_func = {
+            key for alpha in coeff_func for key in coeff_func[alpha].keys()
+        }
+        if particles != particles_from_func:
+            raise MissingCoefficientFunctionException(
+                "Some particles with non-zero coefficient prefactors "
+                "have no coefficient functions defined."
+            )
+
+        return operators, particles
 
 
 class Potential:
     def __init__(self, model):
         self.operators = model.operators
         self.particles = model.particles
-        self.coeff = model.coeff
-        self.full_coeff = model.full_coeff
+        self.coeff_prefactor = model.coeff_prefactor
+        self.coeff_func = model.coeff_func
 
     def eval_V(self, q, material, m_chi, S_chi):
         # TODO: expand this to work for arrays of q (needs to change all the way down)
@@ -82,7 +164,7 @@ class Potential:
         # TODO: write this nicer
         for psi in self.particles:
             for alpha in self.operators:
-                C = self.coeff[alpha][psi] * self.full_coeff(
+                C = self.coeff_prefactor[alpha][psi] * self.coeff_func(
                     alpha, psi, q, m_chi, S_chi
                 )
                 for exp_id, V_func in full_V[alpha].items():
@@ -329,3 +411,27 @@ class Potential:
                 ]
             )
         )
+
+
+class MissingCoefficientFunctionException(Exception):
+    """
+    Raised when an operator has a non-zero coefficient prefactor but no coefficient function.
+    """
+
+    pass
+
+
+class ExtraCoefficientFunctionWarning(Warning):
+    """
+    Warning that an operator has a coefficient function but no non-zero coefficient prefactor, so the operator will be ignored.
+    """
+
+    pass
+
+
+class UnsupportedOperatorException(Exception):
+    """
+    Raised when an operator is not supported.
+    """
+
+    pass
