@@ -1,11 +1,11 @@
-from DARK import Model
-import DARK.constants as const
+from darkmagic import Model
+import darkmagic.constants as const
 
 from numpy import linalg as LA
 
 
 def get_model():
-    coeff = {
+    coeff_prefactor = {
         "1": {"e": 1 / 4, "p": -1 / 4, "n": 0},
         "4": {"e": const.mu_tilde_e, "p": -const.mu_tilde_p, "n": 0},
         "5a": {"e": 1, "p": -1, "n": 0},
@@ -13,7 +13,7 @@ def get_model():
         "6": {"e": -const.mu_tilde_e, "p": const.mu_tilde_p, "n": 0},
     }
 
-    def coeff_qmS(op_id, particle_id, q, m_chi, S_chi):
+    def coeff_func(op_id, particle_id, q, m_chi, S_chi):
         def one_func(q, m_chi, spin):
             return 1.0
 
@@ -40,4 +40,4 @@ def get_model():
             "6": {"e": me_on_mchi, "p": mp_on_mchi, "n": one_func},
         }[op_id][particle_id](q, m_chi, S_chi)
 
-    return Model("mdm", coeff, coeff_qmS)
+    return Model("mdm", coeff_prefactor, coeff_func)

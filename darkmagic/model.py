@@ -8,8 +8,8 @@ class Model:
     def __init__(
         self,
         name: str,
-        coeff: dict,
-        coeff_qmS: dict,
+        coeff_prefactor: dict,
+        coeff_func: dict,
         Fmed_power: int = 0,
         power_V: int = 0,
         S_chi: float = 0.5,
@@ -25,9 +25,9 @@ class Model:
         self.Fmed_power = Fmed_power
         self.power_V = power_V
         self.S_chi = S_chi
-        self.coeff = coeff
-        self.coeff_qmS = coeff_qmS  # Needs better name
-        self.operators, self.particles = self.get_operators_and_fermions(coeff)
+        self.coeff_prefactor = coeff_prefactor
+        self.coeff_func = coeff_func  # Needs better name
+        self.operators, self.particles = self.get_operators_and_particles()
 
     def screen_coeff(self, q, m_chi, epsilon):
         """
@@ -37,26 +37,25 @@ class Model:
             "ij,jk,ik->i", q, epsilon, q
         )
         screened_coeff_qmS = {alpha: {} for alpha in self.operators}
-        for alpha, c_alpha in self.coeff.items():
+        for alpha, c_alpha in self.coeff_prefactor.items():
             screened_c = {
                 "e": q2_qepsq * c_alpha.get("e", 0),
                 "n": c_alpha.get("n", 0),
                 "p": c_alpha.get("p", 0) + (1 - q2_qepsq) * c_alpha.get("e", 0),
             }
             for psi in c_alpha.keys():
-                screened_coeff_qmS[alpha][psi] = screened_c[psi] * self.coeff_qmS(
+                screened_coeff_qmS[alpha][psi] = screened_c[psi] * self.coeff_func(
                     alpha, psi, q, m_chi, self.S_chi
                 )
 
-    @staticmethod
-    def get_operators_and_fermions(coeff):
+    def get_operators_and_particles(self):
         """
         Gets the non-zero operators and particles (psi) from the c_dict
         """
 
         nonzero_pairs = [
             (alpha, psi)
-            for alpha, c_alpha in coeff.items()
+            for alpha, c_alpha in self.coeff_prefactor.items()
             for psi, c_psi in c_alpha.items()
             if c_psi != 0
         ]
