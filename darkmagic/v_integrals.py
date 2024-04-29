@@ -155,7 +155,5 @@ class MBDistribution:
         The result is a 3D array of shape (n_q, 3, 3)
         """
         if self._eye_minus_qhat_qhat is None:
-            self._eye_minus_qhat_qhat = np.eye(3) - np.einsum(
-                "ij,ik->ijk", self.grid.q_hat, self.grid.q_hat
-            )
+            self._eye_minus_qhat_qhat = np.eye(3) - self.grid.qhat_qhat
         return self._eye_minus_qhat_qhat

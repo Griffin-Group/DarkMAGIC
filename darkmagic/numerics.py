@@ -109,6 +109,15 @@ class SphericalGrid:
         self.k_frac = self.q_frac - self.G_frac
         self.k_cart = np.matmul(self.k_frac, material.recip_frac_to_cart)
 
+        # Outer product of qhat with itself is frequently used
+        self._qhat_qhat = None
+
+    @property
+    def qhat_qhat(self):
+        if self._qhat_qhat is None:
+            self._qhat_qhat = np.einsum("...i,...j->...ij", self.q_hat, self.q_hat)
+        return self._qhat_qhat
+
     def _get_q_points(
         self,
         N_grid: ArrayLike,
@@ -212,7 +221,7 @@ class SphericalGrid:
 
 
 class Numerics:
-    """
+    r"""
     A class that represents the numerical parameters for DarkMAGIC calculations.
 
     Args:
@@ -248,7 +257,7 @@ class Numerics:
         use_q_cut: bool = True,
         use_special_mesh: bool = False,
     ):
-        """
+        r"""
         Constructor for the Numerics class.
 
         Args:
