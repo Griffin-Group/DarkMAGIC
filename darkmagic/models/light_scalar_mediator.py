@@ -1,4 +1,7 @@
+import numpy as np
+
 from darkmagic import Model
+from darkmagic.numerics import SphericalGrid
 
 
 def get_model():
@@ -13,7 +16,7 @@ def get_model():
         "1": {"e": one_func, "p": one_func, "n": one_func},
     }
 
-    def F_med(q):
-        return q ** (-2)
+    def F_med(grid: SphericalGrid) -> np.array:
+        return grid.q_norm ** (-2)
 
-    return Model("lsm", coeff_prefactor, coeff_func)
+    return Model("lsm", coeff_prefactor, coeff_func, F_med)

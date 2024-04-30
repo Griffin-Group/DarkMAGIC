@@ -1,8 +1,10 @@
+import warnings
+from typing import Callable
+
 import numpy as np
 
 from darkmagic.constants import levi_civita
-
-import warnings
+from darkmagic.numerics import SphericalGrid
 
 SUPPORTED_OPERATORS = {
     "1",
@@ -37,7 +39,7 @@ class Model:
         name: str,
         coeff_prefactor: dict,
         coeff_func: dict,
-        Fmed_power: int = 0,
+        F_med_prop: Callable[[SphericalGrid], np.array] | None = None,
         power_V: int = 0,
         S_chi: float = 0.5,
     ):
@@ -49,12 +51,20 @@ class Model:
         """
         self.name = name
 
-        self.Fmed_power = Fmed_power
+        self.F_med_prop_prop_val = 0  # temporary
+
         self.power_V = power_V
         self.S_chi = S_chi
         self.coeff_prefactor = coeff_prefactor
         self.coeff_func = coeff_func
         self.operators, self.particles = self._get_operators_and_particles()
+        if F_med_prop is None:
+
+            def ones(grid):
+                return np.ones_like(grid.q_norm)
+
+            F_med_prop = ones
+        self.F_med_prop = F_med_prop
         self._validate_coefficients()
 
     def get_unscreened_coeff(self, alpha, psi, grid, m_chi, S_chi):
@@ -174,6 +184,7 @@ class Potential:
         self.needs_g1 = bool("12" or "11" in terms)
         self.needs_g2 = "20" in terms
 
+        # TODO: Should be merged with _get_zeros?
         V = {t: self._get_zeros(t, material.n_atoms, grid) for t in terms}
 
         def get_slice(t):
