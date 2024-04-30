@@ -282,8 +282,8 @@ class Numerics:
         self.bin_width = bin_width
         self.use_q_cut = use_q_cut
         self.use_special_mesh = use_special_mesh
-        self._grid = None
-        self._dwf_grid = None
+        # self._grid = None
+        # self._dwf_grid = None
 
     def get_grid(
         self, m_chi: float, v_e: ArrayLike, material: Material
@@ -299,9 +299,7 @@ class Numerics:
         Returns:
             SphericalGrid: The spherical grid object.
         """
-        if self._grid is None:
-            self._grid = SphericalGrid(m_chi, v_e, self, material)
-        return self._grid
+        return SphericalGrid(m_chi, v_e, self.use_q_cut, self.N_grid, material)
 
     def get_DWF_grid(self, material: Material) -> MonkhorstPackGrid:
         """
@@ -313,6 +311,4 @@ class Numerics:
         Returns:
             MonkhorstPackGrid: The density-weighted Fermi grid object.
         """
-        if self._dwf_grid is None:
-            self._dwf_grid = MonkhorstPackGrid(self.N_DWF_grid, material)
-        return self._dwf_grid
+        return MonkhorstPackGrid(self.N_DWF_grid, material)
