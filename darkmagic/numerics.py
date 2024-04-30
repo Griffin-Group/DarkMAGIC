@@ -59,6 +59,7 @@ class SphericalGrid:
 
 
     Attributes:
+        nq (int): The number of q points.
         q_max (float): The maximum value of the q vector (eV).
         q_cart (ndarray): The Cartesian coordinates of the q vectors (eV).
         q_frac (ndarray): The fractional coordinates of the q vectors.
@@ -95,6 +96,7 @@ class SphericalGrid:
         self.q_cart, self.q_frac = self._get_q_points(
             N_grid, m_chi, v_e, material.recip_cart_to_frac
         )
+        self.nq = self.q_cart.shape[0]
         # These show up often so it's efficient to compute them only once
         self.q_norm = LA.norm(self.q_cart, axis=1)
         self.q_hat = self.q_cart / self.q_norm[:, None]
