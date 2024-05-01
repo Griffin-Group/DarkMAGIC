@@ -2,13 +2,15 @@ import numpy as np
 from mpi4py.MPI import COMM_WORLD as comm
 
 from darkmagic.io import write_output
+from darkmagic.material import MaterialParameters, PhononMaterial
 
 # Get the example material and model
-from darkmagic.materials.FeGe_Magnon import get_material
-from darkmagic.models.magnetic_dipole import get_model
+from darkmagic.benchmark_models import heavy_scalar_mediator
+
+# from darkmagic.models.magnetic_dipole import get_model
 from darkmagic.numerics import Numerics
 from darkmagic.parallel import JOB_SENTINEL, ROOT_PROCESS, distribute_load
-from darkmagic.rate import MagnonCalculation
+from darkmagic.rate import PhononCalculation
 
 
 def main(material, model, numerics, masses, times, hdf5_filename):
@@ -43,7 +45,8 @@ def main(material, model, numerics, masses, times, hdf5_filename):
 
         print(f"Creating calculation object for m={mass:.3f} and t={time:d}")
 
-        calc = MagnonCalculation(mass, material, model, numerics, time=time)
+        # calc = MagnonCalculation(mass, material, model, numerics, time=time)
+        calc = PhononCalculation(mass, material, model, numerics, time=time)
         [diff_rate, binned_rate, total_rate] = calc.calculate_rate()
 
         diff_rate_list.append([job, np.real(diff_rate)])
@@ -85,11 +88,19 @@ def main(material, model, numerics, masses, times, hdf5_filename):
 
 
 if __name__ == "__main__":
-    masses = np.logspace(4, 7, 90)
+    masses = np.logspace(4, 10, 96)
+    # masses = [1e7]
     times = [0]
-    material = get_material()
-    model = get_model()
-    numerics = Numerics(N_grid=[40, 20, 20], use_special_mesh=False)
-    hdf5_filename = f"out/DarkMAGIC_{material.name}_{model.name}.hdf5"
+    params = MaterialParameters(N={"e": [2, 2], "n": [2, 2], "p": [2, 2]})
+    material = PhononMaterial("hcp_He", params, "tests/data/hcp_He_1GPa.phonopy.yaml")
+    # material = get_material()
+    model = heavy_scalar_mediator
+    numerics = Numerics(
+        N_grid=[100, 50, 50],
+        N_DWF_grid=[30, 30, 30],
+        use_special_mesh=False,
+        use_q_cut=True,
+    )
+    hdf5_filename = f"out/DarkMAGIC_{material.name}_{model.shortname}.hdf5"
 
     main(material, model, numerics, masses, times, hdf5_filename)

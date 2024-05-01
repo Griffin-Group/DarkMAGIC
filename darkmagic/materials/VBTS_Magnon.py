@@ -11,7 +11,7 @@ from radtools import (
 )
 
 import darkmagic.constants as const
-from darkmagic.material import MagnonMaterial, MaterialProperties
+from darkmagic.material import MagnonMaterial, MaterialParameters
 
 
 def get_material():
@@ -173,5 +173,5 @@ def get_material():
     m_cell = 2749.367e9  # YIG mass, all ions
     m_cell = 1643.2017317087846e9  # VBTS mass, magnetic cell
     n_atoms = len(hamiltonian.magnetic_atoms)
-    properties = MaterialProperties(lambda_S=np.ones(n_atoms))
+    properties = MaterialParameters(lambda_S=np.ones(n_atoms))
     return MagnonMaterial("VBTS", properties, hamiltonian, m_cell)

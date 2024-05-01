@@ -8,9 +8,10 @@ from pymatgen.core.structure import Structure
 from radtools import MagnonDispersion, SpinHamiltonian
 
 import darkmagic.constants as const
+from darkmagic.numerics import MonkhorstPackGrid
 
 
-class MaterialProperties:
+class MaterialParameters:
     r"""
     Class for DM-relevant material properties, such as the number of fermions, spin, orbital angular momentum, etc.
 
@@ -177,7 +178,7 @@ class Material:
     def __init__(
         self,
         name: str,
-        properties: MaterialProperties,
+        properties: MaterialParameters,
         structure: Structure,
         m_atoms: ArrayLike,
     ):
@@ -224,7 +225,7 @@ class PhononMaterial(Material):
     """
 
     def __init__(
-        self, name: str, properties: MaterialProperties, phonopy_yaml_path: str
+        self, name: str, properties: MaterialParameters, phonopy_yaml_path: str
     ):
         """
         Constructor for PhononMaterial objects.
@@ -237,6 +238,8 @@ class PhononMaterial(Material):
         """
         # TODO: Need a check for when phonopy_yaml does not have NAC
         phonopy_file = phonopy.load(phonopy_yaml=phonopy_yaml_path, is_nac=True)
+        # TODO: should be a dict that has the correct factor for all codes
+        length_factor = const.bohr_to_Ang if phonopy_file.calculator == "qe" else 1.0
         self.phonopy_file = phonopy_file
         n_atoms = phonopy_file.primitive.get_number_of_atoms()
         self.n_modes = 3 * n_atoms
@@ -257,7 +260,9 @@ class PhononMaterial(Material):
         # At some point should make careful assessment of primitive vs unit_cell
         # PhonoDark uses primitive, but what about when it's different from unit_cell?
         positions = phonopy_file.primitive.scaled_positions
-        lattice = np.array(phonopy_file.primitive.cell) * const.Ang_to_inveV
+        lattice = (
+            np.array(phonopy_file.primitive.cell) * const.Ang_to_inveV * length_factor
+        )
         species = phonopy_file.primitive.symbols
 
         structure = Structure(lattice, species, positions)
@@ -279,7 +284,7 @@ class PhononMaterial(Material):
 
                 * The phonon frequencies are represented as a numpy array of shape (n_k,n_modes)
 
-                * The eigenvectors are represented as a numpy array of shape (n_k, n_modes, n_atoms, 3)
+                * The eigenvectors are represented as a numpy array of shape (n_k, n_atoms, n_modes, 3)
 
                 where n_k is the number of k-points, n_modes is the number of modes,
                 n_atoms is the number of atoms, and the last index is
@@ -299,7 +304,7 @@ class PhononMaterial(Material):
             (len(k_points), self.n_modes, self.n_atoms, 3), dtype=complex
         )
         # Need to reshape the eigenvectors from (n_k, n_modes, n_modes)
-        # to (n_k, n_atoms, n_modes, 3) # TODO: is this correct?
+        # to (n_k, n_modes, n_atoms, 3) # TODO: is this correct?
         if with_eigenvectors:
             # TODO: Should rewrite this with a reshape...
             for q in range(len(k_points)):
@@ -345,8 +350,42 @@ class PhononMaterial(Material):
 
         """
         if self._q_cut is None:
-            self._q_cut = 10.0 * np.sqrt(np.amax(self.m_atoms) * self.max_dE)
+            self._q_cut = 10.0 * np.sqrt(np.amax(self.m_atoms) * self.max_dE / 1.5)
         return self._q_cut
+
+    def get_W_tensor(self, grid: MonkhorstPackGrid) -> np.ndarray:
+        r"""
+        Computes the W tensor for the given Monkhorst-Pack grid. The W tensor for atom $j$ is given by:
+        $$
+        \mathbf{W}_j = \frac{\Omega}{4 m_j} \sum_\nu \int_\text{1BZ} \frac{d^3k}{(2\pi)^3} \frac{\epsilon_{\nu j \bm{k}} \otimes \epsilon_{\nu j \bm{k}}^*}{\omega_{\nu \bm{k}}}
+        $$
+
+        The Debye-Waller factor can be computed from the W tensor as:
+        $$
+        W_j(\bm{q}) = \bm{q} \cdot (\mathbf{W}_j \bm{q})
+        $$
+
+        Args:
+            grid (MonkhorstPackGrid): The Monkhorst-Pack grid.
+
+        Returns:
+            np.ndarray: The W tensor.
+
+        """
+        omega, epsilon = self.get_eig(grid.k_frac)
+        # epsilon is (n_k, n_modes, n_atoms, 3)
+        eps_tensor = np.einsum("...i,...j->...ij", epsilon, np.conj(epsilon))
+
+        # Sum over all modes and divide by the frequency
+        W = (
+            1
+            / (4 * self.m_atoms[None, :, None, None])
+            * np.sum(eps_tensor / omega[..., None, None, None], axis=1)
+        )
+        # Integrate over the BZ
+        return np.sum(W * grid.weights[:, None, None, None], axis=0) / np.sum(
+            grid.weights
+        )
 
 
 class MagnonMaterial(Material):
@@ -362,7 +401,7 @@ class MagnonMaterial(Material):
     def __init__(
         self,
         name: str,
-        properties: MaterialProperties,
+        properties: MaterialParameters,
         hamiltonian: SpinHamiltonian,
         m_cell: float,
         nodmi: bool = False,
@@ -510,7 +549,7 @@ class MagnonMaterial(Material):
         # TODO: this should be an average over the BZ
         if self._max_dE is None:
             k = [1 / 2, 0, 0]
-            omega, _ = self.get_eig(self.recip_frac_to_cart @ k)
+            omega, _ = self.get_eig(self.recip_frac_to_cart @ k, [0, 0, 0])
             self._max_dE = 3 * np.amax(omega)
         return self._max_dE
 

@@ -6,7 +6,7 @@ from numpy.typing import ArrayLike
 
 import darkmagic.constants as const
 from darkmagic.material import MagnonMaterial
-from darkmagic.model import Model
+from darkmagic.model import Model, Potential
 from darkmagic.numerics import Numerics
 from darkmagic.v_integrals import MBDistribution
 
@@ -35,7 +35,9 @@ class Calculation:
         self.model = model
         self.numerics = numerics
         self.grid = numerics.get_grid(m_chi, self.v_e, material)
+        self.dwf_grid = numerics.get_DWF_grid(material)
 
+    # TODO: Should take this outside the class and make v_e required
     def compute_ve(self, t: float):
         """
         Returns the earth's velocity in the lab frame at time t (in hours)
@@ -110,11 +112,11 @@ class MagnonCalculation(Calculation):
 
         # Along with omega and epsilons, these are all q*nu arrays
         bin_num = np.floor((omegas) / self.numerics.bin_width).astype(int)
-        g0 = v_dist.g0
+        g0 = v_dist.G0
 
-        if model_name == "mdm":
+        if model_name == "Magnetic Dipole":
             sigma_nu_q = self.sigma_mdm(self.grid.q_cart, epsilons)
-        elif model_name == "ap":
+        elif model_name == "Anapole":
             sigma_nu_q = self.sigma_ap(self.grid.q_cart, epsilons)
         else:
             raise ValueError(
@@ -139,5 +141,94 @@ class MagnonCalculation(Calculation):
         np.add.at(diff_rate, bin_num, deltaR)
         binned_rate = np.sum(deltaR, axis=0)
         total_rate = sum(diff_rate)
+
+        return [diff_rate, binned_rate, total_rate]
+
+
+class PhononCalculation(Calculation):
+    """
+    Class for calculating the differential rate for phonon scattering
+    """
+
+    def calculate_rate(
+        self,
+    ):
+        """
+        Computes the differential rate
+        """
+
+        max_bin_num = math.ceil(self.material.max_dE / self.numerics.bin_width)
+
+        n_modes = self.material.n_modes
+
+        diff_rate = np.zeros(max_bin_num, dtype=complex)
+        binned_rate = np.zeros(n_modes, dtype=complex)
+
+        # (nq, nmodes) and (nq, nmodes, natoms, 3)
+        omegas, epsilons = self.material.get_eig(self.grid.k_frac)
+        # (nq, na, 3, 3)
+        W_tensor = self.material.get_W_tensor(self.dwf_grid)
+
+        # W_j(q) = q_\alpha W_\alpha\beta q_\beta (DWF)
+        W_q_j = (
+            np.sum(
+                W_tensor[None, ...] * self.grid.qhat_qhat[:, None, ...], axis=(2, 3)
+            ).real
+            * self.grid.q_norm[:, None] ** 2
+        )
+        # exp(i G \cdot x_j - W_j(q))
+        xj = self.material.structure.cart_coords
+        G = self.grid.G_cart
+        exponential = np.exp(1j * np.dot(G, xj.T) - W_q_j)  # (nq, na)
+
+        # q_\alpha \epsilon_{k \nu j \alpha}
+        q_dot_epsconj = np.sum(
+            self.grid.q_cart[:, None, None, :] * epsilons.conj(), axis=3
+        )  # (nq, nmodes, na)
+
+        # H(q)_{\nu j} = e^{i G x_j} e^{- W_j(q)}  \times
+        # \frac{q \cdot \epsilon_{k j \nu}^*}{\sqrt{2 m_j \omega_{k \nu}}
+        H_q_nu_j = (exponential[:, None, :] * q_dot_epsconj) / np.sqrt(
+            2 * self.material.m_atoms[None, None, :] * omegas[..., None]
+        )
+        # TODO: better way to deal with this.
+        # We get issues from the very small negative frequencies very close to Gamma
+        # Which we're not avoiding since I don't want to put a build in threshold.
+        H_q_nu_j = np.nan_to_num(H_q_nu_j)
+
+        # Compute potential
+        pot = Potential(self.model)
+        V_q_j = pot.eval_V(self.grid, self.material, self.m_chi, self.model.S_chi)
+
+        # H(q)_{\nu j'}^* \times H(q)_{\nu j}
+        Hs_jp_H_j = H_q_nu_j.conj()[..., None] * H_q_nu_j[..., None, :]
+        # (V^{00}_{j'}(q))^* \times V^{00}_{j}(q)
+        V00s_jp_V00_j = V_q_j["00"].conj()[..., None] * V_q_j["00"][..., None, :]
+        # \Sigma^0_{\nu}(q)=\sum_{jj'} H(q)_{\nu j'}^* H(q)_{\nu j} V_{00 j'}^* V_{00 j}
+        sigma0_q_nu = np.sum(Hs_jp_H_j * V00s_jp_V00_j[:, None, ...], axis=(2, 3)).real
+        # sigma0_q_nu = np.abs(np.sum((H_q_nu_j * V_q_j["00"][:, None, ...]), axis=2))**2
+
+        # Now we need the maxwell boltzmann distribution
+        v_dist = MBDistribution(self.grid, omegas, self.m_chi, self.v_e)
+        G0 = v_dist.G0
+
+        # Integrate to get deltaR
+        tiled_jacobian = np.tile(self.grid.jacobian, (n_modes, 1)).T
+        vol_element = tiled_jacobian * (
+            (2 * np.pi) ** 3 * np.prod(self.numerics.N_grid)
+        ) ** (-1)
+        deltaR = (
+            (1 / self.material.m_cell)
+            * (const.rho_chi / self.m_chi)
+            * vol_element
+            * self.model.F_med_prop(self.grid)[:, None] ** 2
+            * (sigma0_q_nu * G0)
+        )
+        # Get diff rate, binned rate and total rate
+        bin_num = np.floor((omegas) / self.numerics.bin_width).astype(int)
+        diff_rate = np.zeros(max_bin_num)
+        np.add.at(diff_rate, bin_num, deltaR)
+        binned_rate = np.sum(deltaR, axis=0)
+        total_rate = np.sum(diff_rate)
 
         return [diff_rate, binned_rate, total_rate]
