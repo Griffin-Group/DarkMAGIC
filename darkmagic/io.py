@@ -139,7 +139,7 @@ def write_hdf5(
             "spin": model.S_chi,
             "mass_list": masses,
         }
-        coeff = model.coeff
+        coeff = model.coeff_prefactor
         numerics_parameters = {
             "n_a": numerics.N_grid[0],
             "n_b": numerics.N_grid[1],
@@ -147,9 +147,9 @@ def write_hdf5(
             "power_a": numerics.power_abc[0],
             "power_b": numerics.power_abc[1],
             "power_c": numerics.power_abc[2],
-            "n_DW_x": numerics.n_DW_xyz[0],
-            "n_DW_y": numerics.n_DW_xyz[1],
-            "n_DW_z": numerics.n_DW_xyz[2],
+            "n_DW_x": numerics.N_DWF_grid[0],
+            "n_DW_y": numerics.N_DWF_grid[1],
+            "n_DW_z": numerics.N_DWF_grid[2],
             "energy_bin_width": numerics.bin_width,
             "q_cut": numerics.use_q_cut,
             "special_mesh": numerics.use_special_mesh,
