@@ -1,6 +1,8 @@
+import numpy as np
+
 import darkmagic.constants as const
 from darkmagic import Model
-from darkmagic.benchmark_models.utils import q_sq_on_mchi_sq
+from darkmagic.benchmark_models.utils import q_sq_on_mchi_sq, reduced_mass
 
 
 def get_model() -> Model:
@@ -27,6 +29,14 @@ def get_model() -> Model:
         "8b": {"e": q_sq_on_mchi_sq, "p": q_sq_on_mchi_sq},
         "9": {"e": q_sq_on_mchi_sq, "p": q_sq_on_mchi_sq},
     }
+
+    def reference_cross_section(m_chi: float) -> float:
+        return (
+            np.pi
+            / 6
+            * 1
+            / (const.alphaEM**2 * const.m_e**2 * reduced_mass(m_chi, const.m_e) ** 2)
+        )
 
     return Model("Anapole", coeff_prefactor, coeff_func)
 

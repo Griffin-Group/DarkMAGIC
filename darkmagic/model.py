@@ -33,7 +33,6 @@ SUPPORTED_OPERATORS = {
 }
 
 
-# TODO: c_dict and c_dict_form should prob just be merged?
 class Model:
     """
     A class representing a model for dark matter scattering. See the benchmark models for examples on how to define a model.
@@ -55,6 +54,7 @@ class Model:
         coeff_prefactor: dict,
         coeff_func: dict,
         F_med_prop: Callable[[SphericalGrid], np.array] | None = None,
+        ref_cross_sect: Callable[[np.array], np.array] | None = None,
         S_chi: float = 0.5,
         shortname: str = None,
     ):
@@ -66,6 +66,7 @@ class Model:
             coeff_prefactor (dict): A dictionary of coefficient prefactors.
             coeff_func (dict): A dictionary of coefficient functions.
             F_med_prop (Callable[[SphericalGrid], np.array] | None, optional): A function that calculates the medium flux property. Defaults to None.
+            ref_cross_sect (Callable[[np.array], np.array] | None, optional): A function that calculates the reference cross section. Defaults to None.
             S_chi (float, optional): DM spin, 1/2 by default.
             shortname (str, optional): The short name of the model, used in the output filenames. Defaults to lowercase initials of the model name.
         """
@@ -78,6 +79,7 @@ class Model:
         self.coeff_prefactor = coeff_prefactor
         self.coeff_func = coeff_func
         self.operators, self.particles = self._get_operators_and_particles()
+
         if F_med_prop is None:
 
             def ones(grid):
@@ -85,6 +87,17 @@ class Model:
 
             F_med_prop = ones
         self.F_med_prop = F_med_prop
+
+        # Conversion factor to $\bar{\sigma}$ in NATURAL UNITS
+        if ref_cross_sect is None:
+
+            def ref_cross_sect(m_chi):
+                return np.ones_like(m_chi)
+
+            ref_cross_sect = ref_cross_sect
+
+        self.ref_cross_sect = ref_cross_sect
+
         self._validate_coefficients()
 
         # Unused, for backwards compatibility

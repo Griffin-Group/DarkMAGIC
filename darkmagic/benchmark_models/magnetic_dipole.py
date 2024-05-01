@@ -1,3 +1,5 @@
+import numpy as np
+
 import darkmagic.constants as const
 from darkmagic import Model
 from darkmagic.benchmark_models.utils import (
@@ -29,7 +31,20 @@ def get_model() -> Model:
         "6": {"e": me_on_mchi, "p": mp_on_mchi},
     }
 
-    return Model("Magnetic Dipole", coeff_prefactor, coeff_func)
+    def reference_cross_section(m_chi: float) -> float:
+        return (
+            np.pi
+            * (m_chi + const.m_e) ** 2
+            / (6 * m_chi**2 + const.m_e**2)
+            / const.m_e**2
+        )
+
+    return Model(
+        "Magnetic Dipole",
+        coeff_prefactor,
+        coeff_func,
+        ref_cross_sect=reference_cross_section,
+    )
 
 
 magnetic_dipole = get_model()
