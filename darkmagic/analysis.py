@@ -42,16 +42,16 @@ def get_reach(
 
     # Vanilla PhonoDark, have a threshold of 1 meV by default
     # We need to account for that in the binning
-    bin_num_cut = int(threshold_meV * 1e-3 / energy_bin_width) - int(
+    bin_cutoff = int(threshold_meV * 1e-3 / energy_bin_width) - int(
         threshold / energy_bin_width
     )
 
-    cs_constraint = n_cut / np.sum(raw_binned_rate[:, bin_num_cut:], axis=1)
-    cs_constraint /= (
+    sigma = n_cut / np.sum(raw_binned_rate[:, bin_cutoff:], axis=1)
+    sigma /= (
         exposure_kg_yr
         * const.kg_yr
         * const.cm2
         * BUILT_IN_MODELS[model].ref_cross_sect(m_chi)
     )
 
-    return cs_constraint
+    return m_chi, sigma
