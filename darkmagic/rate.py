@@ -112,11 +112,11 @@ class MagnonCalculation(Calculation):
 
         # Along with omega and epsilons, these are all q*nu arrays
         bin_num = np.floor((omegas) / self.numerics.bin_width).astype(int)
-        g0 = v_dist.g0
+        g0 = v_dist.G0
 
-        if model_name == "mdm":
+        if model_name == "Magnetic Dipole":
             sigma_nu_q = self.sigma_mdm(self.grid.q_cart, epsilons)
-        elif model_name == "ap":
+        elif model_name == "Anapole":
             sigma_nu_q = self.sigma_ap(self.grid.q_cart, epsilons)
         else:
             raise ValueError(
@@ -166,7 +166,8 @@ class PhononCalculation(Calculation):
 
         # (nq, nmodes) and (nq, nmodes, natoms, 3)
         omegas, epsilons = self.material.get_eig(self.grid.k_frac)
-        W_tensor = self.material.get_W_tensor(self.dwf_grid)  # (na, na)
+        # (nq, na, 3, 3)
+        W_tensor = self.material.get_W_tensor(self.dwf_grid)
 
         # W_j(q) = q_\alpha W_\alpha\beta q_\beta (DWF)
         W_q_j = (
@@ -182,14 +183,15 @@ class PhononCalculation(Calculation):
 
         # q_\alpha \epsilon_{k \nu j \alpha}
         q_dot_epsconj = np.sum(
-            self.grid.q_cart[:, None, None, :] * np.conjugate(epsilons), axis=3
+            self.grid.q_cart[:, None, None, :] * epsilons.conj(), axis=3
         )  # (nq, nmodes, na)
 
         # H(q)_{\nu j} = e^{i G x_j} e^{- W_j(q)}  \times
-        # \frac{q \cdot \epsilon_{k j \nu}^*}{\sqrt{m_j \omega_{k \nu}}
+        # \frac{q \cdot \epsilon_{k j \nu}^*}{\sqrt{2 m_j \omega_{k \nu}}
         H_q_nu_j = (exponential[:, None, :] * q_dot_epsconj) / np.sqrt(
-            self.material.m_atoms[None, None, :] * omegas[..., None]
+            2 * self.material.m_atoms[None, None, :] * omegas[..., None]
         )
+        H_q_nu_j = np.nan_to_num(H_q_nu_j)
 
         # Compute potential
         pot = Potential(self.model)
@@ -199,13 +201,13 @@ class PhononCalculation(Calculation):
         Hs_jp_H_j = H_q_nu_j.conj()[..., None] * H_q_nu_j[..., None, :]
         # (V^{00}_{j'}(q))^* \times V^{00}_{j}(q)
         V00s_jp_V00_j = V_q_j["00"].conj()[..., None] * V_q_j["00"][..., None, :]
+        # \Sigma^0_{\nu}(q)=\sum_{jj'} H(q)_{\nu j'}^* H(q)_{\nu j} V_{00 j'}^* V_{00 j}
+        sigma0_q_nu = np.sum(Hs_jp_H_j * V00s_jp_V00_j[:, None, ...], axis=(2, 3)).real
+        # sigma0_q_nu = np.abs(np.sum((H_q_nu_j * V_q_j["00"][:, None, ...]), axis=2))**2
 
         # Now we need the maxwell boltzmann distribution
         v_dist = MBDistribution(self.grid, omegas, self.m_chi, self.v_e)
-        g0 = v_dist.g0
-
-        # \Sigma^0_{\nu}(q)=\sum_{jj'} H(q)_{\nu j'}^* H(q)_{\nu j} V_{00 j'}^* V_{00 j}
-        sigma0_q_nu = np.sum(Hs_jp_H_j * V00s_jp_V00_j[:, None, ...], axis=(2, 3))
+        G0 = v_dist.G0
 
         # Integrate to get deltaR
         tiled_jacobian = np.tile(self.grid.jacobian, (n_modes, 1)).T
@@ -216,15 +218,14 @@ class PhononCalculation(Calculation):
             (1 / self.material.m_cell)
             * (const.rho_chi / self.m_chi)
             * vol_element
-            * self.model.F_med_prop(self.grid) ** 2
-            * (sigma0_q_nu * g0)
+            * self.model.F_med_prop(self.grid)[:, None] ** 2
+            * (sigma0_q_nu * G0)
         )
-
-        ## Get diff rate, binned rate and total rate
+        # Get diff rate, binned rate and total rate
         bin_num = np.floor((omegas) / self.numerics.bin_width).astype(int)
         diff_rate = np.zeros(max_bin_num)
         np.add.at(diff_rate, bin_num, deltaR)
         binned_rate = np.sum(deltaR, axis=0)
-        total_rate = sum(diff_rate)
+        total_rate = np.sum(diff_rate)
 
         return [diff_rate, binned_rate, total_rate]
