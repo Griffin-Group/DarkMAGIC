@@ -238,6 +238,8 @@ class PhononMaterial(Material):
         """
         # TODO: Need a check for when phonopy_yaml does not have NAC
         phonopy_file = phonopy.load(phonopy_yaml=phonopy_yaml_path, is_nac=True)
+        # TODO: should be a dict that has the correct factor for all codes
+        length_factor = const.bohr_to_Ang if phonopy_file.calculator == "qe" else 1.0
         self.phonopy_file = phonopy_file
         n_atoms = phonopy_file.primitive.get_number_of_atoms()
         self.n_modes = 3 * n_atoms
@@ -258,7 +260,9 @@ class PhononMaterial(Material):
         # At some point should make careful assessment of primitive vs unit_cell
         # PhonoDark uses primitive, but what about when it's different from unit_cell?
         positions = phonopy_file.primitive.scaled_positions
-        lattice = np.array(phonopy_file.primitive.cell) * const.Ang_to_inveV
+        lattice = (
+            np.array(phonopy_file.primitive.cell) * const.Ang_to_inveV * length_factor
+        )
         species = phonopy_file.primitive.symbols
 
         structure = Structure(lattice, species, positions)
@@ -346,11 +350,11 @@ class PhononMaterial(Material):
 
         """
         if self._q_cut is None:
-            self._q_cut = 10.0 * np.sqrt(np.amax(self.m_atoms) * self.max_dE)
+            self._q_cut = 10.0 * np.sqrt(np.amax(self.m_atoms) * self.max_dE / 1.5)
         return self._q_cut
 
     def get_W_tensor(self, grid: MonkhorstPackGrid) -> np.ndarray:
-        """
+        r"""
         Computes the W tensor for the given Monkhorst-Pack grid. The W tensor for atom $j$ is given by:
         $$
         \mathbf{W}_j = \frac{\Omega}{4 m_j} \sum_\nu \int_\text{1BZ} \frac{d^3k}{(2\pi)^3} \frac{\epsilon_{\nu j \bm{k}} \otimes \epsilon_{\nu j \bm{k}}^*}{\omega_{\nu \bm{k}}}
@@ -545,7 +549,7 @@ class MagnonMaterial(Material):
         # TODO: this should be an average over the BZ
         if self._max_dE is None:
             k = [1 / 2, 0, 0]
-            omega, _ = self.get_eig(self.recip_frac_to_cart @ k)
+            omega, _ = self.get_eig(self.recip_frac_to_cart @ k, [0, 0, 0])
             self._max_dE = 3 * np.amax(omega)
         return self._max_dE
 
