@@ -1,4 +1,4 @@
-import darkmagic as const
+import darkmagic.constants as const
 from darkmagic import Model
 from darkmagic.benchmark_models.utils import q_sq_on_mchi_sq
 

@@ -1,10 +1,11 @@
 import warnings
-from typing import Callable
+from typing import Callable, Tuple
 
 import numpy as np
 
 from darkmagic.constants import levi_civita
 from darkmagic.numerics import SphericalGrid
+from darkmagic.material import Material
 
 SUPPORTED_OPERATORS = {
     "1",
@@ -34,26 +35,45 @@ SUPPORTED_OPERATORS = {
 
 # TODO: c_dict and c_dict_form should prob just be merged?
 class Model:
+    """
+    A class representing a model for dark matter scattering. See the benchmark models for examples on how to define a model.
+
+    Attributes:
+        name (str): The name of the model.
+        coeff_prefactor (dict): A dictionary of coefficient prefactors (constants).
+        coeff_func (dict): A dictionary of coefficient functions of the form (grid, m_chi, S_chi) -> np.array.
+        F_med_prop (Callable[[SphericalGrid], np.array]): The mediator propagator
+        power_V (int): The power V
+        S_chi (float): The value of S_chi.
+        operators (dict): A dictionary of operators.
+        particles (dict): A dictionary of particles.
+    """
+
     def __init__(
         self,
         name: str,
         coeff_prefactor: dict,
         coeff_func: dict,
         F_med_prop: Callable[[SphericalGrid], np.array] | None = None,
-        power_V: int = 0,
         S_chi: float = 0.5,
+        shortname: str = None,
     ):
         """
-        name: string
-        Fmed_power: float, negative power of q in the Fmed term
-        power_V: float, power of q in the V term (for special mesh)
-        s_chi float, spin of DM particle
+        Constructor for the Model class.
+
+        Args:
+            name (str): The name of the model.
+            coeff_prefactor (dict): A dictionary of coefficient prefactors.
+            coeff_func (dict): A dictionary of coefficient functions.
+            F_med_prop (Callable[[SphericalGrid], np.array] | None, optional): A function that calculates the medium flux property. Defaults to None.
+            S_chi (float, optional): DM spin, 1/2 by default.
+            shortname (str, optional): The short name of the model, used in the output filenames. Defaults to lowercase initials of the model name.
         """
         self.name = name
+        if shortname is None:
+            shortname = "".join([word[0].lower() for word in name.split()])
+        self.shortname = shortname
 
-        self.Fmed_power = 0  # temporary
-
-        self.power_V = power_V
         self.S_chi = S_chi
         self.coeff_prefactor = coeff_prefactor
         self.coeff_func = coeff_func
@@ -67,14 +87,53 @@ class Model:
         self.F_med_prop = F_med_prop
         self._validate_coefficients()
 
-    def get_unscreened_coeff(self, alpha, psi, grid, m_chi, S_chi):
+        # Unused, for backwards compatibility
+        self.Fmed_power = 0
+        self.power_V = 0
+
+    def get_unscreened_coeff(
+        self, alpha: str, psi: str, grid: SphericalGrid, m_chi: float, S_chi: float
+    ) -> float:
+        """
+        Get the unscreened coefficient for a given (alpha, psi) pair.
+
+        Args:
+            alpha: The operator ID.
+            psi: The particle.
+            grid: The spherical grid.
+            m_chi: The dark matter mass.
+            S_chi: The dark matter spin.
+
+        Returns:
+            The unscreened coefficient $c_{\alpha}^{(\psi)}$.
+        """
         return self.coeff_prefactor[alpha][psi] * self.coeff_func[alpha][psi](
             grid, m_chi, S_chi
         )
 
-    def compute_screened_coeff(self, grid, epsilon, m_chi, S_chi):
-        """
-        Screen the coefficients by the form factor
+    def compute_screened_coeff(
+        self, grid: SphericalGrid, epsilon: np.array, m_chi: float, S_chi: float
+    ) -> dict:
+        r"""
+        Compute the screened coefficients for every (operator, particle) pair.
+
+        The screening of electron coefficients is done according to
+        $$
+        c^{(e)}_{\alpha} \rightarrow \frac{c^{(e)}_{\alpha}}{\hat{q} \cdot (\epsilon \hat{q})}
+        $$
+        and the proton coefficients
+        $$
+        c^{(p)}_{\alpha} \rightarrow c^{(p)}_{\alpha} + c^{(e)}_{\alpha} \left( 1 - \frac{1}{\hat{q} \cdot (\epsilon \hat{q})} \right)
+        $$
+
+        Args:
+            grid: The SphericalGrid object containing all the momentum transfer vectors.
+            epsilon: The dielectric tensor.
+            m_chi: The dark matter mass.
+            S_chi: The dark matter spin.
+
+        Returns:
+            A dictionary of the screened coefficients, indexable as [alpha][psi], with each element being a np.array of shape (nq,).
         """
         q_eps_q = np.sum(grid.qhat_qhat * epsilon[None, :], axis=(-1, -2))
         screened_coeff = {
@@ -95,11 +154,13 @@ class Model:
 
         return screened_coeff
 
-    def _get_operators_and_particles(self):
+    def _get_operators_and_particles(self) -> Tuple[set, set]:
         """
-        Gets the non-zero operators and particles (psi) from the coefficients
-        """
+        Gets the non-zero operators and particles (psi) from the coefficients.
 
+        Returns:
+            A tuple containing the set of operators and particles.
+        """
         nonzero_pairs = [
             (alpha, psi)
             for alpha, c_alpha in self.coeff_prefactor.items()
@@ -168,24 +229,57 @@ class Model:
 
 
 class Potential:
-    def __init__(self, model):
+    """
+    Class for evaluating the potential for a given model.
+
+    TODO: needs a good bit of cleanup and rethinking. Maybe this should be a subclass of model?
+    TODO: all terms except V1_00 are written correctly but don't work with an array of q's as they should. (Painful) work in progress.
+
+    Attributes:
+        operators (set): The set of operators.
+        particles (set): The set of particles.
+        c (Callable[[SphericalGrid, np.array, float, float], np.array]): The function to compute the screened coefficients.
+        needs_g1 (bool): Whether the G1 velocity integrals are needed.
+        needs_g2 (bool): Whether the G2 velocity integrals are needed.
+    """
+
+    def __init__(self, model: Model):
+        """
+        Constructor for the Potential class.
+
+        Args:
+            model (Model): The model for which to evaluate the potential.
+        """
         self.operators = model.operators
         self.particles = model.particles
         self.c = model.compute_screened_coeff
 
-    def eval_V(self, grid, material, m_chi, S_chi):
+    def eval_V(
+        self, grid: SphericalGrid, material: Material, m_chi: float, S_chi: float
+    ) -> dict:
         """
         Evaluate the full potential V_j(q) for the given grid and material
+
+        Args:
+            grid (SphericalGrid): The grid of momentum transfer vectors.
+            material (Material): The material object
+            m_chi (float): The dark matter mass.
+            S_chi (float): The dark matter spin.
+
+        Returns:
+            dict: A dictionary of the potential terms, indexed by the term type.
         """
+
+        # Get all the V functions
         full_V = self._get_full_V()
+
+        # Prepare the output dictionary
         terms = {key for alpha in self.operators for key in full_V[alpha].keys()}
+        V = {t: self._get_zeros(t, material.n_atoms, grid) for t in terms}
 
         # Determine which velocity integrals are needed
         self.needs_g1 = bool("12" or "11" in terms)
         self.needs_g2 = "20" in terms
-
-        # TODO: Should be merged with _get_zeros?
-        V = {t: self._get_zeros(t, material.n_atoms, grid) for t in terms}
 
         def get_slice(t):
             return (slice(None),) + (None,) * (V[t].ndim - 1)
@@ -196,15 +290,14 @@ class Potential:
             for alpha in self.operators:
                 C = coeff[alpha][psi]
                 for t, V_func in full_V[alpha].items():
-                    # print(f"V^({psi})_{alpha}_{t}")
-                    # print(V[t].shape)
-                    # print(V_func(grid, psi, material, m_chi, S_chi).shape)
-                    # print(C.shape)
                     V[t] += C[get_slice(t)] * V_func(grid, psi, material, m_chi, S_chi)
         return V
 
     @classmethod
     def _get_full_V(cls):
+        """ "
+        Get all the V functions in a dictionary of dictionaries
+        """
         # TODO: I don't like that this requires specifically naming the methods
         # Can this be done with a decorator so that the function name doesn't matter?
         # The decorator would need arguments to specify the operator id and expansion id
