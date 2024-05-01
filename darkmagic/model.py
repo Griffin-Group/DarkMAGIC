@@ -51,7 +51,7 @@ class Model:
         """
         self.name = name
 
-        self.F_med_prop_prop_val = 0  # temporary
+        self.Fmed_power = 0  # temporary
 
         self.power_V = power_V
         self.S_chi = S_chi

@@ -147,7 +147,6 @@ class SphericalGrid:
         with np.errstate(invalid="ignore"):
             q_cart = q_cart[
                 (np.abs(np.dot(q_cart, v_e) / q_norm + q_norm / 2 / m_chi) < const.VESC)
-                & (q_norm > 0)
             ]
         # TODO: double check that right multiplication works well
         q_frac = np.matmul(q_cart, recip_cart_to_frac)
