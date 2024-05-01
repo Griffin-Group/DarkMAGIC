@@ -2,92 +2,107 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://oashour.github.io/DarkMAGIC/develop/</loc>
-         <lastmod>2024-04-26</lastmod>
+         <lastmod>2024-05-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://oashour.github.io/DarkMAGIC/develop/formalism/</loc>
-         <lastmod>2024-04-26</lastmod>
+         <lastmod>2024-05-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://oashour.github.io/DarkMAGIC/develop/reference/SUMMARY/</loc>
-         <lastmod>2024-04-26</lastmod>
+         <lastmod>2024-05-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://oashour.github.io/DarkMAGIC/develop/reference/darkmagic/</loc>
-         <lastmod>2024-04-26</lastmod>
+         <lastmod>2024-05-01</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://oashour.github.io/DarkMAGIC/develop/reference/darkmagic/analysis/</loc>
+         <lastmod>2024-05-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://oashour.github.io/DarkMAGIC/develop/reference/darkmagic/constants/</loc>
-         <lastmod>2024-04-26</lastmod>
+         <lastmod>2024-05-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://oashour.github.io/DarkMAGIC/develop/reference/darkmagic/io/</loc>
-         <lastmod>2024-04-26</lastmod>
+         <lastmod>2024-05-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://oashour.github.io/DarkMAGIC/develop/reference/darkmagic/material/</loc>
-         <lastmod>2024-04-26</lastmod>
+         <lastmod>2024-05-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://oashour.github.io/DarkMAGIC/develop/reference/darkmagic/model/</loc>
-         <lastmod>2024-04-26</lastmod>
+         <lastmod>2024-05-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://oashour.github.io/DarkMAGIC/develop/reference/darkmagic/numerics/</loc>
-         <lastmod>2024-04-26</lastmod>
+         <lastmod>2024-05-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://oashour.github.io/DarkMAGIC/develop/reference/darkmagic/parallel/</loc>
-         <lastmod>2024-04-26</lastmod>
+         <lastmod>2024-05-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://oashour.github.io/DarkMAGIC/develop/reference/darkmagic/rate/</loc>
-         <lastmod>2024-04-26</lastmod>
+         <lastmod>2024-05-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://oashour.github.io/DarkMAGIC/develop/reference/darkmagic/v_integrals/</loc>
-         <lastmod>2024-04-26</lastmod>
+         <lastmod>2024-05-01</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://oashour.github.io/DarkMAGIC/develop/reference/darkmagic/benchmark_models/</loc>
+         <lastmod>2024-05-01</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://oashour.github.io/DarkMAGIC/develop/reference/darkmagic/benchmark_models/anapole/</loc>
+         <lastmod>2024-05-01</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://oashour.github.io/DarkMAGIC/develop/reference/darkmagic/benchmark_models/hadrophilic_scalar_mediator/</loc>
+         <lastmod>2024-05-01</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://oashour.github.io/DarkMAGIC/develop/reference/darkmagic/benchmark_models/magnetic_dipole/</loc>
+         <lastmod>2024-05-01</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://oashour.github.io/DarkMAGIC/develop/reference/darkmagic/benchmark_models/utils/</loc>
+         <lastmod>2024-05-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://oashour.github.io/DarkMAGIC/develop/reference/darkmagic/materials/</loc>
-         <lastmod>2024-04-26</lastmod>
+         <lastmod>2024-05-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://oashour.github.io/DarkMAGIC/develop/reference/darkmagic/materials/VBTS_Magnon/</loc>
-         <lastmod>2024-04-26</lastmod>
+         <lastmod>2024-05-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://oashour.github.io/DarkMAGIC/develop/reference/darkmagic/materials/YIG_Magnon/</loc>
-         <lastmod>2024-04-26</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
-         <loc>https://oashour.github.io/DarkMAGIC/develop/reference/darkmagic/models/</loc>
-         <lastmod>2024-04-26</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
-         <loc>https://oashour.github.io/DarkMAGIC/develop/reference/darkmagic/models/anapole/</loc>
-         <lastmod>2024-04-26</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
-         <loc>https://oashour.github.io/DarkMAGIC/develop/reference/darkmagic/models/magnetic_dipole/</loc>
-         <lastmod>2024-04-26</lastmod>
+         <lastmod>2024-05-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>
