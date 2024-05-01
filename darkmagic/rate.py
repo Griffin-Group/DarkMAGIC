@@ -191,6 +191,9 @@ class PhononCalculation(Calculation):
         H_q_nu_j = (exponential[:, None, :] * q_dot_epsconj) / np.sqrt(
             2 * self.material.m_atoms[None, None, :] * omegas[..., None]
         )
+        # TODO: better way to deal with this.
+        # We get issues from the very small negative frequencies very close to Gamma
+        # Which we're not avoiding since I don't want to put a build in threshold.
         H_q_nu_j = np.nan_to_num(H_q_nu_j)
 
         # Compute potential
