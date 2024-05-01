@@ -106,6 +106,8 @@ class SphericalGrid:
         # Deriving this is straightforward, remember we're sampling
         # with a power of 2 in the q direction, hence the square roots on |q|
         self.jacobian = 8 * np.pi * self.q_norm ** (5 / 2) * self.q_max ** (1 / 2)
+        # Volume element dV = d^3q J(q) / (2pi)^3 / N^3
+        self.vol_element = self.jacobian / ((2 * np.pi) ** 3 * np.prod(N_grid))
 
         # Get the k-vectors
         self.k_frac = self.q_frac - self.G_frac
