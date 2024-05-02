@@ -322,20 +322,35 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#commands" class="md-nav__link">
+  <a href="#features" class="md-nav__link">
     <span class="md-ellipsis">
-      Commands
+      Features
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Features">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#planned-features-short-term" class="md-nav__link">
+    <span class="md-ellipsis">
+      Planned Features (short term)
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#project-layout" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#planned-features-long-term" class="md-nav__link">
     <span class="md-ellipsis">
-      Project layout
+      Planned Features (long term)
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -904,20 +919,35 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#commands" class="md-nav__link">
+  <a href="#features" class="md-nav__link">
     <span class="md-ellipsis">
-      Commands
+      Features
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Features">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#planned-features-short-term" class="md-nav__link">
+    <span class="md-ellipsis">
+      Planned Features (short term)
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#project-layout" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#planned-features-long-term" class="md-nav__link">
     <span class="md-ellipsis">
-      Project layout
+      Planned Features (long term)
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -940,19 +970,60 @@
 
 
 <h1 id="darkmagic">DarkMAGIC</h1>
-<h2 id="commands">Commands</h2>
+<p>The <strong>D</strong>ark <strong>M</strong>atter <strong><em>A</em></strong><em>b</em> <em>initio</em> phonon/ma<strong>G</strong>non <strong>I</strong>nteraction <strong>C</strong>alculator (DarkMAGIC) is a python package for calculating dark matter interaction rates with phonons and magnons in real materials, based on properties calculated from first principles (mainly, density functional theory). It is based on the effective field theory developed by Trickle, Zhang and Zurek <a href="https://arxiv.org/abs/2009.13534">paper</a>, and takes inspiration from the code they released with that paper, <a href="https://github.com/tanner-trickle/PhonoDark">PhonoDark</a>. </p>
+<p>DarkMAGIC is currently in pre-alpha testing, so not all features are implemented and not everything has been tested. Development is in progress, and once at a satisfying stage, a manuscript will be prepared.</p>
+<h2 id="features">Features</h2>
 <ul>
-<li><code>mkdocs new [dir-name]</code> - Create a new project.</li>
-<li><code>mkdocs serve</code> - Start the live-reloading docs server.</li>
-<li><code>mkdocs build</code> - Build the documentation site.</li>
-<li><code>mkdocs -h</code> - Print help message and exit.</li>
+<li>Calculate scattering rates from single phonons and magnons.</li>
+<li>Supports phonon calculations using the frozen cell method or density functional perturbation theory with arbitrary DFT codes, based on the interface with <a href="https://phonopy.github.io/phonopy/">phonopy</a>.</li>
+<li>Supports toy models and <em>ab initio</em>-based spin hamiltonians via <a href="https://rad-tools.org/en/stable/">rad-tools</a> and TB2J(https://tb2j.readthedocs.io/en/latest/).</li>
+<li>Parallelized with MPI, and extremely performant.</li>
+<li>Easy to use Python API, with multiple pre-defined benchmark models.</li>
+<li>Portable HDF5 output format that allows the reconstruction of calculation as python objects. DarkMAGIC can also read and write HDF5 files in the format used by PhonoDark, but with limited functionality since it does not include all the parameters necessary to rebuild a calculation.</li>
 </ul>
-<h2 id="project-layout">Project layout</h2>
-<div class="language-text highlight"><pre><span></span><code>mkdocs.yml    # The configuration file.
-docs/
-    index.md  # The documentation homepage.
-    ...       # Other markdown pages, images and other files.
-</code></pre></div>
+<h3 id="planned-features-short-term">Planned Features (short term)</h3>
+<ul>
+<li>In principle, all operators in the <a href="https://arxiv.org/abs/2009.13534">EFT paper</a> are implemented for phonons, but only spin-independent operators are currently functional due to a recent refactoring. Only the magnetic dipole and anapole models for magnons are currently implemented. This will be dealt with soon.</li>
+<li>JIT compilation for increased performance.</li>
+<li>Command line interface.</li>
+<li>Further post-processing and plotting tools.</li>
+<li>More documentation and examples. This website contains extensive, automatically-generated documentation for the python API.</li>
+</ul>
+<h3 id="planned-features-long-term">Planned Features (long term)</h3>
+<ul>
+<li>Multi-phonon processes</li>
+<li>Absorption</li>
+<li>Support for fully first-principles time-dependent DFT magnon calculations instead of just spin Hamiltonians.</li>
+</ul>
+<h1 id="example">Example</h1>
+<p>More examples coming soon</p>
+<p>This will be run from a Jupyter notebook or as a python script</p>
+<pre><code class="language-python">import numpy as np
+
+from darkmagic import Calculator, MaterialParameters, PhononMaterial, Numerics
+from darkmagic.benchmark_models import light_scalar_mediator
+
+# Masses in eV and times of day in hours (to calculate the earth's velocity)
+masses = np.logspace(4, 10, 96)
+times = [0]
+
+# Phonons in Helium
+params = MaterialParameters(N={&quot;e&quot;: [2, 2], &quot;n&quot;: [2, 2], &quot;p&quot;: [2, 2]})
+material = PhononMaterial(&quot;hcp_He&quot;, params, &quot;tests/data/hcp_He_1GPa.phonopy.yaml&quot;)
+model = light_scalar_mediator
+
+# Numerics
+numerics = Numerics(
+    N_grid=[80, 40, 40],  # Spherical grid for momentum transfer
+    N_DWF_grid=[30, 30, 30],  # Monkhorst-Pack grid for Debye-Waller factor
+)
+
+# Create calculator object
+full_calc = Calculator(&quot;scattering&quot;, masses, material, model, numerics, times)
+full_calc.evaluate()  # Run calculation
+full_calc.to_file()  # Write HDF5 file (default name is &quot;material.name_model.name.h5&quot;)
+</code></pre>
+<p>To run in parallel, simply run with <code>srun -n &lt;nprocs&gt; python script.py</code> or whatever your system uses.</p>
 
 
 

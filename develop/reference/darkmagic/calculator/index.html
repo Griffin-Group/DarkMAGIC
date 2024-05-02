@@ -1932,8 +1932,7 @@
 <span class="normal">257</span>
 <span class="normal">258</span>
 <span class="normal">259</span>
-<span class="normal">260</span>
-<span class="normal">261</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">compute_reach</span><span class="p">(</span>
+<span class="normal">260</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">compute_reach</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">threshold_meV</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
     <span class="n">exposure_kg_yr</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
@@ -1958,7 +1957,6 @@
 
     <span class="n">energy_bin_width</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numerics</span><span class="o">.</span><span class="n">bin_width</span>
     <span class="n">threshold</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numerics</span><span class="o">.</span><span class="n">_threshold</span>  <span class="c1"># legacy for PD support</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;got a threshold of &quot;</span><span class="p">,</span> <span class="n">threshold</span><span class="p">)</span>
     <span class="n">m_chi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_chi</span>
     <span class="c1"># get time index</span>
     <span class="k">try</span><span class="p">:</span>
