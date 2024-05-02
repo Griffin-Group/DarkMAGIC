@@ -71,7 +71,7 @@ class Model:
             shortname (str, optional): The short name of the model, used in the output filenames. Defaults to lowercase initials of the model name.
         """
         self.name = name
-        if shortname is None:
+        if shortname is None and self.name is not None:
             shortname = "".join([word[0].lower() for word in name.split()])
         self.shortname = shortname
 
@@ -103,6 +103,40 @@ class Model:
         # Unused, for backwards compatibility
         self.Fmed_power = 0
         self.power_V = 0
+
+    @classmethod
+    def from_dict(cls, d: dict):
+        # TODO: this is not file format agnostic
+        Fmed_power = d.get("Fmed_power", 0)
+        # power_V = d.get("power_V", 0)
+        S_chi = d["dm_properties"]["spin"]
+        shortname = d.get("model_name")
+        coeff_prefactor = d["c_coeffs"]
+
+        def F_med_prop(grid):
+            return grid.q_norm ** (-Fmed_power)
+
+        def ones(grid):
+            return np.ones_like(grid.q_norm)
+
+        warnings.warn(
+            "Reconstructing ceofficient functions from an HDF5 file that does not "
+            "contain them (e.g., PhonoDark formatted files). They will all be set to"
+            "one, which is likely incorrect."
+        )
+        coeff_func = {
+            alpha: {psi: ones for psi in coeff_prefactor[alpha].keys()}
+            for alpha in coeff_prefactor.keys()
+        }
+
+        return cls(
+            "Unknown",
+            coeff_prefactor,
+            coeff_func,
+            F_med_prop,
+            S_chi=S_chi,
+            shortname=shortname,
+        )
 
     def get_unscreened_coeff(
         self, alpha: str, psi: str, grid: SphericalGrid, m_chi: float, S_chi: float
