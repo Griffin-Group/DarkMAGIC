@@ -81,23 +81,23 @@ class Calculator:
     @classmethod
     def from_file(cls, filename: str, format="phonodark"):
         """
-        Load the rates from a file
+        Load a model from a file
         """
-        numerics, particle_physics, rates = read_h5(filename, format)
-        time = particle_physics["times"]
-        m_chi = particle_physics["dm_properties"]["mass_list"]
+        calc, numerics, model, data = read_h5(filename, format)
+        time = calc["time"]
+        m_chi = calc["m_chi"]
         numerics = Numerics.from_dict(numerics)
-        material = None
+        model = Model.from_dict(model)
+        material = None  # TODO: add material info to DarkMAGIC output
         if material is None:
             warnings.warn(
-                "Material information not found in file. Running the calculation won't work, but the read in results can be analyzed."
+                "Material information not found in file. Running the calculation won't work, but the parsed in results can be analyzed."
             )
-        model = Model.from_dict(particle_physics)
 
-        calc = cls(m_chi, material, model, numerics, time=time)
-        calc.binned_rate = rates[0]
-        calc.diff_rate = rates[1]
-        calc.total_rate = rates[2]
+        calc = cls(calc["calc_type"], m_chi, material, model, numerics, time=time)
+        calc.binned_rate = data["binned_rate"]
+        calc.diff_rate = data["diff_rate"]
+        calc.total_rate = data["total_rate"]
 
         return calc
 

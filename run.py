@@ -1,16 +1,15 @@
 import numpy as np
 from mpi4py.MPI import COMM_WORLD as comm
 
-from darkmagic.io import write_output
-from darkmagic.material import MaterialParameters, PhononMaterial
+from darkmagic.io import write_h5
 
 # Get the example material and model
-from darkmagic.benchmark_models import heavy_scalar_mediator
+from darkmagic.benchmark_models import magnetic_dipole
+from darkmagic.materials.VBTS_Magnon import get_material
 
-# from darkmagic.models.magnetic_dipole import get_model
 from darkmagic.numerics import Numerics
 from darkmagic.parallel import JOB_SENTINEL, ROOT_PROCESS, distribute_load
-from darkmagic.rate import PhononCalculation
+from darkmagic.calculator import Calculator
 
 
 def main(material, model, numerics, masses, times, hdf5_filename):
@@ -24,6 +23,7 @@ def main(material, model, numerics, masses, times, hdf5_filename):
     full_job_list = None
     if rank_id == ROOT_PROCESS:
         full_job_list = distribute_load(n_ranks, masses, times)
+    full_calc = Calculator("scattering", masses, material, model, numerics, times)
 
     job_list = comm.scatter(full_job_list, root=ROOT_PROCESS)
 
@@ -35,6 +35,13 @@ def main(material, model, numerics, masses, times, hdf5_filename):
     if rank_id == ROOT_PROCESS:
         print("Done configuring calculation")
 
+    # Very ugly...
+    # if isinstance(material, PhononMaterial):
+    #    calc_class = PhononCalculation
+    # elif isinstance(material, MagnonMaterial):
+    #    calc_class = MagnonCalculation
+    # else:
+    #    raise ValueError("Material not recognized.")
     # TODO: not an ideal implementation with a sentinel
     for job in job_list:
         if job[0] == JOB_SENTINEL and job[1] == JOB_SENTINEL:
@@ -45,8 +52,8 @@ def main(material, model, numerics, masses, times, hdf5_filename):
 
         print(f"Creating calculation object for m={mass:.3f} and t={time:d}")
 
-        # calc = MagnonCalculation(mass, material, model, numerics, time=time)
-        calc = PhononCalculation(mass, material, model, numerics, time=time)
+        # calc = calc_class(mass, material, model, numerics, time=time)
+        calc = full_calc.calc_list[job[1]][job[0]]
         [diff_rate, binned_rate, total_rate] = calc.calculate_rate()
 
         diff_rate_list.append([job, np.real(diff_rate)])
@@ -68,7 +75,7 @@ def main(material, model, numerics, masses, times, hdf5_filename):
         all_binned_rate_list = [binned_rate_list]
         all_total_rate_list = [total_rate_list]
 
-    write_output(
+    write_h5(
         hdf5_filename,
         material,
         model,
@@ -88,19 +95,35 @@ def main(material, model, numerics, masses, times, hdf5_filename):
 
 
 if __name__ == "__main__":
-    masses = np.logspace(4, 10, 96)
-    # masses = [1e7]
-    times = [0]
-    params = MaterialParameters(N={"e": [2, 2], "n": [2, 2], "p": [2, 2]})
-    material = PhononMaterial("hcp_He", params, "tests/data/hcp_He_1GPa.phonopy.yaml")
-    # material = get_material()
-    model = heavy_scalar_mediator
+    # Masses and times
+    masses = np.logspace(4, 7, 8)
+    masses = [1e5, 1e6, 1e7]
+    times = [0, 1]
+
+    # Phonons in Helium
+    # params = MaterialParameters(N={"e": [2, 2], "n": [2, 2], "p": [2, 2]})
+    # material = PhononMaterial("hcp_He", params, "tests/data/hcp_He_1GPa.phonopy.yaml")
+    # model = heavy_scalar_mediator
+
+    # Magnons in VBTS
+    material = get_material()
+    model = magnetic_dipole
+
+    # Numerics
     numerics = Numerics(
-        N_grid=[100, 50, 50],
-        N_DWF_grid=[30, 30, 30],
+        N_grid=[
+            5,
+            1,
+            1,
+        ],
+        N_DWF_grid=[4, 4, 4],
         use_special_mesh=False,
         use_q_cut=True,
     )
-    hdf5_filename = f"out/DarkMAGIC_{material.name}_{model.shortname}.hdf5"
+    hdf5_filename = f"out/DarkMAGIC_{material.name}_{model.shortname}_whatever.hdf5"
+    # Serial implementation
+    full_calc = Calculator("scattering", masses, material, model, numerics, times)
+    full_calc.evaluate()
+    full_calc.to_file()
 
-    main(material, model, numerics, masses, times, hdf5_filename)
+    # main(material, model, numerics, masses, times, hdf5_filename)
