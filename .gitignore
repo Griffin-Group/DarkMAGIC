@@ -13,3 +13,4 @@ MnO_Magnon.py
 *.pickle
 VBT.vasp
 VBTS_mdm.h5
+hcp_He_lsm.h5
