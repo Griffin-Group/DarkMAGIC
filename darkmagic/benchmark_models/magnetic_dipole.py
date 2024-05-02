@@ -44,6 +44,7 @@ def get_model() -> Model:
         coeff_prefactor,
         coeff_func,
         ref_cross_sect=reference_cross_section,
+        shortname="mdm",
     )
 
 
