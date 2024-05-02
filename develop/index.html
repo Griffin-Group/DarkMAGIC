@@ -970,13 +970,13 @@
 
 
 <h1 id="darkmagic">DarkMAGIC</h1>
-<p>The <strong>D</strong>ark <strong>M</strong>atter <strong><em>A</em></strong><em>b</em> <em>initio</em> phonon/ma<strong>G</strong>non <strong>I</strong>nteraction <strong>C</strong>alculator (DarkMAGIC) is a python package for calculating dark matter interaction rates with phonons and magnons in real materials, based on properties calculated from first principles (mainly, density functional theory). It is based on the effective field theory developed by Trickle, Zhang and Zurek <a href="https://arxiv.org/abs/2009.13534">paper</a>, and takes inspiration from the code they released with that paper, <a href="https://github.com/tanner-trickle/PhonoDark">PhonoDark</a>. </p>
+<p>The <strong>D</strong>ark <strong>M</strong>atter <strong><em>A</em></strong><em>b</em> <em>initio</em> phonon/ma<strong>G</strong>non <strong>I</strong>nteraction <strong>C</strong>alculator (DarkMAGIC) is a python package for calculating dark matter interaction rates with phonons and magnons in real materials, based on properties calculated from first principles (mainly, density functional theory). It is based on <a href="https://arxiv.org/abs/2009.13534">the effective field theory developed by Trickle, Zhang and Zurek</a>, and takes inspiration from the code they released with that paper, <a href="https://github.com/tanner-trickle/PhonoDark">PhonoDark</a>. </p>
 <p>DarkMAGIC is currently in pre-alpha testing, so not all features are implemented and not everything has been tested. Development is in progress, and once at a satisfying stage, a manuscript will be prepared.</p>
 <h2 id="features">Features</h2>
 <ul>
 <li>Calculate scattering rates from single phonons and magnons.</li>
 <li>Supports phonon calculations using the frozen cell method or density functional perturbation theory with arbitrary DFT codes, based on the interface with <a href="https://phonopy.github.io/phonopy/">phonopy</a>.</li>
-<li>Supports toy models and <em>ab initio</em>-based spin hamiltonians via <a href="https://rad-tools.org/en/stable/">rad-tools</a> and TB2J(https://tb2j.readthedocs.io/en/latest/).</li>
+<li>Supports toy models and <em>ab initio</em>-based spin hamiltonians via <a href="https://rad-tools.org/en/stable/">rad-tools</a> and <a href="https://tb2j.readthedocs.io/en/latest/">TB2J</a>.</li>
 <li>Parallelized with MPI, and extremely performant.</li>
 <li>Easy to use Python API, with multiple pre-defined benchmark models.</li>
 <li>Portable HDF5 output format that allows the reconstruction of calculation as python objects. DarkMAGIC can also read and write HDF5 files in the format used by PhonoDark, but with limited functionality since it does not include all the parameters necessary to rebuild a calculation.</li>
