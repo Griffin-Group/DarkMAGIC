@@ -76,7 +76,7 @@ class SingleRateCalc(ABC):
         return [diff_rate, binned_rate, total_rate]
 
 
-class MagnonScatterCalc(SingleRateCalc):
+class MagnonScatterRate(SingleRateCalc):
     """
     Class for calculating the differential rate for magnon scattering
     """
@@ -125,7 +125,7 @@ class MagnonScatterCalc(SingleRateCalc):
         return LA.norm(np.cross(tiled_q, 2 * const.mu_tilde_e * E_q_nu), axis=2) ** 2
 
 
-class PhononScatterCalc(SingleRateCalc):
+class PhononScatterRate(SingleRateCalc):
     """
     Class for calculating the differential rate for phonon scattering
     """
@@ -179,6 +179,6 @@ class PhononScatterCalc(SingleRateCalc):
 
 
 RATE_CALC_CLASSES = {
-    PhononMaterial: PhononScatterCalc,
-    MagnonMaterial: MagnonScatterCalc,
+    ("scattering", PhononMaterial): PhononScatterRate,
+    ("scattering", MagnonMaterial): MagnonScatterRate,
 }
