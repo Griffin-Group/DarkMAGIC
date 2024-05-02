@@ -1,16 +1,17 @@
-import itertools
 import math
 import warnings
 
 import numpy as np
+from mpi4py.MPI import COMM_WORLD
 from numpy.typing import ArrayLike
 
 import darkmagic.constants as const
 from darkmagic.benchmark_models import BUILT_IN_MODELS
-from darkmagic.io import read_h5
+from darkmagic.io import read_h5, write_h5
 from darkmagic.material import Material
 from darkmagic.model import Model
 from darkmagic.numerics import Numerics
+from darkmagic.parallel import JOB_SENTINEL, ROOT_PROCESS, distribute_load
 from darkmagic.rate import RATE_CALC_CLASSES
 
 
@@ -21,27 +22,47 @@ class Calculator:
 
     def __init__(
         self,
-        m_chi: float,
+        calc_type: str,
+        m_chi: ArrayLike,
         material: Material,
         model: Model,
         numerics: Numerics,
         time: ArrayLike | None = None,
         v_e: ArrayLike | None = None,
     ):
+        """
+        Initializes the calculator
+
+        Args:
+            calc_type (str): The type of calculation, only "scattering" is supported at the moment
+            m_chi (ArrayLike): The list of dark matter masses
+            material (Material): The material
+            model (Model): The model
+            numerics (Numerics): The numerical parameters
+            time (ArrayLike, optional): The list of times in hours. Defaults to None.
+            v_e (ArrayLike, optional): The list of earth velocities. Defaults to None (i.e., calculate from the tiems)
+
+        Raises:
+            ValueError: If neither time nor v_e are provided
+            ValueError: If both time and v_e are provided
+        """
+        if calc_type not in ["scattering"]:
+            raise ValueError("Only 'scattering' is supported at the moment")
+
         if time is None and v_e is None:
             raise ValueError("Either time or v_e must be provided")
         if time is not None and v_e is not None:
             raise ValueError("Only one of time or v_e should be provided")
 
         self.v_e = self.compute_ve(time) if time is not None else v_e
-        self.time = time
+        self.time = time if time is not None else np.zeros(len(self.v_e))
         self.numerics = numerics
         self.material = material
         self.m_chi = m_chi
         self.model = model
 
         # TODO: this is ugly
-        calc_class = RATE_CALC_CLASSES.get(type(material))
+        calc_class = RATE_CALC_CLASSES.get((calc_type, type(material)))
         if calc_class is None:
             warnings.warn(
                 "Material class not recognized. This is possibly because you"
@@ -84,6 +105,23 @@ class Calculator:
         """
         Computes the differential rate for all masses and earth velocities
         """
+
+        n_ranks = COMM_WORLD.Get_size()  # Number of ranks
+        rank_id = COMM_WORLD.Get_rank()  # Rank ID
+
+        if rank_id == ROOT_PROCESS:
+            print("Done setting up MPI")
+
+        full_job_list = None
+        if rank_id == ROOT_PROCESS:
+            full_job_list = distribute_load(n_ranks, self.m_chi, self.v_e)
+
+        job_list = COMM_WORLD.scatter(full_job_list, root=ROOT_PROCESS)
+
+        if rank_id == ROOT_PROCESS:
+            print("Done configuring calculation")
+
+        # Set up empty arrays to store the results
         max_bin_num = math.ceil(self.material.max_dE / self.numerics.bin_width)
         self.diff_rate = np.zeros((len(self.time), len(self.m_chi), max_bin_num))
         self.binned_rate = np.zeros(
@@ -91,12 +129,39 @@ class Calculator:
         )
         self.total_rate = np.zeros((len(self.time), len(self.m_chi)))
 
-        for im, iv in itertools.product(range(len(self.m_chi)), range(len(self.time))):
+        # for im, iv in itertools.product(range(len(self.m_chi)), range(len(self.time))):
+        for job in job_list:
+            if job[0] == JOB_SENTINEL and job[1] == JOB_SENTINEL:
+                continue
+            im, iv = job[0], job[1]
             (
                 self.diff_rate[iv, im],
                 self.binned_rate[iv, im],
                 self.total_rate[iv, im],
             ) = self.calc_list[iv][im].calculate_rate()
+
+    def to_file(self, filename: str | None = None, format="darkmagic"):
+        """
+        Save the rates to a file
+        """
+        if filename is None:
+            filename = f"{self.material.name}_{self.model.shortname}.h5"
+        write_h5(
+            filename,
+            self.material,
+            self.model,
+            self.numerics,
+            self.m_chi,
+            self.time,  # TODO: generate this even if zeros
+            self.v_e,
+            self.total_rate,
+            self.diff_rate,
+            self.binned_rate,
+            ROOT_PROCESS,
+            COMM_WORLD,
+            parallel=False,
+            format=format,
+        )  # Need to implement the parallel writing with the class...
 
     @staticmethod
     def compute_ve(times: float):
