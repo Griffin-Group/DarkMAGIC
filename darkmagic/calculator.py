@@ -78,6 +78,9 @@ class Calculator:
                 for v in self.v_e
             ]
 
+        self._binned_rate, self._diff_rate, self._total_rate = None, None, None
+        self.binned_rate, self.diff_rate, self.total_rate = None, None, None
+
     @classmethod
     def from_file(cls, filename: str, format="darkmagic"):
         """
@@ -121,7 +124,31 @@ class Calculator:
         if rank == ROOT_PROCESS:
             print("Done configuring calculation")
 
-        # Set up empty arrays to store the results
+        diff_rates, binned_rates, total_rates = [], [], []
+        # Loop over the tasks and calculate the rates
+        for job in task_list:
+            if job[0] == JOB_SENTINEL and job[1] == JOB_SENTINEL:
+                continue
+            im, iv = job[0], job[1]
+            d, b, t = self.calc_list[iv][im].calculate_rate()
+            diff_rates.append([job, d.real])
+            binned_rates.append([job, b.real])
+            total_rates.append([job, t.real])
+            # (
+            #    self.diff_rate[iv, im],
+            #    self.binned_rate[iv, im],
+            #    self.total_rate[iv, im],
+            # ) = self.calc_list[iv][im].calculate_rate()
+
+        print(f"Rank {rank} done calculating rates.")
+        # COMM_WORLD.Barrier()
+
+        # Saving the old format temporarily
+        self._diff_rate = COMM_WORLD.allgather(diff_rates)  # , root=ROOT_PROCESS)
+        self._binned_rate = COMM_WORLD.allgather(binned_rates)  # , root=ROOT_PROCESS)
+        self._total_rate = COMM_WORLD.allgather(total_rates)  # , root=ROOT_PROCESS)
+
+        # TODO: this is hideous....
         max_bin_num = math.ceil(self.material.max_dE / self.numerics.bin_width)
         self.diff_rate = np.zeros((len(self.time), len(self.m_chi), max_bin_num))
         self.binned_rate = np.zeros(
@@ -129,18 +156,15 @@ class Calculator:
         )
         self.total_rate = np.zeros((len(self.time), len(self.m_chi)))
 
-        # Loop over the tasks and calculate the rates
-        for job in task_list:
-            if job[0] == JOB_SENTINEL and job[1] == JOB_SENTINEL:
-                continue
-            im, iv = job[0], job[1]
-            (
-                self.diff_rate[iv, im],
-                self.binned_rate[iv, im],
-                self.total_rate[iv, im],
-            ) = self.calc_list[iv][im].calculate_rate()
-        print(f"Rank {rank} done calculating rates.")
-        COMM_WORLD.Barrier()
+        for rates in self._diff_rate:
+            for job, rate in rates:
+                self.diff_rate[job[1], job[0]] = rate
+        for rates in self._binned_rate:
+            for job, rate in rates:
+                self.binned_rate[job[1], job[0]] = rate
+        for rates in self._total_rate:
+            for job, rate in rates:
+                self.total_rate[job[1], job[0]] = rate
 
     def to_file(self, filename: str | None = None, format="darkmagic"):
         """
@@ -161,6 +185,7 @@ class Calculator:
             raise ValueError(
                 "Rates are not computed yet. Please run the calculation first using the evaluate method."
             )
+
         write_h5(
             filename,
             self.material,
