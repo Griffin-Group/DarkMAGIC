@@ -4,7 +4,45 @@ import numpy as np
 from darkmagic.parallel import ROOT_PROCESS
 
 
-def write_output(
+def read_h5(filename, format):
+    # TODO: this should make the dicts file format agnostic
+    if format == "phonodark":
+        return read_phonodark(filename)
+    else:
+        raise ValueError(f"Format {format} not recognized.")
+
+
+def read_phonodark(filename):
+    with h5py.File(filename, "r") as f:
+        particle_physics = dict_from_h5group(f["particle_physics"])
+        numerics = dict_from_h5group(f["numerics"])
+        data = dict_from_h5group(f["data"])
+        times = particle_physics["times"]
+        m_chi = particle_physics["dm_properties"]["mass_list"]
+        diff_rate = np.array(
+            [
+                [data["diff_rate"][str(t)][str(m)] for m in range(len(m_chi))]
+                for t in range(len(times))
+            ]
+        )
+        binned_rate = np.array(
+            [
+                [data["binned_rate"][str(t)][str(m)] for m in range(len(m_chi))]
+                for t in range(len(times))
+            ]
+        )
+        total_rate = np.array(
+            [
+                [data["rate"][str(t)][str(m)] for m in range(len(m_chi))]
+                for t in range(len(times))
+            ]
+        )[0].T
+        # TODO: finish building a more universal format
+        numerics["threshold"] = particle_physics["threshold"]
+    return numerics, particle_physics, (binned_rate, diff_rate, total_rate)
+
+
+def write_h5(
     out_filename,
     material,
     model,
@@ -20,12 +58,14 @@ def write_output(
 ):
     # Write to file
     # TODO: is there a more succinct way to do this?
+    # TODO: this should be cleaned up to not depend on MPI stuff and that low
+    # level stuff can go elsewhere?
     print(f"Writing to file {out_filename}{' in parallel' if parallel else ''}...")
     if not parallel and proc_id == ROOT_PROCESS:
         print("Done gathering!!!")
         print("----------")
 
-        write_hdf5(
+        write_phonodark(
             out_filename,
             material,
             model,
@@ -38,7 +78,7 @@ def write_output(
             comm=None,
         )
     else:
-        write_hdf5(
+        write_phonodark(
             out_filename,
             material,
             model,
@@ -52,7 +92,23 @@ def write_output(
         )
 
 
-def write_group_from_dict(hdf5_file, group_name, data_dict):
+def dict_from_h5group(group):
+    """
+    Recurses through an h5py group and creates a dictionary with the same structure.
+    """
+    result = {}
+    for k in group.keys():
+        v = group[k]
+        result[k] = dict_from_h5group(v) if isinstance(v, h5py.Group) else np.array(v)
+        if isinstance(result[k], np.ndarray) and result[k].ndim == 0:
+            result[k] = result[k].item()
+        # Convert string arrays to strings
+        if isinstance(result[k], np.ndarray) and result[k].dtype.char == "S":
+            result[k] = result[k].astype(str)[0]
+    return result
+
+
+def h5group_to_dict(hdf5_file, group_name, data_dict):
     """
     Recurses through a dictionary and creates appropriate groups or datasets
     This is parallel friendly, nothing is variable length.
@@ -60,7 +116,7 @@ def write_group_from_dict(hdf5_file, group_name, data_dict):
 
     for index in data_dict:
         if isinstance(data_dict[index], dict):
-            write_group_from_dict(hdf5_file, f"{group_name}/{index}", data_dict[index])
+            h5group_to_dict(hdf5_file, f"{group_name}/{index}", data_dict[index])
         else:
             data = (
                 np.array([data_dict[index]], dtype="S")
@@ -70,8 +126,7 @@ def write_group_from_dict(hdf5_file, group_name, data_dict):
             hdf5_file.create_dataset(f"{group_name}/{index}", data=data)
 
 
-# TODO: should be a method of the future "Full Calculation" class
-def write_hdf5(
+def write_phonodark(
     out_file,
     material,
     model,
@@ -122,16 +177,10 @@ def write_hdf5(
 
     def get_dicts(model, numerics, masses, times):
         physics_parameters = {
-            # energy threshold
-            "threshold": 0,
-            # time of days (hr)
+            "threshold": numerics._threshold,
             "times": times,
-            # - d log FDM / d log q. q dependence of mediator propagator
             "Fmed_power": model.Fmed_power,
-            # power of q in the potential, used to find optimal integration mesh
             "power_V": model.power_V,
-            # flag to compute for a specific model
-            # SI computes using the algorithm presented in 1910.08092
             "special_model": False,
             "model_name": "mdm",
         }
@@ -144,15 +193,15 @@ def write_hdf5(
             "n_a": numerics.N_grid[0],
             "n_b": numerics.N_grid[1],
             "n_c": numerics.N_grid[2],
-            "power_a": numerics.power_abc[0],
-            "power_b": numerics.power_abc[1],
-            "power_c": numerics.power_abc[2],
+            "power_a": numerics._power_abc[0],
+            "power_b": numerics._power_abc[1],
+            "power_c": numerics._power_abc[2],
             "n_DW_x": numerics.N_DWF_grid[0],
             "n_DW_y": numerics.N_DWF_grid[1],
             "n_DW_z": numerics.N_DWF_grid[2],
             "energy_bin_width": numerics.bin_width,
             "q_cut": numerics.use_q_cut,
-            "special_mesh": numerics.use_special_mesh,
+            "special_mesh": numerics._use_special_mesh,
         }
         return physics_parameters, dm_properties_dict, coeff, numerics_parameters
 
@@ -168,13 +217,11 @@ def write_hdf5(
 
     with cm as out_f:
         # Create groups/datasets and write out input parameters
-        write_group_from_dict(out_f, "numerics", numerics_parameters)
-        write_group_from_dict(out_f, "particle_physics", physics_parameters)
+        h5group_to_dict(out_f, "numerics", numerics_parameters)
+        h5group_to_dict(out_f, "particle_physics", physics_parameters)
         out_f.create_dataset("version", data=np.array(["0.0.1"], dtype="S"))
-        write_group_from_dict(
-            out_f, "particle_physics/dm_properties", dm_properties_dict
-        )
-        write_group_from_dict(out_f, "particle_physics/c_coeffs", c_dict)
+        h5group_to_dict(out_f, "particle_physics/dm_properties", dm_properties_dict)
+        h5group_to_dict(out_f, "particle_physics/c_coeffs", c_dict)
 
         num_bins = len(all_diff_rate_list[0][0][1])
         num_modes = len(all_binned_rate_list[0][0][1])
@@ -196,8 +243,8 @@ def write_hdf5(
             for t, b, d in zip(tr_list, br_list, dr_list):
                 # The first element of t, b, and d is a tuple of the mass and time index
                 # The second element is either a scalar (total) or an array (binned and diff)
-                # For binned and diff, the dimensions of the array are num_bins and num_modes
-                # respectively
+                # For binned and diff, the dimensions of the array are num_bins
+                # and num_modes respectively
 
                 # mass_index, time_index
                 j, i = map(str, map(int, t[0]))
