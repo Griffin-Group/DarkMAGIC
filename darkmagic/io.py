@@ -293,10 +293,7 @@ def write_phonodark(
     )
 
     # Get appropriate context manager for serial/parallel
-    if comm is None:
-        cm = h5py.File(out_file, "w")
-    else:
-        cm = h5py.File(out_file, "w", driver="mpio", comm=comm)
+    cm = _get_context_manager(out_file, comm)
 
     with cm as h5f:
         # Create groups/datasets and write out input parameters
@@ -306,8 +303,14 @@ def write_phonodark(
         h5group_to_dict(h5f, "particle_physics/dm_properties", dm_properties_dict)
         h5group_to_dict(h5f, "particle_physics/c_coeffs", c_dict)
 
-        num_bins = len(all_diff_rate_list[0][0][1])
-        num_modes = len(all_binned_rate_list[0][0][1])
+        if isinstance(all_diff_rate_list, list):
+            # Old implementation friendly
+            num_bins = len(all_diff_rate_list[0][0][1])
+            num_modes = len(all_binned_rate_list[0][0][1])
+        else:
+            num_bins = all_diff_rate_list.shape[-1]
+            num_modes = all_binned_rate_list.shape[-1]
+
         # In parallel all datasets need to be created by all ranks
         for i in range(len(physics_parameters["times"])):
             for j in range(len(dm_properties_dict["mass_list"])):
@@ -318,23 +321,39 @@ def write_phonodark(
                 h5f.create_dataset(
                     f"data/binned_rate/{i}/{j}", shape=(num_modes,), dtype="f8"
                 )
-        # Write out rates to the file
-        # To accomodate for serial, can flatten all_total_rate_list
-        for tr_list, br_list, dr_list in zip(
-            all_total_rate_list, all_binned_rate_list, all_diff_rate_list
-        ):
-            for t, b, d in zip(tr_list, br_list, dr_list):
-                # The first element of t, b, and d is a tuple of the mass and time index
-                # The second element is either a scalar (total) or an array (binned and diff)
-                # For binned and diff, the dimensions of the array are num_bins
-                # and num_modes respectively
+                # This will work for the new implementation where
+                # the data is arrays indexed as (time, mass), but not
+                # in parallel. See parallel implementation below.
+                h5f[f"data/rate/{i}/{j}"][...] = all_total_rate_list[i, j]
+                h5f[f"data/diff_rate/{i}/{j}"][...] = all_diff_rate_list[i, j]
+                h5f[f"data/binned_rate/{i}/{j}"][...] = all_binned_rate_list[i, j]
 
-                # mass_index, time_index
-                j, i = map(str, map(int, t[0]))
-                # print(f'Writing data/rate/{i}/{j} = {t[1]} to {out_f["data"]["rate"][i][j]}')
-                h5f["data"]["rate"][i][j][...] = t[1]
-                h5f["data"]["binned_rate"][i][j][...] = b[1]
-                h5f["data"]["diff_rate"][i][j][...] = d[1]
+            # Parallel friendly implementation
+            # Write out rates to the file
+            # To accomodate for serial, can flatten all_total_rate_list
+            # for tr_list, br_list, dr_list in zip(
+            #     all_total_rate_list, all_binned_rate_list, all_diff_rate_list
+            # ):
+            #     for t, b, d in zip(tr_list, br_list, dr_list):
+            #         # The first element of t, b, and d is a tuple of the mass and time index
+            #         # The second element is either a scalar (total) or an array (binned and diff)
+            #         # For binned and diff, the dimensions of the array are num_bins
+            #         # and num_modes respectively
+
+            #         # mass_index, time_index
+            #         j, i = map(str, map(int, t[0]))
+            #         # print(f'Writing data/rate/{i}/{j} = {t[1]} to {out_f["data"]["rate"][i][j]}')
+            #         h5f["data"]["rate"][i][j][...] = t[1]
+            #         h5f["data"]["binned_rate"][i][j][...] = b[1]
+            #         h5f["data"]["diff_rate"][i][j][...] = d[1]
+
+
+def _get_context_manager(out_file, comm):
+    if comm is None:
+        cm = h5py.File(out_file, "w")
+    else:
+        cm = h5py.File(out_file, "w", driver="mpio", comm=comm)
+    return cm
 
 
 def dict_from_h5group(group: h5py.Group):
