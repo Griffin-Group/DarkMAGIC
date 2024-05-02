@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from typing import Tuple
 
 import numpy as np
@@ -8,7 +9,7 @@ from pymatgen.core.structure import Structure
 from radtools import MagnonDispersion, SpinHamiltonian
 
 import darkmagic.constants as const
-from darkmagic.numerics import MonkhorstPackGrid
+from darkmagic.numerics import SphericalGrid, MonkhorstPackGrid
 
 
 class MaterialParameters:
@@ -156,8 +157,7 @@ class MaterialParameters:
         assert len(self.lambda_L) == n_atoms
 
 
-# TODO: make this an abstract class and define Phonon/MagnonMaterial as children
-class Material:
+class Material(ABC):
     """
     Represents a generic material with its structural and atomic properties.
 
@@ -211,6 +211,30 @@ class Material:
         # Internal variables
         self._max_dE = None
         self._q_cut = None
+
+    @abstractmethod
+    def get_eig(
+        self, grid: SphericalGrid | MonkhorstPackGrid, with_eigenvectors: bool = True
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Abstract method for computing eigenvalues and eigenvectors
+        """
+        pass
+
+    @property
+    @abstractmethod
+    def max_dE(self) -> float:
+        """
+        Abstract method for estimating the maximum energy deposition
+        """
+        pass
+
+    @property
+    def q_cut(self) -> float:
+        """
+        Abstract method for estimating a cutoff for the momentum transfer
+        """
+        pass
 
 
 class PhononMaterial(Material):
@@ -270,41 +294,40 @@ class PhononMaterial(Material):
         super().__init__(name, properties, structure, m_atoms)
 
     def get_eig(
-        self, k_points: ArrayLike, with_eigenvectors: bool = True
+        self, grid: SphericalGrid, with_eigenvectors: bool = True
     ) -> Tuple[np.ndarray, np.ndarray]:
         """
         Calculates the phonon frequencies and eigenvectors for the given k-points.
 
         Args:
-            k_points (ArrayLike): Numpy array of k-points in fractional coordinates.
-            with_eigenvectors (bool, optional): Flag indicating whether to calculate eigenvectors.
+            grid (SphericalGrid): The grid object with the k-points.
+            with_eigenvectors (bool, optional): Whether to compute the eigenvectors. Defaults to True.
 
         Returns:
             A tuple containing the phonon frequencies and eigenvectors.
 
                 * The phonon frequencies are represented as a numpy array of shape (n_k,n_modes)
 
-                * The eigenvectors are represented as a numpy array of shape (n_k, n_atoms, n_modes, 3)
+                * The eigenvectors are represented as a numpy array of shape (n_k, n_modes, n_atoms, 3)
 
                 where n_k is the number of k-points, n_modes is the number of modes,
                 n_atoms is the number of atoms, and the last index is
                 for the x, y, z components of the eigenvectors.
         """
-        # run phonopy in mesh mode
+        k_points = grid.k_frac
         self.phonopy_file.run_qpoints(k_points, with_eigenvectors=with_eigenvectors)
 
         mesh_dict = self.phonopy_file.get_qpoints_dict()
-
         eigenvectors_pre = mesh_dict.get("eigenvectors", None)
-        # print(eigenvectors_pre)
-        # convert frequencies to correct units
+
+        # Convert from THz (phonopy default for any calculator) to eV
         omega = const.THz_to_eV * mesh_dict["frequencies"]
 
         eigenvectors = np.zeros(
             (len(k_points), self.n_modes, self.n_atoms, 3), dtype=complex
         )
         # Need to reshape the eigenvectors from (n_k, n_modes, n_modes)
-        # to (n_k, n_modes, n_atoms, 3) # TODO: is this correct?
+        # to (n_k, n_modes, n_atoms, 3)
         if with_eigenvectors:
             # TODO: Should rewrite this with a reshape...
             for q in range(len(k_points)):
@@ -328,14 +351,20 @@ class PhononMaterial(Material):
         """
         if self._max_dE is None:
             if self.phonopy_file.primitive.get_number_of_atoms() == 1:
-                self.phonopy_file.run_mesh([20, 20, 20], with_eigenvectors=False)
+                self.phonopy_file.run_mesh([20, 20, 20])
                 mesh_dict = self.phonopy_file.get_mesh_dict()
                 weights = mesh_dict["weights"]
                 omega = const.THz_to_eV * mesh_dict["frequencies"]
+                # 2 is arbitrary
                 self._max_dE = 2 * np.mean(np.average(omega, axis=0, weights=weights))
             else:
-                omega, _ = self.get_eig([[0, 0, 0]], with_eigenvectors=False)
-                self._max_dE = 1.5 * np.amax(omega)
+                self.phonopy_file.run_qpoints([[0, 0, 0]])
+                omega_gamma = (
+                    self.phonopy_file.get_qpoints_dict()["frequencies"]
+                    * const.THz_to_eV
+                )
+                # 1.5 is arbitrary
+                self._max_dE = 1.5 * np.amax(omega_gamma)
         return self._max_dE
 
     @property
@@ -372,7 +401,7 @@ class PhononMaterial(Material):
             np.ndarray: The W tensor.
 
         """
-        omega, epsilon = self.get_eig(grid.k_frac)
+        omega, epsilon = self.get_eig(grid)
         # epsilon is (n_k, n_modes, n_atoms, 3)
         eps_tensor = np.einsum("...i,...j->...ij", epsilon, np.conj(epsilon))
 
@@ -442,11 +471,8 @@ class MagnonMaterial(Material):
                 for atom in hamiltonian.magnetic_atoms
             ]
         )
-        # sqrt(Sj/2)
-        # TODO: make this an internal variable
-        self.sqrt_spins_2 = np.sqrt(
-            np.array([atom.spin for atom in hamiltonian.magnetic_atoms]) / 2
-        )
+        # Spins
+        self.Sj = np.array([atom.spin for atom in hamiltonian.magnetic_atoms])
         # The vectors for rotating to local coordiante system
         # TODO: make this an internal variable
         self.rj = self.dispersion.u
@@ -459,35 +485,54 @@ class MagnonMaterial(Material):
         m_atoms = [m_cell / n_atoms] * n_atoms
         super().__init__(name, properties, structure, m_atoms)
 
-    def get_eig(self, k: ArrayLike, G: ArrayLike) -> Tuple[np.ndarray, np.ndarray]:
+    def get_eig(self, grid: SphericalGrid) -> Tuple[np.ndarray, np.ndarray]:
         """
-        Calculate the eigenvalues and magnon polarization vectors for a given k-point and G-vector.
+        Computes the magnon eigenvalues and eigenvectors (polarization vectors) for a list of k-points.
+
+        Args:
+            k (ArrayLike): The k-point in fractional coordinates.
+
+        Returns:
+
+        """
+        omegas = np.zeros((grid.nq, self.n_modes))
+        epsilons = np.zeros((grid.nq, self.n_modes, self.n_atoms, 3), dtype=complex)
+
+        # TODO: This is a very slow implementation
+        for ik, k in enumerate(grid.k_cart):
+            omegas[ik, ...], epsilons[ik, ...] = self._get_eig_k(k)
+
+        return omegas, epsilons
+
+    def _get_eig_k(self, k: ArrayLike) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Calculate the eigenvalues and magnon polarization vectors for a given k-point
 
         Args:
             k (ArrayLike): Single k-point, cartesian coordinates (units of eV).
             G (ArrayLike): Single G-vector, cartesian coordinates (units of eV).
 
         Returns:
-            Tuple[np.ndarray, np.ndarray]: A tuple containing the eigenvalues (omega_nu_k) and eigenvectors (epsilon_nu_k_G).
-                - omega_nu_k: (N,) an array of complex numbers representing the eigenvalues in eV.
-                - epsilon_nu_k_G: (N,3) array of complex numbers representing the eigenvectors (magnon polarization vectors) in eV/??
+            Tuple[np.ndarray, np.ndarray]: A tuple containing the eigenvalues (omega_nu) and eigenvectors (epsilon_nu_j).
+                - omega_nu: (N,) an array of real numbers representing the eigenvalues in eV.
+                - epsilon_nu_j: (N,N,3) array of complex numbers representing the eigenvectors (magnon polarization vectors), indexed as mode, atom, xyz
                 N is the number of magnon modes.
 
         """
-        # Calculate the prefactor
-        prefactor = self.sqrt_spins_2 * np.exp(1j * np.dot(self.xj, G))
 
         # See Tanner's Disseration and RadTools doc for explanation of the 1/2
+        omega_nu, Tk = self._get_omega_T(self.dispersion.h(k) / 2)
         N = self.n_atoms
-        omega_nu_k, Tk = self._get_omega_T(self.dispersion.h(k) / 2)
         Uk_conj = np.conjugate(Tk[:N, :N])  # This is U_{j,nu,k})*
         V_minusk = np.conjugate(Tk[N:, :N])  # This is ((V_{j,nu,-k})*)*
 
-        epsilon_nu_k_G = (prefactor[:, None] * V_minusk).T @ np.conjugate(self.rj) + (
-            prefactor[:, None] * Uk_conj
-        ).T @ self.rj
+        # Need to sort out the nu vs j index situation...
+        epsilon_nu_j = (
+            V_minusk[..., None] * (self.rj[:, None, :]).conj()
+            + Uk_conj[..., None] * self.rj[:, None, :]
+        )
 
-        return omega_nu_k, epsilon_nu_k_G  # (n,) and (n,3) array of complex numbers
+        return omega_nu, epsilon_nu_j  # (n,) and (n,3) array of complex numbers
 
     def _get_omega_T(self, D) -> Tuple[np.ndarray, np.ndarray]:
         """
@@ -549,7 +594,7 @@ class MagnonMaterial(Material):
         # TODO: this should be an average over the BZ
         if self._max_dE is None:
             k = [1 / 2, 0, 0]
-            omega, _ = self.get_eig(self.recip_frac_to_cart @ k, [0, 0, 0])
+            omega, _ = self._get_eig_k(self.recip_frac_to_cart @ k)
             self._max_dE = 3 * np.amax(omega)
         return self._max_dE
 

@@ -71,7 +71,7 @@ class Model:
             shortname (str, optional): The short name of the model, used in the output filenames. Defaults to lowercase initials of the model name.
         """
         self.name = name
-        if shortname is None:
+        if shortname is None and self.name is not None:
             shortname = "".join([word[0].lower() for word in name.split()])
         self.shortname = shortname
 
@@ -103,6 +103,51 @@ class Model:
         # Unused, for backwards compatibility
         self.Fmed_power = 0
         self.power_V = 0
+
+    @classmethod
+    def from_dict(cls, d: dict):
+        """
+        Create a Model object from a dictionary.
+
+        Args:
+            d (dict): The dictionary containing the model information.
+
+        Returns:
+            Model: The Model object.
+        """
+        return cls(
+            d["name"],
+            d["coeff_prefactor"],
+            d["coeff_func"],
+            None,  # d["F_med_prop"],
+            S_chi=d["S_chi"],
+            shortname=d["shortname"],
+        )
+
+    def to_dict(self, serializable=False) -> dict:
+        """
+        Convert the Model object to a dictionary.
+
+        Args:
+            serializable (bool, optional): Whether to return a serializable dictionary. Defaults to False. This essentially replaces function handles with their names.
+
+        Returns:
+            dict: The dictionary representation of the Model object.
+        """
+        cf = self.coeff_func
+        if serializable:
+            cf = {
+                alpha: {psi: f.__name__ for psi, f in c.items()}
+                for alpha, c in cf.items()
+            }
+        return {
+            "name": self.name,
+            "coeff_prefactor": self.coeff_prefactor,
+            "coeff_func": cf,
+            # "F_med_prop": self.F_med_prop,  # TODO: this isn't written
+            "S_chi": self.S_chi,
+            "shortname": self.shortname,
+        }
 
     def get_unscreened_coeff(
         self, alpha: str, psi: str, grid: SphericalGrid, m_chi: float, S_chi: float

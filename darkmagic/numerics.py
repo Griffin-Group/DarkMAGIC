@@ -106,6 +106,8 @@ class SphericalGrid:
         # Deriving this is straightforward, remember we're sampling
         # with a power of 2 in the q direction, hence the square roots on |q|
         self.jacobian = 8 * np.pi * self.q_norm ** (5 / 2) * self.q_max ** (1 / 2)
+        # Volume element dV = d^3q J(q) / (2pi)^3 / N^3
+        self.vol_element = self.jacobian / ((2 * np.pi) ** 3 * np.prod(N_grid))
 
         # Get the k-vectors
         self.k_frac = self.q_frac - self.G_frac
@@ -252,11 +254,12 @@ class Numerics:
     def __init__(
         self,
         N_grid: ArrayLike = None,
-        power_abc: ArrayLike = None,
         N_DWF_grid: ArrayLike = None,
         bin_width: float = 1e-3,
         use_q_cut: bool = True,
         use_special_mesh: bool = False,
+        threshold=0,
+        power_abc: ArrayLike = None,
     ):
         r"""
         Constructor for the Numerics class.
@@ -268,6 +271,7 @@ class Numerics:
             bin_width (float): The width of the energy bin. Rebinning to larger bins is possible in postprocessing.
             use_q_cut (bool): Whether to use a cutoff for the momentum transfer from DM. If False, the cutoff is set to the maximum possible value $2 m_{\chi} (v_{\text{esc}} + v_{\text{e}})$.
             use_special_mesh (bool): Whether to use a special mesh for the spherical grid (currently unused)
+            threshold (float): unused, DarkMAGIC does not impose any thresholds during the actual calculation. Maintained for backwards compatibility.
         """
         if N_grid is None:
             N_grid = [20, 10, 10]
@@ -276,13 +280,50 @@ class Numerics:
         if N_DWF_grid is None:
             N_DWF_grid = [20, 20, 20]
         self.N_grid = np.array(N_grid)
-        self.power_abc = np.array(power_abc)
+        self._power_abc = np.array(power_abc)
         self.N_DWF_grid = np.array(N_DWF_grid)
         self.bin_width = bin_width
         self.use_q_cut = use_q_cut
-        self.use_special_mesh = use_special_mesh
-        # self._grid = None
-        # self._dwf_grid = None
+        self._use_special_mesh = use_special_mesh
+        self._threshold = threshold
+
+    @classmethod
+    def from_dict(cls, d: dict):
+        """
+        Create a Numerics object from a dictionary.
+
+        Args:
+            d (dict): The dictionary containing the numerical parameters.
+
+        Returns:
+            Numerics: The Numerics object.
+        """
+        return cls(
+            d["N_grid"],
+            d["N_DWF_grid"],
+            d["bin_width"],
+            d["use_q_cut"],
+            d["_use_special_mesh"],
+            d["_threshold"],
+            d["_power_abc"],
+        )
+
+    def to_dict(self):
+        """
+        Convert the Numerics object to a dictionary.
+
+        Returns:
+            dict: The dictionary containing the numerical parameters.
+        """
+        return {
+            "N_grid": self.N_grid,
+            "N_DWF_grid": self.N_DWF_grid,
+            "bin_width": self.bin_width,
+            "use_q_cut": self.use_q_cut,
+            "_use_special_mesh": self._use_special_mesh,
+            "_threshold": self._threshold,
+            "_power_abc": self._power_abc,
+        }
 
     def get_grid(
         self, m_chi: float, v_e: ArrayLike, material: Material
