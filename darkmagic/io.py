@@ -128,7 +128,7 @@ def write_h5(
             all_binned_rate_list,
             comm=None,
         )
-    else:
+    elif parallel:
         writer(
             out_filename,
             material,
@@ -349,11 +349,11 @@ def write_phonodark(
 
 
 def _get_context_manager(out_file, comm):
-    if comm is None:
-        cm = h5py.File(out_file, "w")
-    else:
-        cm = h5py.File(out_file, "w", driver="mpio", comm=comm)
-    return cm
+    return (
+        h5py.File(out_file, "w")
+        if comm is None
+        else h5py.File(out_file, "w", driver="mpio", comm=comm)
+    )
 
 
 def dict_from_h5group(group: h5py.Group):

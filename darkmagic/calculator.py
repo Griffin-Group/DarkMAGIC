@@ -179,7 +179,7 @@ class Calculator:
             self.diff_rate,
             self.binned_rate,
             COMM_WORLD.Get_rank(),
-            COMM_WORLD,
+            None,
             parallel=False,
             format=format,
         )
