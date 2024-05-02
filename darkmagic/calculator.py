@@ -228,7 +228,6 @@ class Calculator:
 
         energy_bin_width = self.numerics.bin_width
         threshold = self.numerics._threshold  # legacy for PD support
-        print("got a threshold of ", threshold)
         m_chi = self.m_chi
         # get time index
         try:

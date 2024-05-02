@@ -1,15 +1,59 @@
 # DarkMAGIC
 
-## Commands
+The **D**ark **M**atter ***A****b* *initio* phonon/ma**G**non **I**nteraction **C**alculator (DarkMAGIC) is a python package for calculating dark matter interaction rates with phonons and magnons in real materials, based on properties calculated from first principles (mainly, density functional theory). It is based on the effective field theory developed by Trickle, Zhang and Zurek [paper](https://arxiv.org/abs/2009.13534), and takes inspiration from the code they released with that paper, [PhonoDark](https://github.com/tanner-trickle/PhonoDark). 
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
+DarkMAGIC is currently in pre-alpha testing, so not all features are implemented and not everything has been tested. Development is in progress, and once at a satisfying stage, a manuscript will be prepared.
 
-## Project layout
+## Features
+* Calculate scattering rates from single phonons and magnons.
+* Supports phonon calculations using the frozen cell method or density functional perturbation theory with arbitrary DFT codes, based on the interface with [phonopy](https://phonopy.github.io/phonopy/).
+* Supports toy models and *ab initio*-based spin hamiltonians via [rad-tools](https://rad-tools.org/en/stable/) and TB2J(https://tb2j.readthedocs.io/en/latest/).
+* Parallelized with MPI, and extremely performant.
+* Easy to use Python API, with multiple pre-defined benchmark models.
+* Portable HDF5 output format that allows the reconstruction of calculation as python objects. DarkMAGIC can also read and write HDF5 files in the format used by PhonoDark, but with limited functionality since it does not include all the parameters necessary to rebuild a calculation.
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+### Planned Features (short term)
+* In principle, all operators in the [EFT paper](https://arxiv.org/abs/2009.13534) are implemented for phonons, but only spin-independent operators are currently functional due to a recent refactoring. Only the magnetic dipole and anapole models for magnons are currently implemented. This will be dealt with soon.
+* JIT compilation for increased performance.
+* Command line interface.
+* Further post-processing and plotting tools.
+* More documentation and examples. This website contains extensive, automatically-generated documentation for the python API.
+
+### Planned Features (long term)
+* Multi-phonon processes
+* Absorption
+* Support for fully first-principles time-dependent DFT magnon calculations instead of just spin Hamiltonians.
+
+# Example
+
+More examples coming soon
+
+This will be run from a Jupyter notebook or as a python script
+```python
+import numpy as np
+
+from darkmagic import Calculator, MaterialParameters, PhononMaterial, Numerics
+from darkmagic.benchmark_models import light_scalar_mediator
+
+# Masses in eV and times of day in hours (to calculate the earth's velocity)
+masses = np.logspace(4, 10, 96)
+times = [0]
+
+# Phonons in Helium
+params = MaterialParameters(N={"e": [2, 2], "n": [2, 2], "p": [2, 2]})
+material = PhononMaterial("hcp_He", params, "tests/data/hcp_He_1GPa.phonopy.yaml")
+model = light_scalar_mediator
+
+# Numerics
+numerics = Numerics(
+    N_grid=[80, 40, 40],  # Spherical grid for momentum transfer
+    N_DWF_grid=[30, 30, 30],  # Monkhorst-Pack grid for Debye-Waller factor
+)
+
+# Create calculator object
+full_calc = Calculator("scattering", masses, material, model, numerics, times)
+full_calc.evaluate()  # Run calculation
+full_calc.to_file()  # Write HDF5 file (default name is "material.name_model.name.h5")
+```
+
+To run in parallel, simply run with `srun -n <nprocs> python script.py` or whatever your system uses.
