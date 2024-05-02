@@ -6,6 +6,7 @@ from pytest_parametrize_cases import Case, parametrize_cases
 
 import darkmagic.constants as const
 from darkmagic.material import MaterialParameters, PhononMaterial
+from darkmagic.numerics import MonkhorstPackGrid
 
 TEST_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -312,7 +313,8 @@ def test_phonon_material(
     assert material.m_atoms[0] == pytest.approx(m_atom1 * const.amu_to_eV)
     assert np.all(material.epsilon == eps)
     assert np.all(material.born[0] == bec1)
-    freq, eigvec = material.get_eig([[0, 0, 0]], with_eigenvectors=True)
+    grid = MonkhorstPackGrid([1, 1, 1], material, shift=False)
+    freq, eigvec = material.get_eig(grid, with_eigenvectors=True)
     assert freq.shape == (1, n_atoms * 3)
     assert eigvec.shape == (1, n_atoms * 3, n_atoms, 3)
     # Acoustic modes
