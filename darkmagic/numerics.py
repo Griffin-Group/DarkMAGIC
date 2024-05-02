@@ -254,12 +254,12 @@ class Numerics:
     def __init__(
         self,
         N_grid: ArrayLike = None,
-        power_abc: ArrayLike = None,
         N_DWF_grid: ArrayLike = None,
         bin_width: float = 1e-3,
         use_q_cut: bool = True,
         use_special_mesh: bool = False,
         threshold=0,
+        power_abc: ArrayLike = None,
     ):
         r"""
         Constructor for the Numerics class.
@@ -298,29 +298,30 @@ class Numerics:
         Returns:
             Numerics: The Numerics object.
         """
-        # TODO: this is not file format agnostic
-        N_grid = [d.get("n_a"), d.get("n_b"), d.get("n_c")]
-        if any(x is None for x in N_grid):
-            N_grid = None
-        power_abc = [d.get("power_a"), d.get("power_b"), d.get("power_c")]
-        if any(x is None for x in power_abc):
-            power_abc = None
-        N_DWF_grid = [d.get("n_DW_x"), d.get("n_DW_y"), d.get("n_DW_z")]
-        if any(x is None for x in N_DWF_grid):
-            N_DWF_grid = None
-        use_q_cut = d.get("q_cut", True)
-        use_special_mesh = d.get("special_mesh", False)
-        bin_width = d.get("energy_bin_width")
-        threshold = d.get("threshold", 0)
         return cls(
-            N_grid,
-            power_abc,
-            N_DWF_grid,
-            bin_width,
-            use_q_cut,
-            use_special_mesh,
-            threshold,
+            d["N_grid"],
+            d["N_DWF_grid"],
+            d["bin_width"],
+            d["use_q_cut"],
+            d["_use_special_mesh"],
+            d["_threshold"],
+            d["_power_abc"],
         )
+
+    def to_dict(self):
+        """
+        Convert the Numerics object to a dictionary.
+
+        Returns:
+            dict: The dictionary containing the numerical parameters.
+        """
+        return {
+            "threshold": self._threshold,
+            "N_grid": self.N_grid,
+            "N_DWF_grid": self.N_DWF_grid,
+            "energy_bin_width": self.bin_width,
+            "q_cut": self.use_q_cut,
+        }
 
     def get_grid(
         self, m_chi: float, v_e: ArrayLike, material: Material

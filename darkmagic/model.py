@@ -106,37 +106,48 @@ class Model:
 
     @classmethod
     def from_dict(cls, d: dict):
-        # TODO: this is not file format agnostic
-        Fmed_power = d.get("Fmed_power", 0)
-        # power_V = d.get("power_V", 0)
-        S_chi = d["dm_properties"]["spin"]
-        shortname = d.get("model_name")
-        coeff_prefactor = d["c_coeffs"]
+        """
+        Create a Model object from a dictionary.
 
-        def F_med_prop(grid):
-            return grid.q_norm ** (-Fmed_power)
+        Args:
+            d (dict): The dictionary containing the model information.
 
-        def ones(grid):
-            return np.ones_like(grid.q_norm)
-
-        warnings.warn(
-            "Reconstructing ceofficient functions from an HDF5 file that does not "
-            "contain them (e.g., PhonoDark formatted files). They will all be set to"
-            "one, which is likely incorrect."
-        )
-        coeff_func = {
-            alpha: {psi: ones for psi in coeff_prefactor[alpha].keys()}
-            for alpha in coeff_prefactor.keys()
-        }
-
+        Returns:
+            Model: The Model object.
+        """
         return cls(
-            "Unknown",
-            coeff_prefactor,
-            coeff_func,
-            F_med_prop,
-            S_chi=S_chi,
-            shortname=shortname,
+            d["name"],
+            d["coeff_prefactor"],
+            d["coeff_func"],
+            d["F_med_prop"],
+            S_chi=d["S_chi"],
+            shortname=d["shortname"],
         )
+
+    def to_dict(self, serializable=False) -> dict:
+        """
+        Convert the Model object to a dictionary.
+
+        Args:
+            serializable (bool, optional): Whether to return a serializable dictionary. Defaults to False. This essentially replaces function handles with their names.
+
+        Returns:
+            dict: The dictionary representation of the Model object.
+        """
+        cf = self.coeff_func
+        if serializable:
+            cf = {
+                alpha: {psi: f.__name__ for psi, f in c.items()}
+                for alpha, c in cf.items()
+            }
+        return {
+            "name": self.name,
+            "coeff_prefactor": self.coeff_prefactor,
+            "coeff_func": cf,
+            # "F_med_prop": self.F_med_prop,  # TODO: this isn't written
+            "S_chi": self.S_chi,
+            "shortname": self.shortname,
+        }
 
     def get_unscreened_coeff(
         self, alpha: str, psi: str, grid: SphericalGrid, m_chi: float, S_chi: float
