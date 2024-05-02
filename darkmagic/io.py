@@ -2,6 +2,43 @@ import h5py
 import numpy as np
 
 from darkmagic.parallel import ROOT_PROCESS
+import pkg_resources
+
+VERSION = my_version = pkg_resources.get_distribution("dark-magic").version
+
+
+def dict_from_h5group(group):
+    """
+    Recurses through an h5py group and creates a dictionary with the same structure.
+    """
+    result = {}
+    for k in group.keys():
+        v = group[k]
+        result[k] = dict_from_h5group(v) if isinstance(v, h5py.Group) else np.array(v)
+        if isinstance(result[k], np.ndarray) and result[k].ndim == 0:
+            result[k] = result[k].item()
+        # Convert string arrays to strings
+        if isinstance(result[k], np.ndarray) and result[k].dtype.char == "S":
+            result[k] = result[k].astype(str)[0]
+    return result
+
+
+def h5group_to_dict(hdf5_file, group_name, data_dict):
+    """
+    Recurses through a dictionary and creates appropriate groups or datasets
+    This is parallel friendly, nothing is variable length.
+    """
+
+    for index in data_dict:
+        if isinstance(data_dict[index], dict):
+            h5group_to_dict(hdf5_file, f"{group_name}/{index}", data_dict[index])
+        else:
+            data = (
+                np.array([data_dict[index]], dtype="S")
+                if isinstance(data_dict[index], str)
+                else data_dict[index]
+            )
+            hdf5_file.create_dataset(f"{group_name}/{index}", data=data)
 
 
 def read_h5(filename, format):
@@ -49,81 +86,52 @@ def write_h5(
     numerics,
     masses,
     times,
+    v_e,
     all_total_rate_list,
     all_diff_rate_list,
     all_binned_rate_list,
     proc_id,
     comm,
     parallel=False,
+    format="darkmagic",
 ):
     # Write to file
     # TODO: is there a more succinct way to do this?
     # TODO: this should be cleaned up to not depend on MPI stuff and that low
     # level stuff can go elsewhere?
     print(f"Writing to file {out_filename}{' in parallel' if parallel else ''}...")
+    writer = write_phonodark if format == "phonodark" else write_darkmagic
     if not parallel and proc_id == ROOT_PROCESS:
         print("Done gathering!!!")
         print("----------")
 
-        write_phonodark(
+        writer(
             out_filename,
             material,
             model,
             numerics,
             masses,
             times,
+            v_e,
             all_total_rate_list,
             all_diff_rate_list,
             all_binned_rate_list,
             comm=None,
         )
     else:
-        write_phonodark(
+        writer(
             out_filename,
             material,
             model,
             numerics,
             masses,
             times,
+            v_e,
             all_total_rate_list,
             all_diff_rate_list,
             all_binned_rate_list,
             comm=comm,
         )
-
-
-def dict_from_h5group(group):
-    """
-    Recurses through an h5py group and creates a dictionary with the same structure.
-    """
-    result = {}
-    for k in group.keys():
-        v = group[k]
-        result[k] = dict_from_h5group(v) if isinstance(v, h5py.Group) else np.array(v)
-        if isinstance(result[k], np.ndarray) and result[k].ndim == 0:
-            result[k] = result[k].item()
-        # Convert string arrays to strings
-        if isinstance(result[k], np.ndarray) and result[k].dtype.char == "S":
-            result[k] = result[k].astype(str)[0]
-    return result
-
-
-def h5group_to_dict(hdf5_file, group_name, data_dict):
-    """
-    Recurses through a dictionary and creates appropriate groups or datasets
-    This is parallel friendly, nothing is variable length.
-    """
-
-    for index in data_dict:
-        if isinstance(data_dict[index], dict):
-            h5group_to_dict(hdf5_file, f"{group_name}/{index}", data_dict[index])
-        else:
-            data = (
-                np.array([data_dict[index]], dtype="S")
-                if isinstance(data_dict[index], str)
-                else data_dict[index]
-            )
-            hdf5_file.create_dataset(f"{group_name}/{index}", data=data)
 
 
 def write_phonodark(
@@ -252,3 +260,90 @@ def write_phonodark(
                 out_f["data"]["rate"][i][j][...] = t[1]
                 out_f["data"]["binned_rate"][i][j][...] = b[1]
                 out_f["data"]["diff_rate"][i][j][...] = d[1]
+
+
+def write_darkmagic(
+    out_file,
+    material,
+    model,
+    numerics,
+    masses,
+    times,
+    v_e,
+    all_total_rate_list,
+    all_diff_rate_list,
+    all_binned_rate_list,
+    comm=None,
+):
+    """
+    Args:
+    - out_file: Path to the output HDF5 file.
+    - material: Material object.
+    - model: Model object.
+    - numerics: Numerics object.
+    - masses: List of masses for the jobs.
+    - times: List of times for the jobs.
+    - all_total_rate_list: List of total rate data.
+    - all_diff_rate_list: List of differential rate data.
+    - all_binned_rate_list: List of binned rate data.
+    - comm: MPI communicator for parallel writing (default is None).
+
+    Returns:
+    - None
+    """
+
+    def get_dicts(model, numerics, masses, times):
+        coeff_prefactor = model.coeff_prefactor
+        cf = model.coeff_func
+        coeff_func = {
+            alpha: {psi: f.__name__ for psi, f in c.items()} for alpha, c in cf.items()
+        }
+        model = {
+            "model_name": model.shortname,
+            "spin": model.S_chi,
+            "coeff_prefactor": coeff_prefactor,
+            "coeff_func": coeff_func,
+        }
+        calc = {
+            "m_chi": masses,
+            "times": times,
+            "v_e": v_e,
+        }
+        numerics = {
+            "threshold": numerics._threshold,
+            "N_grid": numerics.N_grid,
+            "N_DWF_grid": numerics.N_DWF_grid,
+            "energy_bin_width": numerics.bin_width,
+            "q_cut": numerics.use_q_cut,
+        }
+        return model, calc, coeff_prefactor, coeff_func, numerics
+
+    model, calc, coeff_prefactor, coeff_func, numerics = get_dicts(
+        model, numerics, masses, times
+    )
+
+    # Get appropriate context manager for serial/parallel
+    if comm is None:
+        cm = h5py.File(out_file, "w")
+    else:
+        cm = h5py.File(out_file, "w", driver="mpio", comm=comm)
+
+    with cm as out_f:
+        # Create groups/datasets and write out input parameters
+        h5group_to_dict(out_f, "numerics", numerics)
+        h5group_to_dict(out_f, "model", model)
+        h5group_to_dict(out_f, "calc", calc)
+        out_f.create_dataset("version", data=np.array([VERSION], dtype="S"))
+
+        nt = len(times)
+        nm = len(masses)
+        num_bins = all_diff_rate_list.shape[-1]
+        num_modes = all_binned_rate_list.shape[-1]
+
+        out_f.create_dataset("data/diff_rate", shape=(nt, nm, num_bins), dtype="f8")
+        out_f.create_dataset("data/binned_rate", shape=(nt, nm, num_modes), dtype="f8")
+        out_f.create_dataset("data/rate", shape=(nt, nm), dtype="f8")
+
+        out_f["data"]["diff_rate"][...] = all_diff_rate_list
+        out_f["data"]["binned_rate"][...] = all_binned_rate_list
+        out_f["data"]["rate"][...] = all_total_rate_list
