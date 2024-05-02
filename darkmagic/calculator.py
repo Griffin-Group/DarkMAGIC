@@ -134,37 +134,17 @@ class Calculator:
             diff_rates.append([job, d.real])
             binned_rates.append([job, b.real])
             total_rates.append([job, t.real])
-            # (
-            #    self.diff_rate[iv, im],
-            #    self.binned_rate[iv, im],
-            #    self.total_rate[iv, im],
-            # ) = self.calc_list[iv][im].calculate_rate()
 
         print(f"Rank {rank} done calculating rates.")
-        # COMM_WORLD.Barrier()
-
-        # Saving the old format temporarily
-        self._diff_rate = COMM_WORLD.allgather(diff_rates)  # , root=ROOT_PROCESS)
-        self._binned_rate = COMM_WORLD.allgather(binned_rates)  # , root=ROOT_PROCESS)
-        self._total_rate = COMM_WORLD.allgather(total_rates)  # , root=ROOT_PROCESS)
 
         # TODO: this is hideous....
-        max_bin_num = math.ceil(self.material.max_dE / self.numerics.bin_width)
-        self.diff_rate = np.zeros((len(self.time), len(self.m_chi), max_bin_num))
-        self.binned_rate = np.zeros(
-            (len(self.time), len(self.m_chi), self.material.n_modes)
-        )
-        self.total_rate = np.zeros((len(self.time), len(self.m_chi)))
+        # Might be desirable to save these for parallel IO reimplementation
+        diff_rate = COMM_WORLD.gather(diff_rates, root=ROOT_PROCESS)
+        binned_rate = COMM_WORLD.gather(binned_rates, root=ROOT_PROCESS)
+        total_rate = COMM_WORLD.gather(total_rates, root=ROOT_PROCESS)
 
-        for rates in self._diff_rate:
-            for job, rate in rates:
-                self.diff_rate[job[1], job[0]] = rate
-        for rates in self._binned_rate:
-            for job, rate in rates:
-                self.binned_rate[job[1], job[0]] = rate
-        for rates in self._total_rate:
-            for job, rate in rates:
-                self.total_rate[job[1], job[0]] = rate
+        if rank == ROOT_PROCESS:
+            self._reshape_rates(diff_rate, binned_rate, total_rate)
 
     def to_file(self, filename: str | None = None, format="darkmagic"):
         """
@@ -181,18 +161,19 @@ class Calculator:
             self.diff_rate is None
             or self.binned_rate is None
             or self.total_rate is None
-        ):
+        ) and COMM_WORLD.Get_rank() == ROOT_PROCESS:
             raise ValueError(
                 "Rates are not computed yet. Please run the calculation first using the evaluate method."
             )
 
+        # TODO: re-implement parallel IO
         write_h5(
             filename,
             self.material,
             self.model,
             self.numerics,
             self.m_chi,
-            self.time,  # TODO: generate this even if zeros
+            self.time,
             self.v_e,
             self.total_rate,
             self.diff_rate,
@@ -201,7 +182,7 @@ class Calculator:
             COMM_WORLD,
             parallel=False,
             format=format,
-        )  # Need to implement the parallel writing with the class...
+        )
 
     @staticmethod
     def compute_ve(times: float):
@@ -278,3 +259,21 @@ class Calculator:
         )
 
         return sigma
+
+    def _reshape_rates(self, diff_rate, binned_rate, total_rate):
+        """
+        Reshape the rates into the correct format.
+        """
+        nt, nm = len(self.time), len(self.m_chi)
+        max_bin_num = math.ceil(self.material.max_dE / self.numerics.bin_width)
+        self.diff_rate = np.zeros((nt, nm, max_bin_num))
+        self.binned_rate = np.zeros((nt, nm, self.material.n_modes))
+        self.total_rate = np.zeros((nt, nm))
+
+        for rate_array, rate_list in zip(
+            [self.diff_rate, self.binned_rate, self.total_rate],
+            [diff_rate, binned_rate, total_rate],
+        ):
+            for rates in rate_list:
+                for job, r in rates:
+                    rate_array[job[1], job[0]] = r
