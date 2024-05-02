@@ -6,6 +6,11 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://oashour.github.io/DarkMAGIC/develop/examples/</loc>
+         <lastmod>2024-05-02</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://oashour.github.io/DarkMAGIC/develop/formalism/</loc>
          <lastmod>2024-05-02</lastmod>
          <changefreq>daily</changefreq>
