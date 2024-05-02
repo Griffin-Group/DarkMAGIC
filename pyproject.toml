@@ -32,8 +32,8 @@ classifiers=[
 ]
 
 [project.urls]
-Homepage = "https://github.com/oashour/DarkMAGIC"
-Issues = "https://github.com/oashour/DarkMAGIC/issues"
+Homepage = "https://github.com/Griffin-Group/DarkMAGIC"
+Issues = "https://github.com/Griffin-Group/DarkMAGIC/issues"
 
 [tool.setuptools.packages]
 find = {}  # Scan the project directory with the default parameters
