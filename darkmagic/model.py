@@ -119,7 +119,7 @@ class Model:
             d["name"],
             d["coeff_prefactor"],
             d["coeff_func"],
-            d["F_med_prop"],
+            None,  # d["F_med_prop"],
             S_chi=d["S_chi"],
             shortname=d["shortname"],
         )

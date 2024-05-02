@@ -102,7 +102,7 @@ def write_h5(
     all_total_rate_list,
     all_diff_rate_list,
     all_binned_rate_list,
-    proc_id,
+    rank,
     comm,
     parallel=False,
     format="darkmagic",
@@ -111,11 +111,10 @@ def write_h5(
     # TODO: is there a more succinct way to do this?
     # TODO: this should be cleaned up to not depend on MPI stuff and that low
     # level stuff can go elsewhere?
-    print(f"Writing to file {out_filename}{' in parallel' if parallel else ''}...")
+    if rank == ROOT_PROCESS:
+        print(f"Writing to file {out_filename}{' in parallel' if parallel else ''}...")
     writer = write_phonodark if format == "phonodark" else write_darkmagic
-    if not parallel and proc_id == ROOT_PROCESS:
-        print("Done gathering.")
-
+    if not parallel and rank == ROOT_PROCESS:
         writer(
             out_filename,
             material,
@@ -150,12 +149,12 @@ def write_darkmagic(
     material,
     model,
     numerics,
-    masses,
-    times,
+    m_chi,
+    time,
     v_e,
-    all_total_rate_list,
-    all_diff_rate_list,
-    all_binned_rate_list,
+    total_rate,
+    diff_rate,
+    binned_rate,
     comm=None,
 ):
     """
@@ -166,8 +165,8 @@ def write_darkmagic(
         material: Material object.
         model: Model object.
         numerics: Numerics object.
-        masses: List of masses for the jobs.
-        times: List of times for the jobs.
+        m_chi: List of masses for the jobs.
+        time: List of times for the jobs.
         all_total_rate_list: List of total rate data.
         all_diff_rate_list: List of differential rate data.
         all_binned_rate_list: List of binned rate data.
@@ -187,25 +186,26 @@ def write_darkmagic(
         h5group_to_dict(out_f, "numerics", numerics.to_dict())
         h5group_to_dict(out_f, "model", model.to_dict(serializable=True))
         calc = {
-            "m_chi": masses,
-            "times": times,
+            "calc_type": "scattering",
+            "m_chi": m_chi,
+            "time": time,
             "v_e": v_e,
         }
         # Create groups/datasets and write out input parameters
         h5group_to_dict(out_f, "calc", calc)
         out_f.create_dataset("version", data=np.array([VERSION], dtype="S"))
 
-        nt, nm = len(times), len(masses)
-        num_bins = all_diff_rate_list.shape[-1]
-        num_modes = all_binned_rate_list.shape[-1]
+        nt, nm = len(time), len(m_chi)
+        num_bins = diff_rate.shape[-1]
+        num_modes = binned_rate.shape[-1]
 
         out_f.create_dataset("data/diff_rate", shape=(nt, nm, num_bins), dtype="f8")
         out_f.create_dataset("data/binned_rate", shape=(nt, nm, num_modes), dtype="f8")
-        out_f.create_dataset("data/rate", shape=(nt, nm), dtype="f8")
+        out_f.create_dataset("data/total_rate", shape=(nt, nm), dtype="f8")
 
-        out_f["data"]["diff_rate"][...] = all_diff_rate_list
-        out_f["data"]["binned_rate"][...] = all_binned_rate_list
-        out_f["data"]["rate"][...] = all_total_rate_list
+        out_f["data"]["diff_rate"][...] = diff_rate
+        out_f["data"]["binned_rate"][...] = binned_rate
+        out_f["data"]["total_rate"][...] = total_rate
 
 
 def write_phonodark(
@@ -215,6 +215,7 @@ def write_phonodark(
     numerics,
     masses,
     times,
+    v_e,
     all_total_rate_list,
     all_diff_rate_list,
     all_binned_rate_list,

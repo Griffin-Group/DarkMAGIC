@@ -316,11 +316,13 @@ class Numerics:
             dict: The dictionary containing the numerical parameters.
         """
         return {
-            "threshold": self._threshold,
             "N_grid": self.N_grid,
             "N_DWF_grid": self.N_DWF_grid,
-            "energy_bin_width": self.bin_width,
-            "q_cut": self.use_q_cut,
+            "bin_width": self.bin_width,
+            "use_q_cut": self.use_q_cut,
+            "_use_special_mesh": self._use_special_mesh,
+            "_threshold": self._threshold,
+            "_power_abc": self._power_abc,
         }
 
     def get_grid(

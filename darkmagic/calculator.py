@@ -79,7 +79,7 @@ class Calculator:
             ]
 
     @classmethod
-    def from_file(cls, filename: str, format="phonodark"):
+    def from_file(cls, filename: str, format="darkmagic"):
         """
         Load a model from a file
         """
@@ -107,18 +107,18 @@ class Calculator:
         """
 
         n_ranks = COMM_WORLD.Get_size()  # Number of ranks
-        rank_id = COMM_WORLD.Get_rank()  # Rank ID
+        rank = COMM_WORLD.Get_rank()  # Processor rank
 
-        if rank_id == ROOT_PROCESS:
+        if rank == ROOT_PROCESS:
             print("Done setting up MPI")
 
-        full_job_list = None
-        if rank_id == ROOT_PROCESS:
-            full_job_list = distribute_load(n_ranks, self.m_chi, self.v_e)
+        all_tasks = None
+        if rank == ROOT_PROCESS:
+            all_tasks = distribute_load(n_ranks, self.m_chi, self.v_e)
 
-        job_list = COMM_WORLD.scatter(full_job_list, root=ROOT_PROCESS)
+        task_list = COMM_WORLD.scatter(all_tasks, root=ROOT_PROCESS)
 
-        if rank_id == ROOT_PROCESS:
+        if rank == ROOT_PROCESS:
             print("Done configuring calculation")
 
         # Set up empty arrays to store the results
@@ -129,8 +129,8 @@ class Calculator:
         )
         self.total_rate = np.zeros((len(self.time), len(self.m_chi)))
 
-        # for im, iv in itertools.product(range(len(self.m_chi)), range(len(self.time))):
-        for job in job_list:
+        # Loop over the tasks and calculate the rates
+        for job in task_list:
             if job[0] == JOB_SENTINEL and job[1] == JOB_SENTINEL:
                 continue
             im, iv = job[0], job[1]
@@ -139,13 +139,28 @@ class Calculator:
                 self.binned_rate[iv, im],
                 self.total_rate[iv, im],
             ) = self.calc_list[iv][im].calculate_rate()
+        print(f"Rank {rank} done calculating rates.")
+        COMM_WORLD.Barrier()
 
     def to_file(self, filename: str | None = None, format="darkmagic"):
         """
-        Save the rates to a file
+        Save the rates to a file.
+
+        Args:
+            filename (str, optional): The name of the file to save to. Defaults to None (i.e., use the default name, {material.name_model.name.h5}).
+            format (str, optional): The format of the file. Defaults to "darkmagic".
         """
         if filename is None:
             filename = f"{self.material.name}_{self.model.shortname}.h5"
+        # Make sure all the rates are note None
+        if (
+            self.diff_rate is None
+            or self.binned_rate is None
+            or self.total_rate is None
+        ):
+            raise ValueError(
+                "Rates are not computed yet. Please run the calculation first using the evaluate method."
+            )
         write_h5(
             filename,
             self.material,
@@ -157,7 +172,7 @@ class Calculator:
             self.total_rate,
             self.diff_rate,
             self.binned_rate,
-            ROOT_PROCESS,
+            COMM_WORLD.Get_rank(),
             COMM_WORLD,
             parallel=False,
             format=format,
