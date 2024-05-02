@@ -399,27 +399,6 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="../analysis/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    analysis
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
     
     
     
@@ -428,7 +407,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1_1" >
         
           
           
@@ -444,14 +423,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_3_1_2" id="__nav_3_1_2_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_3_1_1" id="__nav_3_1_1_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_1_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_1_2">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_1_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1_1">
             <span class="md-nav__icon md-icon"></span>
             benchmark_models
           </label>
@@ -544,6 +523,27 @@
           </ul>
         </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../calculator/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    calculator
+  </span>
+  
+
+      </a>
     </li>
   
 
@@ -812,6 +812,24 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#darkmagic.numerics.Numerics.from_dict" class="md-nav__link">
+    <span class="md-ellipsis">
+      from_dict
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#darkmagic.numerics.Numerics.to_dict" class="md-nav__link">
+    <span class="md-ellipsis">
+      to_dict
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#darkmagic.numerics.Numerics.get_grid" class="md-nav__link">
     <span class="md-ellipsis">
       get_grid
@@ -981,6 +999,24 @@
   
     <nav class="md-nav" aria-label="Numerics">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#darkmagic.numerics.Numerics.from_dict" class="md-nav__link">
+    <span class="md-ellipsis">
+      from_dict
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#darkmagic.numerics.Numerics.to_dict" class="md-nav__link">
+    <span class="md-ellipsis">
+      to_dict
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#darkmagic.numerics.Numerics.get_grid" class="md-nav__link">
@@ -1457,7 +1493,9 @@ use_sym (bool, optional): Whether to use symmetry to reduce the number of grid p
 <span class="normal">112</span>
 <span class="normal">113</span>
 <span class="normal">114</span>
-<span class="normal">115</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">m_chi</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">v_e</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
@@ -1491,6 +1529,8 @@ use_sym (bool, optional): Whether to use symmetry to reduce the number of grid p
     <span class="c1"># Deriving this is straightforward, remember we&#39;re sampling</span>
     <span class="c1"># with a power of 2 in the q direction, hence the square roots on |q|</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span> <span class="o">=</span> <span class="mi">8</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">q_norm</span> <span class="o">**</span> <span class="p">(</span><span class="mi">5</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">q_max</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="c1"># Volume element dV = d^3q J(q) / (2pi)^3 / N^3</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">vol_element</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span> <span class="o">/</span> <span class="p">((</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">**</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">N_grid</span><span class="p">))</span>
 
     <span class="c1"># Get the k-vectors</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">k_frac</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q_frac</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">G_frac</span>
@@ -1527,7 +1567,7 @@ use_sym (bool, optional): Whether to use symmetry to reduce the number of grid p
 
 
 <h2 id="darkmagic.numerics.Numerics" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">Numerics</span><span class="p">(</span><span class="n">N_grid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">power_abc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">N_DWF_grid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bin_width</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">use_q_cut</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_special_mesh</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">Numerics</span><span class="p">(</span><span class="n">N_grid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">N_DWF_grid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bin_width</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">use_q_cut</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_special_mesh</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">power_abc</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h2>
 
@@ -1848,14 +1888,26 @@ Returns the Monkhorst-Pack grid for computing the Debye-Waller factor.</p>
                 <code>False</code>
           </td>
         </tr>
+        <tr class="doc-section-item">
+          <td><code>threshold</code></td>
+          <td>
+                <code>float</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>unused, DarkMAGIC does not impose any thresholds during the actual calculation. Maintained for backwards compatibility.</p>
+            </div>
+          </td>
+          <td>
+                <code>0</code>
+          </td>
+        </tr>
     </tbody>
   </table>
 
                 <details class="quote">
                   <summary>Source code in <code>darkmagic/numerics.py</code></summary>
-                  <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">252</span>
-<span class="normal">253</span>
-<span class="normal">254</span>
+                  <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">254</span>
 <span class="normal">255</span>
 <span class="normal">256</span>
 <span class="normal">257</span>
@@ -1884,14 +1936,20 @@ Returns the Monkhorst-Pack grid for computing the Debye-Waller factor.</p>
 <span class="normal">280</span>
 <span class="normal">281</span>
 <span class="normal">282</span>
-<span class="normal">283</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">N_grid</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">power_abc</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">N_DWF_grid</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">bin_width</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-3</span><span class="p">,</span>
     <span class="n">use_q_cut</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">use_special_mesh</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">power_abc</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Constructor for the Numerics class.</span>
@@ -1903,6 +1961,7 @@ Returns the Monkhorst-Pack grid for computing the Debye-Waller factor.</p>
 <span class="sd">        bin_width (float): The width of the energy bin. Rebinning to larger bins is possible in postprocessing.</span>
 <span class="sd">        use_q_cut (bool): Whether to use a cutoff for the momentum transfer from DM. If False, the cutoff is set to the maximum possible value $2 m_{\chi} (v_{\text{esc}} + v_{\text{e}})$.</span>
 <span class="sd">        use_special_mesh (bool): Whether to use a special mesh for the spherical grid (currently unused)</span>
+<span class="sd">        threshold (float): unused, DarkMAGIC does not impose any thresholds during the actual calculation. Maintained for backwards compatibility.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">N_grid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">N_grid</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
@@ -1911,11 +1970,12 @@ Returns the Monkhorst-Pack grid for computing the Debye-Waller factor.</p>
     <span class="k">if</span> <span class="n">N_DWF_grid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">N_DWF_grid</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">]</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">N_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">N_grid</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">power_abc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">power_abc</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_power_abc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">power_abc</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">N_DWF_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">N_DWF_grid</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">bin_width</span> <span class="o">=</span> <span class="n">bin_width</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">use_q_cut</span> <span class="o">=</span> <span class="n">use_q_cut</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">use_special_mesh</span> <span class="o">=</span> <span class="n">use_special_mesh</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_use_special_mesh</span> <span class="o">=</span> <span class="n">use_special_mesh</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_threshold</span> <span class="o">=</span> <span class="n">threshold</span>
 </code></pre></div></td></tr></table></div>
                 </details>
 
@@ -1930,6 +1990,202 @@ Returns the Monkhorst-Pack grid for computing the Debye-Waller factor.</p>
 
 
 
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="darkmagic.numerics.Numerics.from_dict" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">from_dict</span><span class="p">(</span><span class="n">d</span><span class="p">)</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Create a Numerics object from a dictionary.</p>
+
+
+
+  <p><span class="doc-section-title">Parameters:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td><code>d</code></td>
+          <td>
+                <code>dict</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The dictionary containing the numerical parameters.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><span class="doc-section-title">Returns:</span></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+<td><code>Numerics</code></td>          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The Numerics object.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>darkmagic/numerics.py</code></summary>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a Numerics object from a dictionary.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        d (dict): The dictionary containing the numerical parameters.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Numerics: The Numerics object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;N_grid&quot;</span><span class="p">],</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;N_DWF_grid&quot;</span><span class="p">],</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;bin_width&quot;</span><span class="p">],</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;use_q_cut&quot;</span><span class="p">],</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;_use_special_mesh&quot;</span><span class="p">],</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;_threshold&quot;</span><span class="p">],</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;_power_abc&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="darkmagic.numerics.Numerics.to_dict" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">to_dict</span><span class="p">()</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Convert the Numerics object to a dictionary.</p>
+
+
+
+  <p><span class="doc-section-title">Returns:</span></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+<td><code>dict</code></td>          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The dictionary containing the numerical parameters.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>darkmagic/numerics.py</code></summary>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span>
+<span class="normal">320</span>
+<span class="normal">321</span>
+<span class="normal">322</span>
+<span class="normal">323</span>
+<span class="normal">324</span>
+<span class="normal">325</span>
+<span class="normal">326</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert the Numerics object to a dictionary.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: The dictionary containing the numerical parameters.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;N_grid&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">N_grid</span><span class="p">,</span>
+        <span class="s2">&quot;N_DWF_grid&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">N_DWF_grid</span><span class="p">,</span>
+        <span class="s2">&quot;bin_width&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">bin_width</span><span class="p">,</span>
+        <span class="s2">&quot;use_q_cut&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_q_cut</span><span class="p">,</span>
+        <span class="s2">&quot;_use_special_mesh&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_special_mesh</span><span class="p">,</span>
+        <span class="s2">&quot;_threshold&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_threshold</span><span class="p">,</span>
+        <span class="s2">&quot;_power_abc&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_power_abc</span><span class="p">,</span>
+    <span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
 
 
 <div class="doc doc-object doc-function">
@@ -2030,21 +2286,21 @@ Returns the Monkhorst-Pack grid for computing the Debye-Waller factor.</p>
 
           <details class="quote">
             <summary>Source code in <code>darkmagic/numerics.py</code></summary>
-            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">287</span>
-<span class="normal">288</span>
-<span class="normal">289</span>
-<span class="normal">290</span>
-<span class="normal">291</span>
-<span class="normal">292</span>
-<span class="normal">293</span>
-<span class="normal">294</span>
-<span class="normal">295</span>
-<span class="normal">296</span>
-<span class="normal">297</span>
-<span class="normal">298</span>
-<span class="normal">299</span>
-<span class="normal">300</span>
-<span class="normal">301</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_grid</span><span class="p">(</span>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">328</span>
+<span class="normal">329</span>
+<span class="normal">330</span>
+<span class="normal">331</span>
+<span class="normal">332</span>
+<span class="normal">333</span>
+<span class="normal">334</span>
+<span class="normal">335</span>
+<span class="normal">336</span>
+<span class="normal">337</span>
+<span class="normal">338</span>
+<span class="normal">339</span>
+<span class="normal">340</span>
+<span class="normal">341</span>
+<span class="normal">342</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_grid</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">m_chi</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">v_e</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span> <span class="n">material</span><span class="p">:</span> <span class="n">Material</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SphericalGrid</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -2136,17 +2392,17 @@ Returns the Monkhorst-Pack grid for computing the Debye-Waller factor.</p>
 
           <details class="quote">
             <summary>Source code in <code>darkmagic/numerics.py</code></summary>
-            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">303</span>
-<span class="normal">304</span>
-<span class="normal">305</span>
-<span class="normal">306</span>
-<span class="normal">307</span>
-<span class="normal">308</span>
-<span class="normal">309</span>
-<span class="normal">310</span>
-<span class="normal">311</span>
-<span class="normal">312</span>
-<span class="normal">313</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_DWF_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">material</span><span class="p">:</span> <span class="n">Material</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MonkhorstPackGrid</span><span class="p">:</span>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">344</span>
+<span class="normal">345</span>
+<span class="normal">346</span>
+<span class="normal">347</span>
+<span class="normal">348</span>
+<span class="normal">349</span>
+<span class="normal">350</span>
+<span class="normal">351</span>
+<span class="normal">352</span>
+<span class="normal">353</span>
+<span class="normal">354</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_DWF_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">material</span><span class="p">:</span> <span class="n">Material</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MonkhorstPackGrid</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the density-weighted Fermi grid object.</span>
 
