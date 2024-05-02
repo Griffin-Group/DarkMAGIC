@@ -1,12 +1,13 @@
 site_name: "DarkMAGIC"
-site_url: "https://oashour.github.io/DarkMAGIC/"
-repo_url: "https://github.com/oashour/DarkMAGIC/"
-repo_name: "oashour/DarkMAGIC"
+site_url: "https://Griffin-Group.github.io/DarkMAGIC/"
+repo_url: "https://github.com/Griffin-Group/DarkMAGIC/"
+repo_name: "Griffin-Group/DarkMAGIC"
 copyright: Copyright &copy; 2024 Omar A. Ashour
-edit_uri: edit/main/docs/
+edit_uri: blob/main/docs/
 
 nav:
   - Home: index.md
+  - Examples: examples.md
   - Formalism: formalism.md
   - Code Reference: reference/
 
@@ -44,6 +45,7 @@ theme:
 
 extra:
   version:
+    default: develop
     provider: mike
 
 plugins:

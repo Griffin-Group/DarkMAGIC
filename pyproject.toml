@@ -5,9 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "dark-magic"
 version = "0.0.1"
-authors = [
-  { name="Omar A. Ashour", email="ashour@berkeley.edu" },
-]
+authors = [{ name = "Omar A. Ashour", email = "ashour@berkeley.edu" }]
 description = "Dark Matter Ab initio maGnon/phonon Interaction Calculator (DarkMAGIC) is a python package for computing DM interaction rates with collective excitations based on ab initio calculations of material properties."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -17,9 +15,9 @@ dependencies = [
     "rad-tools",
     "h5py",
     "mpi4py",
-    "setuptools",
+    "setuptools; python_version=='3.12'",
 ]
-classifiers=[
+classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -32,11 +30,21 @@ classifiers=[
 ]
 
 [project.urls]
-Homepage = "https://github.com/oashour/DarkMAGIC"
-Issues = "https://github.com/oashour/DarkMAGIC/issues"
+Homepage = "https://github.com/Griffin-Group/DarkMAGIC"
+Issues = "https://github.com/Griffin-Group/DarkMAGIC/issues"
 
+[project.optional-dependencies]
+docs = [ # Optional dependencies for building documentation
+    "mkdocs-material",
+    "mike",
+    "mkdocstrings",
+    "mkdocstrings-python",
+    "mkdocs-literate-nav",
+    "mkdocs-gen-files",
+    "mkdocs-section-index",
+]
 [tool.setuptools.packages]
-find = {}  # Scan the project directory with the default parameters
+find = {} # Scan the project directory with the default parameters
 
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.
@@ -74,8 +82,8 @@ exclude = [
 line-length = 88
 indent-width = 4
 
-# Assume Python 3.8
-target-version = "py38"
+# Assume Python 3.10
+target-version = "py310"
 
 [tool.ruff.lint]
 # Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
