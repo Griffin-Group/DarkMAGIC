@@ -1,4 +1,4 @@
-# DarkMAGIC
+# DarkMAGIC 🔮
 [![Develop Docs](https://img.shields.io/badge/status-pre--alpha-red)](https://oashour.github.io/DarkMAGIC/develop/)
 ![Tests](https://github.com/oashour/DarkMAGIC/actions/workflows/run_tests.yaml/badge.svg)
 [![License](https://img.shields.io/badge/License-MIT-blue)](#license "Go to license section")
