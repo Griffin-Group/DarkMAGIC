@@ -43,6 +43,9 @@ docs = [ # Optional dependencies for building documentation
     "mkdocs-gen-files",
     "mkdocs-section-index",
 ]
+dev = ["pytest", "ruff", "pytest_parametrize_cases"] # Deps for development
+build = ["build", "twine", "wheel"] # Deps for building and publishing
+
 [tool.setuptools.packages]
 find = {} # Scan the project directory with the default parameters
 
