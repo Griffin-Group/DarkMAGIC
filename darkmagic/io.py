@@ -3,12 +3,12 @@ from typing import Tuple
 
 import h5py
 import numpy as np
-import pkg_resources
+from importlib.metadata import version
 
 from darkmagic.benchmark_models.utils import one
 from darkmagic.parallel import ROOT_PROCESS
 
-VERSION = my_version = pkg_resources.get_distribution("dark-magic").version
+VERSION = version("darkmagic")
 
 
 def read_h5(filename, format):
