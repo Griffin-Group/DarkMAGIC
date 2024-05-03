@@ -28,4 +28,4 @@ jobs:
       - name: Build Docs Website
         run: |
           mike deploy --update-aliases ${{ github.event.release.tag_name }} latest
-          mike set-default --push latest
+          mike set-default --push --allow-empty latest
