@@ -2,7 +2,7 @@
 
 The **D**ark **M**atter ***A****b* *initio* phonon/ma**G**non **I**nteraction **C**alculator (DarkMAGIC) is a python package for calculating dark matter interaction rates with phonons and magnons in real materials, based on properties calculated from first principles (mainly, density functional theory). It is based on [the effective field theory developed by Trickle, Zhang and Zurek](https://arxiv.org/abs/2009.13534), and takes inspiration from the code they released with that paper, [PhonoDark](https://github.com/tanner-trickle/PhonoDark). 
 
-DarkMAGIC is currently in pre-alpha testing, so not all features are implemented and not everything has been tested. Development is in progress, and once at a satisfying stage, a manuscript will be prepared.
+DarkMAGIC is currently in pre-alpha testing, so not all features are implemented, the public API is unstable, and not everything has been tested. Development is in progress, and once at a satisfying stage, a manuscript will be prepared.
 
 ## Features
 * Calculate scattering rates from single phonons and magnons.
