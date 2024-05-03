@@ -2,8 +2,8 @@
 [![Develop Docs](https://img.shields.io/badge/status-pre--alpha-red)](https://oashour.github.io/DarkMAGIC/develop/)
 ![Tests](https://github.com/oashour/DarkMAGIC/actions/workflows/run_tests.yaml/badge.svg)
 [![License](https://img.shields.io/badge/License-MIT-blue)](#license "Go to license section")
-[![Stable Docs](https://img.shields.io/badge/docs-stable-blue)](https://oashour.github.io/DarkMAGIC/latest/)
-[![Develop Docs](https://img.shields.io/badge/docs-develop-purple)](https://oashour.github.io/DarkMAGIC/develop/)
+[![Stable Docs](https://img.shields.io/badge/docs-stable-blue)](https://Griffin-Group.github.io/DarkMAGIC/latest/)
+[![Develop Docs](https://img.shields.io/badge/docs-develop-purple)](https://Griffin-Group.github.io/DarkMAGIC/develop/)
 <!--![GitHub Release](https://img.shields.io/github/v/release/oashour/DarkMAGIC?include_prereleases)-->
 
 The **D**ark **M**atter ***A****b* *initio* phonon/ma**G**non **I**nteraction **C**alculator (**DarkMAGIC**) is a python package for calculating dark matter interaction rates with phonons and magnons in real materials, based on properties calculated from first principles (mainly, density functional theory). It is based on [the effective field theory developed by Trickle, Zhang and Zurek](https://arxiv.org/abs/2009.13534), and takes inspiration from the code they released with that paper, [PhonoDark](https://github.com/tanner-trickle/PhonoDark). 
