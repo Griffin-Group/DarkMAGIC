@@ -1,8 +1,8 @@
 import math
 import warnings
+import itertools
 
 import numpy as np
-from mpi4py.MPI import COMM_WORLD
 from numpy.typing import ArrayLike
 
 import darkmagic.constants as const
@@ -11,8 +11,8 @@ from darkmagic.io import read_h5, write_h5
 from darkmagic.material import Material
 from darkmagic.model import Model
 from darkmagic.numerics import Numerics
-from darkmagic.parallel import JOB_SENTINEL, ROOT_PROCESS, distribute_load
 from darkmagic.rate import RATE_CALC_CLASSES
+from darkmagic.parallel import JOB_SENTINEL, ROOT_PROCESS, distribute_load
 
 
 class Calculator:
@@ -60,6 +60,7 @@ class Calculator:
         self.material = material
         self.m_chi = m_chi
         self.model = model
+        self.comm = None  # MPI communicator
 
         # TODO: this is ugly
         calc_class = RATE_CALC_CLASSES.get((calc_type, type(material)))
@@ -104,47 +105,22 @@ class Calculator:
 
         return calc
 
-    def evaluate(self):
+    def evaluate(self, mpi: bool = False):
         """
         Computes the differential rate for all masses and earth velocities
+
+        Args:
+            mpi (bool, optional): Whether to run the calculation in parallel using MPI. Defaults to False.
         """
-
-        n_ranks = COMM_WORLD.Get_size()  # Number of ranks
-        rank = COMM_WORLD.Get_rank()  # Processor rank
-
-        if rank == ROOT_PROCESS:
-            print("Done setting up MPI")
-
-        all_tasks = None
-        if rank == ROOT_PROCESS:
-            all_tasks = distribute_load(n_ranks, self.m_chi, self.v_e)
-
-        task_list = COMM_WORLD.scatter(all_tasks, root=ROOT_PROCESS)
-
-        if rank == ROOT_PROCESS:
-            print("Done configuring calculation")
-
-        diff_rates, binned_rates, total_rates = [], [], []
-        # Loop over the tasks and calculate the rates
-        for job in task_list:
-            if job[0] == JOB_SENTINEL and job[1] == JOB_SENTINEL:
-                continue
-            im, iv = job[0], job[1]
-            d, b, t = self.calc_list[iv][im].calculate_rate()
-            diff_rates.append([job, d.real])
-            binned_rates.append([job, b.real])
-            total_rates.append([job, t.real])
-
-        print(f"Rank {rank} done calculating rates.")
-
-        # TODO: this is hideous....
-        # Might be desirable to save these for parallel IO reimplementation
-        diff_rate = COMM_WORLD.gather(diff_rates, root=ROOT_PROCESS)
-        binned_rate = COMM_WORLD.gather(binned_rates, root=ROOT_PROCESS)
-        total_rate = COMM_WORLD.gather(total_rates, root=ROOT_PROCESS)
-
-        if rank == ROOT_PROCESS:
-            self._reshape_rates(diff_rate, binned_rate, total_rate)
+        nv, nm = len(self.time), len(self.m_chi)
+        max_bin_num = math.ceil(self.material.max_dE / self.numerics.bin_width)
+        self.diff_rate = np.zeros((nv, nm, max_bin_num))
+        self.binned_rate = np.zeros((nv, nm, self.material.n_modes))
+        self.total_rate = np.zeros((nv, nm))
+        if mpi:
+            self._evaluate_mpi()
+        else:
+            self._evaluate_serial()
 
     def to_file(self, filename: str | None = None, format="darkmagic"):
         """
@@ -157,11 +133,12 @@ class Calculator:
         if filename is None:
             filename = f"{self.material.name}_{self.model.shortname}.h5"
         # Make sure all the rates are note None
+        rank = self.comm.Get_rank() if self.comm is not None else 0
         if (
             self.diff_rate is None
             or self.binned_rate is None
             or self.total_rate is None
-        ) and COMM_WORLD.Get_rank() == ROOT_PROCESS:
+        ) and rank == ROOT_PROCESS:
             raise ValueError(
                 "Rates are not computed yet. Please run the calculation first using the evaluate method."
             )
@@ -178,8 +155,8 @@ class Calculator:
             self.total_rate,
             self.diff_rate,
             self.binned_rate,
-            COMM_WORLD.Get_rank(),
-            None,
+            rank,
+            None,  # should be self.comm when parallel is reimplemented
             parallel=False,
             format=format,
         )
@@ -259,15 +236,71 @@ class Calculator:
 
         return sigma
 
+    def _evaluate_serial(self):
+        """
+        Evaluate the rates without MPI
+        """
+
+        for im, iv in itertools.product(
+            range(nm := len(self.m_chi)), range(nv := len(self.v_e))
+        ):
+            print(
+                f"Rate calculation: {im * nv + iv + 1}/{(nv*nm)}.",
+            )
+            (
+                self.diff_rate[iv, im],
+                self.binned_rate[iv, im],
+                self.total_rate[iv, im],
+            ) = self.calc_list[iv][im].calculate_rate()
+
+    def _evaluate_mpi(self):
+        """
+        Evaluate the rates in parallel using MPI
+        """
+        from mpi4py.MPI import COMM_WORLD
+
+        self.comm = COMM_WORLD
+        n_ranks = self.comm.Get_size()  # Number of ranks
+        rank = self.comm.Get_rank()  # Processor rank
+
+        if rank == ROOT_PROCESS:
+            print("Done setting up MPI")
+
+        all_tasks = None
+        if rank == ROOT_PROCESS:
+            all_tasks = distribute_load(n_ranks, self.m_chi, self.v_e)
+
+        task_list = self.comm.scatter(all_tasks, root=ROOT_PROCESS)
+
+        if rank == ROOT_PROCESS:
+            print("Done configuring calculation")
+
+        diff_rates, binned_rates, total_rates = [], [], []
+        # Loop over the tasks and calculate the rates
+        for job in task_list:
+            if job[0] == JOB_SENTINEL and job[1] == JOB_SENTINEL:
+                continue
+            im, iv = job[0], job[1]
+            d, b, t = self.calc_list[iv][im].calculate_rate()
+            diff_rates.append([job, d.real])
+            binned_rates.append([job, b.real])
+            total_rates.append([job, t.real])
+
+        print(f"Rank {rank} done calculating rates.")
+
+        # TODO: this is hideous....
+        # Might be desirable to save these for parallel IO reimplementation
+        diff_rate = self.comm.gather(diff_rates, root=ROOT_PROCESS)
+        binned_rate = self.comm.gather(binned_rates, root=ROOT_PROCESS)
+        total_rate = self.comm.gather(total_rates, root=ROOT_PROCESS)
+
+        if rank == ROOT_PROCESS:
+            self._reshape_rates(diff_rate, binned_rate, total_rate)
+
     def _reshape_rates(self, diff_rate, binned_rate, total_rate):
         """
         Reshape the rates into the correct format.
         """
-        nt, nm = len(self.time), len(self.m_chi)
-        max_bin_num = math.ceil(self.material.max_dE / self.numerics.bin_width)
-        self.diff_rate = np.zeros((nt, nm, max_bin_num))
-        self.binned_rate = np.zeros((nt, nm, self.material.n_modes))
-        self.total_rate = np.zeros((nt, nm))
 
         for rate_array, rate_list in zip(
             [self.diff_rate, self.binned_rate, self.total_rate],

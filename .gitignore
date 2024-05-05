@@ -15,4 +15,6 @@ VBT.vasp
 VBTS_mdm.h5
 hcp_He_lsm.h5
 venv/**
-dm.py
+run.py
+omni_model.py
+./*.h5
