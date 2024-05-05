@@ -114,21 +114,9 @@ def write_h5(
     if rank == ROOT_PROCESS:
         print(f"Writing to file {out_filename}{' in parallel' if parallel else ''}...")
     writer = write_phonodark if format == "phonodark" else write_darkmagic
-    if not parallel and rank == ROOT_PROCESS:
-        writer(
-            out_filename,
-            material,
-            model,
-            numerics,
-            masses,
-            times,
-            v_e,
-            all_total_rate_list,
-            all_diff_rate_list,
-            all_binned_rate_list,
-            comm=None,
-        )
-    elif parallel:
+    if not parallel:
+        comm = None
+    if (not parallel and rank == ROOT_PROCESS) or parallel:
         writer(
             out_filename,
             material,
@@ -142,6 +130,9 @@ def write_h5(
             all_binned_rate_list,
             comm=comm,
         )
+    if rank == ROOT_PROCESS and not parallel:
+        # TODO: should have proper message for paralle IO when reimplemented
+        print("Done writing.")
 
 
 def write_darkmagic(
