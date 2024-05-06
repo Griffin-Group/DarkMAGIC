@@ -45,7 +45,7 @@ class SingleRateCalc(ABC):
     @property
     def dwf_grid(self):
         if self._dwf_grid is None:
-            self._dwf_grid = self.numerics.get_DWF_grid(self.material)
+            self._dwf_grid = self.numerics.get_DWF_grid()
         return self._dwf_grid
 
     @abstractmethod

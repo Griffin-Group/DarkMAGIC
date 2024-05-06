@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-from copy import deepcopy
 from typing import TYPE_CHECKING, Tuple
 
 import numpy as np
 from numpy import linalg as LA
 from numpy.typing import ArrayLike
-from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 
 import darkmagic.constants as const
 
@@ -26,30 +24,21 @@ class MonkhorstPackGrid:
 
     def __init__(
         self,
-        N_grid: ArrayLike,
-        material: Material,
+        N_grid: np.ndarray,
         shift: bool = True,
-        use_sym: bool = False,
     ):
         """
         Constructor for the MonkhorstPackGrid class.
 
         N_grid (ArrayLike): The number of grid points along each reciprocal lattice vector.
-        material (Material): The material for which the grid is generated.
         shift (bool): Whether to shift the grid. Defaults to a shifted grid to avoid singularities in DWF.
-        use_sym (bool, optional): Whether to use symmetry to reduce the number of grid points. Defaults to False. The W tensor is only calculated once so this isn't necessary to use and causes issues.
         """
-        shift = [1, 1, 1] if shift else [0, 0, 0]
-        # SGA struggles with the struct in 1/eV, so we scale back to ang
-        struct = deepcopy(material.structure)
-        struct.scale_lattice(struct.volume * (const.inveV_to_Ang) ** 3)
-        sga = SpacegroupAnalyzer(struct)
-        if use_sym:
-            points = sga.get_ir_reciprocal_mesh(N_grid, is_shift=shift)
-            self.k_frac, self.weights = map(np.array, zip(*points))
-        else:
-            self.k_frac, _ = sga.get_ir_reciprocal_mesh_map(N_grid, is_shift=shift)
-            self.weights = np.ones_like(self.k_frac[:, 0])
+        s = np.array([1, 1, 1]) / 2 if shift else np.array([0, 0, 0])
+        grid_indices = np.meshgrid(*[np.arange(n) for n in N_grid], indexing="ij")
+        k_list = np.stack(grid_indices, axis=-1).reshape(-1, 3) / N_grid
+        k_list += ((N_grid + 1) % 2 - N_grid // 2 + s) / N_grid
+        self.k_frac = np.array(sorted(k_list, key=tuple), dtype=np.float64)
+        self.weights = np.ones_like(self.k_frac[:, 0], dtype=np.int64)
 
 
 class SphericalGrid:
@@ -242,7 +231,7 @@ class Numerics:
         get_grid(m_chi: float, v_e: ArrayLike, material: Material) -> SphericalGrid:
             Returns the spherical grid for the given dark matter mass, Earth velocity, and material.
 
-        get_DWF_grid(material: Material) -> MonkhorstPackGrid:
+        get_DWF_grid() -> MonkhorstPackGrid:
             Returns the Monkhorst-Pack grid for computing the Debye-Waller factor.
     """
 
@@ -336,7 +325,7 @@ class Numerics:
         """
         return SphericalGrid(m_chi, v_e, self.use_q_cut, self.N_grid, material)
 
-    def get_DWF_grid(self, material: Material) -> MonkhorstPackGrid:
+    def get_DWF_grid(self) -> MonkhorstPackGrid:
         """
         Returns the density-weighted Fermi grid object.
 
@@ -346,4 +335,4 @@ class Numerics:
         Returns:
             MonkhorstPackGrid: The density-weighted Fermi grid object.
         """
-        return MonkhorstPackGrid(self.N_DWF_grid, material)
+        return MonkhorstPackGrid(self.N_DWF_grid)
