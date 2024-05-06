@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import itertools
 from copy import deepcopy
 from typing import TYPE_CHECKING, Tuple
 
@@ -169,12 +168,8 @@ class SphericalGrid:
             A tuple containing the Cartesian and fractional coordinates of the G vectors.
         """
         # Generate the 8 closest G-vectors to each q-point
-        G_frac = np.array(
-            [
-                list(itertools.product(*zip(np.floor(q), np.ceil(q))))
-                for q in self.q_frac
-            ]
-        )
+        offsets = np.indices((2,) * 3).reshape(3, -1).T
+        G_frac = np.floor(self.q_frac)[:, None, :] + offsets
         # TODO: double check that right multiplication works well
         G_cart = np.matmul(G_frac, recip_frac_to_cart)
         # Compute the distances between the q-point and each of the 8 G-vectors

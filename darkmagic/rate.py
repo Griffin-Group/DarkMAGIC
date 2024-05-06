@@ -29,12 +29,24 @@ class SingleRateCalc(ABC):
         numerics: Numerics,
     ):
         self.m_chi = m_chi
-        self.v_e = v_e  # self.compute_ve(time) if time is not None else v_e
+        self.v_e = v_e
         self.material = material
         self.model = model
         self.numerics = numerics
-        self.grid = numerics.get_grid(m_chi, self.v_e, material)
-        self.dwf_grid = numerics.get_DWF_grid(material)
+        self._grid = None
+        self._dwf_grid = None
+
+    @property
+    def grid(self):
+        if self._grid is None:
+            self._grid = self.numerics.get_grid(self.m_chi, self.v_e, self.material)
+        return self._grid
+
+    @property
+    def dwf_grid(self):
+        if self._dwf_grid is None:
+            self._dwf_grid = self.numerics.get_DWF_grid(self.material)
+        return self._dwf_grid
 
     @abstractmethod
     def calculate_sigma_q_nu(self, omegas, epsilons):
