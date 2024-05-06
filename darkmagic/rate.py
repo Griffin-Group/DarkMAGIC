@@ -33,8 +33,10 @@ class SingleRateCalc(ABC):
         self.material = material
         self.model = model
         self.numerics = numerics
-        self.grid = numerics.get_grid(m_chi, self.v_e, material)
-        self.dwf_grid = numerics.get_DWF_grid(material)
+        self.grid = numerics.get_grid(
+            m_chi, self.v_e, material.q_cut, material.recip_cart_to_frac
+        )
+        self.dwf_grid = numerics.get_DWF_grid()
 
     @abstractmethod
     def calculate_sigma_q_nu(self, omegas, epsilons):
