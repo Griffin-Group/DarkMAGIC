@@ -211,9 +211,12 @@ class Calculator:
             self.numerics._threshold / energy_bin_width
         )
 
-        day_averaged_rate = np.mean(self.diff_rate[:t_idx, ...], axis=0)
+        # Sum the rate over the energy bins -> (time, mass) array
+        total_rate = np.sum(self.diff_rate[..., bin_cutoff:], axis=2)
+        # Average the rate over a full day -> (mass,) array
+        day_averaged_rate = np.mean(total_rate[:t_idx, ...], axis=0)
         # Return normalized rate as a (time, mass) array
-        return np.sum(self.diff_rate[..., bin_cutoff], axis=1) / day_averaged_rate
+        return total_rate / day_averaged_rate
 
     def compute_reach(
         self,
