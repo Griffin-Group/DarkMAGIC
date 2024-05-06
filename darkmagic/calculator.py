@@ -1,6 +1,5 @@
 import math
 import warnings
-# import itertools
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -236,7 +235,6 @@ class Calculator:
 
         return sigma
 
-    # @njit
     @staticmethod
     def _evaluate_serial(
         diff_rate: np.ndarray,
