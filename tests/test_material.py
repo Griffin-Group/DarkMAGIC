@@ -313,7 +313,7 @@ def test_phonon_material(
     assert material.m_atoms[0] == pytest.approx(m_atom1 * const.amu_to_eV)
     assert np.all(material.epsilon == eps)
     assert np.all(material.born[0] == bec1)
-    grid = MonkhorstPackGrid([1, 1, 1], material, shift=False)
+    grid = MonkhorstPackGrid([1, 1, 1], shift=False)
     freq, eigvec = material.get_eig(grid, with_eigenvectors=True)
     assert freq.shape == (1, n_atoms * 3)
     assert eigvec.shape == (1, n_atoms * 3, n_atoms, 3)

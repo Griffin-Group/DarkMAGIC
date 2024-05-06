@@ -252,7 +252,7 @@ class Calculator:
         for task in np.indices((nm, nv)).T.reshape(-1, 2):
             im, iv = task[0], task[1]
             print(
-                f"Rate calculation: {im * nv + iv + 1}/{(nv*nm)}.",
+                f"Rate calculation: {im + iv*nm + 1}/{(nv*nm)}.",
             )
             (
                 diff_rate[iv, im],

@@ -24,7 +24,7 @@ class MonkhorstPackGrid:
 
     def __init__(
         self,
-        N_grid: np.ndarray,
+        N_grid: ArrayLike,
         shift: bool = True,
     ):
         """
@@ -33,10 +33,13 @@ class MonkhorstPackGrid:
         N_grid (ArrayLike): The number of grid points along each reciprocal lattice vector.
         shift (bool): Whether to shift the grid. Defaults to a shifted grid to avoid singularities in DWF.
         """
+        N_grid = np.array(N_grid)
         s = np.array([1, 1, 1]) / 2 if shift else np.array([0, 0, 0])
+        # Generate grid and apply shifts
         grid_indices = np.meshgrid(*[np.arange(n) for n in N_grid], indexing="ij")
         k_list = np.stack(grid_indices, axis=-1).reshape(-1, 3) / N_grid
         k_list += ((N_grid + 1) % 2 - N_grid // 2 + s) / N_grid
+        # Sort the k-points by their coordinates
         self.k_frac = np.array(sorted(k_list, key=tuple), dtype=np.float64)
         self.weights = np.ones_like(self.k_frac[:, 0], dtype=np.int64)
 
