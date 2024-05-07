@@ -1,0 +1,2777 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://Griffin-Group.github.io/DarkMAGIC/v0.0.3/reference/darkmagic/io/">
+      
+      
+        <link rel="prev" href="../constants/">
+      
+      
+        <link rel="next" href="../material/">
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+    
+    
+      
+        <title>io - DarkMAGIC</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.66ac8b77.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../../css/code_select.css">
+    
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#darkmagic.io" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="DarkMAGIC" class="md-header__button md-logo" aria-label="DarkMAGIC" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            DarkMAGIC
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              io
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9h-1.9M20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69m-9.15 3.96h2.3L12 9l-1.15 3.65Z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12c0-2.42-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Griffin-Group/DarkMAGIC/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Griffin-Group/DarkMAGIC
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="DarkMAGIC" class="md-nav__button md-logo" aria-label="DarkMAGIC" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    DarkMAGIC
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Griffin-Group/DarkMAGIC/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Griffin-Group/DarkMAGIC
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Examples
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../formalism/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Formalism
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Code Reference
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Code Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1" checked>
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    darkmagic
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4_1" id="__nav_4_1_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4_1">
+            <span class="md-nav__icon md-icon"></span>
+            darkmagic
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1_1" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../benchmark_models/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    benchmark_models
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4_1_1" id="__nav_4_1_1_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_1_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_1_1">
+            <span class="md-nav__icon md-icon"></span>
+            benchmark_models
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../benchmark_models/anapole/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    anapole
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../benchmark_models/hadrophilic_scalar_mediator/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    hadrophilic_scalar_mediator
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../benchmark_models/magnetic_dipole/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    magnetic_dipole
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../benchmark_models/utils/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    utils
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../calculator/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    calculator
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../constants/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    constants
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    io
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    io
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#darkmagic.io" class="md-nav__link">
+    <span class="md-ellipsis">
+      io
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#darkmagic.io.read_h5" class="md-nav__link">
+    <span class="md-ellipsis">
+      read_h5
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#darkmagic.io.read_darkmagic" class="md-nav__link">
+    <span class="md-ellipsis">
+      read_darkmagic
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#darkmagic.io.read_phonodark" class="md-nav__link">
+    <span class="md-ellipsis">
+      read_phonodark
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#darkmagic.io.write_darkmagic" class="md-nav__link">
+    <span class="md-ellipsis">
+      write_darkmagic
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#darkmagic.io.write_phonodark" class="md-nav__link">
+    <span class="md-ellipsis">
+      write_phonodark
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#darkmagic.io.dict_from_h5group" class="md-nav__link">
+    <span class="md-ellipsis">
+      dict_from_h5group
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#darkmagic.io.h5group_to_dict" class="md-nav__link">
+    <span class="md-ellipsis">
+      h5group_to_dict
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#darkmagic.io.phonodark_to_darkmagic" class="md-nav__link">
+    <span class="md-ellipsis">
+      phonodark_to_darkmagic
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../material/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    material
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1_6" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../materials/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    materials
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4_1_6" id="__nav_4_1_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_1_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_1_6">
+            <span class="md-nav__icon md-icon"></span>
+            materials
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../materials/VBTS_Magnon/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    VBTS_Magnon
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../materials/YIG_Magnon/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    YIG_Magnon
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../model/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    model
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../numerics/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    numerics
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../parallel/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    parallel
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rate/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    rate
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../v_integrals/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    v_integrals
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#darkmagic.io" class="md-nav__link">
+    <span class="md-ellipsis">
+      io
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#darkmagic.io.read_h5" class="md-nav__link">
+    <span class="md-ellipsis">
+      read_h5
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#darkmagic.io.read_darkmagic" class="md-nav__link">
+    <span class="md-ellipsis">
+      read_darkmagic
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#darkmagic.io.read_phonodark" class="md-nav__link">
+    <span class="md-ellipsis">
+      read_phonodark
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#darkmagic.io.write_darkmagic" class="md-nav__link">
+    <span class="md-ellipsis">
+      write_darkmagic
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#darkmagic.io.write_phonodark" class="md-nav__link">
+    <span class="md-ellipsis">
+      write_phonodark
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#darkmagic.io.dict_from_h5group" class="md-nav__link">
+    <span class="md-ellipsis">
+      dict_from_h5group
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#darkmagic.io.h5group_to_dict" class="md-nav__link">
+    <span class="md-ellipsis">
+      h5group_to_dict
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#darkmagic.io.phonodark_to_darkmagic" class="md-nav__link">
+    <span class="md-ellipsis">
+      phonodark_to_darkmagic
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+  <h1>io</h1>
+
+<div class="doc doc-object doc-module">
+
+
+
+<a id="darkmagic.io"></a>
+  <div class="doc doc-contents first">
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="darkmagic.io.read_h5" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">read_h5</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span></code>
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Reads data from an HDF5 file based on the specified format.</p>
+
+
+
+  <p><span class="doc-section-title">Parameters:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td><code>filename</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The path to the HDF5 file to read.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>format</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The format of the data to read. Should be either "phonodark" or "darkmagic".</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><span class="doc-section-title">Returns:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The data read from the HDF5 file based on the specified format.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><span class="doc-section-title">Raises:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td>
+                <code>ValueError</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>If the provided format is not recognized.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>darkmagic/io.py</code></summary>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">read_h5</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="nb">format</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reads data from an HDF5 file based on the specified format.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filename (str): The path to the HDF5 file to read.</span>
+<span class="sd">        format (str): The format of the data to read. Should be either &quot;phonodark&quot; or &quot;darkmagic&quot;.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The data read from the HDF5 file based on the specified format.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the provided format is not recognized.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="s2">&quot;phonodark&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">read_phonodark</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">format</span> <span class="o">==</span> <span class="s2">&quot;darkmagic&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">read_darkmagic</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Format </span><span class="si">{</span><span class="nb">format</span><span class="si">}</span><span class="s2"> not recognized.&quot;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="darkmagic.io.read_darkmagic" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">read_darkmagic</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span></code>
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Reads data from an HDF5 file in the 'darkmagic' format.</p>
+
+
+
+  <p><span class="doc-section-title">Parameters:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td><code>filename</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The path to the HDF5 file in DarkMAGIC format.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><span class="doc-section-title">Returns:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td>
+                <code><span title="typing.Tuple">Tuple</span>[dict, dict, dict, dict]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Tuple containing the calculated values, numerics, model, and data in 'darkmagic' format.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>darkmagic/io.py</code></summary>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">read_darkmagic</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reads data from an HDF5 file in the &#39;darkmagic&#39; format.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filename (str): The path to the HDF5 file in DarkMAGIC format.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple containing the calculated values, numerics, model, and data in &#39;darkmagic&#39; format.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">calc</span> <span class="o">=</span> <span class="n">dict_from_h5group</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s2">&quot;calc&quot;</span><span class="p">])</span>
+        <span class="n">numerics</span> <span class="o">=</span> <span class="n">dict_from_h5group</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s2">&quot;numerics&quot;</span><span class="p">])</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">dict_from_h5group</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">])</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">dict_from_h5group</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">calc</span><span class="p">,</span> <span class="n">numerics</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">data</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="darkmagic.io.read_phonodark" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">read_phonodark</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span></code>
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Reads data from an HDF5 file in the 'phonodark' format and converts it to the 'darkmagic' format.</p>
+
+
+
+  <p><span class="doc-section-title">Parameters:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td><code>filename</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The path to the HDF5 file in 'phonodark' format.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><span class="doc-section-title">Returns:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td>
+                <code><span title="typing.Tuple">Tuple</span>[dict, dict, dict, dict]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Tuple containing the calculated values, numerics, model, and data converted to 'DarkMAGIC' format.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>darkmagic/io.py</code></summary>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span>
+<span class="normal">87</span>
+<span class="normal">88</span>
+<span class="normal">89</span>
+<span class="normal">90</span>
+<span class="normal">91</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">read_phonodark</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reads data from an HDF5 file in the &#39;phonodark&#39; format and converts it to the &#39;darkmagic&#39; format.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filename (str): The path to the HDF5 file in &#39;phonodark&#39; format.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple containing the calculated values, numerics, model, and data converted to &#39;DarkMAGIC&#39; format.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">get_phonodark_rate</span><span class="p">(</span><span class="n">group</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="n">group</span><span class="p">][</span><span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">)][</span><span class="nb">str</span><span class="p">(</span><span class="n">m</span><span class="p">)]</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">masses</span><span class="p">))]</span>
+                <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">times</span><span class="p">))</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">particle_physics</span> <span class="o">=</span> <span class="n">dict_from_h5group</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s2">&quot;particle_physics&quot;</span><span class="p">])</span>
+        <span class="n">numerics</span> <span class="o">=</span> <span class="n">dict_from_h5group</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s2">&quot;numerics&quot;</span><span class="p">])</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">dict_from_h5group</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">])</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="n">particle_physics</span><span class="p">[</span><span class="s2">&quot;times&quot;</span><span class="p">]</span>
+        <span class="n">masses</span> <span class="o">=</span> <span class="n">particle_physics</span><span class="p">[</span><span class="s2">&quot;dm_properties&quot;</span><span class="p">][</span><span class="s2">&quot;mass_list&quot;</span><span class="p">]</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;diff_rate&quot;</span><span class="p">:</span> <span class="n">get_phonodark_rate</span><span class="p">(</span><span class="s2">&quot;diff_rate&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;binned_rate&quot;</span><span class="p">:</span> <span class="n">get_phonodark_rate</span><span class="p">(</span><span class="s2">&quot;binned_rate&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;total_rate&quot;</span><span class="p">:</span> <span class="n">get_phonodark_rate</span><span class="p">(</span><span class="s2">&quot;rate&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="n">calc</span><span class="p">,</span> <span class="n">numerics</span><span class="p">,</span> <span class="n">model</span> <span class="o">=</span> <span class="n">phonodark_to_darkmagic</span><span class="p">(</span>
+            <span class="n">numerics</span><span class="p">,</span> <span class="n">particle_physics</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">masses</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">calc</span><span class="p">,</span> <span class="n">numerics</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">data</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="darkmagic.io.write_darkmagic" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">write_darkmagic</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span> <span class="n">material</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">numerics</span><span class="p">,</span> <span class="n">m_chi</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">v_e</span><span class="p">,</span> <span class="n">total_rate</span><span class="p">,</span> <span class="n">diff_rate</span><span class="p">,</span> <span class="n">binned_rate</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Write data to hdf5 file in DarkMAGIC format.</p>
+
+
+
+  <p><span class="doc-section-title">Parameters:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td><code>out_file</code></td>
+          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Path to the output HDF5 file.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>material</code></td>
+          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Material object.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>model</code></td>
+          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Model object.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>numerics</code></td>
+          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Numerics object.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>m_chi</code></td>
+          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>List of masses for the jobs.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>time</code></td>
+          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>List of times for the jobs.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>all_total_rate_list</code></td>
+          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>List of total rate data.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>all_diff_rate_list</code></td>
+          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>List of differential rate data.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>all_binned_rate_list</code></td>
+          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>List of binned rate data.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>comm</code></td>
+          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>MPI communicator for parallel writing (default is None).</p>
+            </div>
+          </td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><span class="doc-section-title">Returns:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>None</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>darkmagic/io.py</code></summary>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">write_darkmagic</span><span class="p">(</span>
+    <span class="n">out_file</span><span class="p">,</span>
+    <span class="n">material</span><span class="p">,</span>
+    <span class="n">model</span><span class="p">,</span>
+    <span class="n">numerics</span><span class="p">,</span>
+    <span class="n">m_chi</span><span class="p">,</span>
+    <span class="n">time</span><span class="p">,</span>
+    <span class="n">v_e</span><span class="p">,</span>
+    <span class="n">total_rate</span><span class="p">,</span>
+    <span class="n">diff_rate</span><span class="p">,</span>
+    <span class="n">binned_rate</span><span class="p">,</span>
+    <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Write data to hdf5 file in DarkMAGIC format.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        out_file: Path to the output HDF5 file.</span>
+<span class="sd">        material: Material object.</span>
+<span class="sd">        model: Model object.</span>
+<span class="sd">        numerics: Numerics object.</span>
+<span class="sd">        m_chi: List of masses for the jobs.</span>
+<span class="sd">        time: List of times for the jobs.</span>
+<span class="sd">        all_total_rate_list: List of total rate data.</span>
+<span class="sd">        all_diff_rate_list: List of differential rate data.</span>
+<span class="sd">        all_binned_rate_list: List of binned rate data.</span>
+<span class="sd">        comm: MPI communicator for parallel writing (default is None).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Get appropriate context manager for serial/parallel</span>
+    <span class="k">if</span> <span class="n">comm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cm</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">cm</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;mpio&quot;</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">cm</span> <span class="k">as</span> <span class="n">out_f</span><span class="p">:</span>
+        <span class="n">h5group_to_dict</span><span class="p">(</span><span class="n">out_f</span><span class="p">,</span> <span class="s2">&quot;numerics&quot;</span><span class="p">,</span> <span class="n">numerics</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
+        <span class="n">h5group_to_dict</span><span class="p">(</span><span class="n">out_f</span><span class="p">,</span> <span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">serializable</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+        <span class="n">calc</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;calc_type&quot;</span><span class="p">:</span> <span class="s2">&quot;scattering&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;m_chi&quot;</span><span class="p">:</span> <span class="n">m_chi</span><span class="p">,</span>
+            <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="n">time</span><span class="p">,</span>
+            <span class="s2">&quot;v_e&quot;</span><span class="p">:</span> <span class="n">v_e</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="c1"># Create groups/datasets and write out input parameters</span>
+        <span class="n">h5group_to_dict</span><span class="p">(</span><span class="n">out_f</span><span class="p">,</span> <span class="s2">&quot;calc&quot;</span><span class="p">,</span> <span class="n">calc</span><span class="p">)</span>
+        <span class="n">out_f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s2">&quot;version&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">VERSION</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;S&quot;</span><span class="p">))</span>
+
+        <span class="n">nt</span><span class="p">,</span> <span class="n">nm</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">time</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">m_chi</span><span class="p">)</span>
+        <span class="n">num_bins</span> <span class="o">=</span> <span class="n">diff_rate</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">num_modes</span> <span class="o">=</span> <span class="n">binned_rate</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">out_f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s2">&quot;data/diff_rate&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">nt</span><span class="p">,</span> <span class="n">nm</span><span class="p">,</span> <span class="n">num_bins</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;f8&quot;</span><span class="p">)</span>
+        <span class="n">out_f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s2">&quot;data/binned_rate&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">nt</span><span class="p">,</span> <span class="n">nm</span><span class="p">,</span> <span class="n">num_modes</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;f8&quot;</span><span class="p">)</span>
+        <span class="n">out_f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s2">&quot;data/total_rate&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">nt</span><span class="p">,</span> <span class="n">nm</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;f8&quot;</span><span class="p">)</span>
+
+        <span class="n">out_f</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="s2">&quot;diff_rate&quot;</span><span class="p">][</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">diff_rate</span>
+        <span class="n">out_f</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="s2">&quot;binned_rate&quot;</span><span class="p">][</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">binned_rate</span>
+        <span class="n">out_f</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="s2">&quot;total_rate&quot;</span><span class="p">][</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">total_rate</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="darkmagic.io.write_phonodark" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">write_phonodark</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span> <span class="n">material</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">numerics</span><span class="p">,</span> <span class="n">masses</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">v_e</span><span class="p">,</span> <span class="n">all_total_rate_list</span><span class="p">,</span> <span class="n">all_diff_rate_list</span><span class="p">,</span> <span class="n">all_binned_rate_list</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Write data to hdf5 file in PhonoDark format</p>
+<p>all_*_rate_list has a complicated format.
+For starters, it has as many elements as there are jobs. Each element is a list of the
+(m_chi, time) pairs that have been computed. Each of those elements is a two element array.
+The first element is a tuple of the mass and time index. The second element is either a scalar
+(total) or an array (binned and diff). For binned and diff, the dimensions of the array are
+num_bins and num_modes respectively.</p>
+<p>So for example, if we have 4 masses and 2 times, distributed over 4 jobs, then diff_rate list will look like this:
+[
+    # This is the job 1 array, which does mass index 0 at time indices 0,1
+    [ [ [0, 0], [num_bins elements]], [[0, 1], [num_bins_elements], ...], # job 1
+    # This is the job 1 array, which does mass index 1 at time indices 0,1
+    [ [ [1, 0], [num_bins elements]], [[1, 1], [num_bins_elements], ...], # job 2
+    ...
+]
+This format is temporary, just for backwards compatibility with PhonoDark.</p>
+
+
+
+  <p><span class="doc-section-title">Parameters:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td><code>out_file</code></td>
+          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Path to the output HDF5 file.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>material</code></td>
+          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Material object.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>model</code></td>
+          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Model object.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>numerics</code></td>
+          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Numerics object.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>masses</code></td>
+          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>List of masses for the jobs.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>times</code></td>
+          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>List of times for the jobs.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>all_total_rate_list</code></td>
+          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>List of total rate data.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>all_diff_rate_list</code></td>
+          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>List of differential rate data.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>all_binned_rate_list</code></td>
+          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>List of binned rate data.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>comm</code></td>
+          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>MPI communicator for parallel writing (default is None).</p>
+            </div>
+          </td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><span class="doc-section-title">Returns:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>None</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>darkmagic/io.py</code></summary>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span>
+<span class="normal">320</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">write_phonodark</span><span class="p">(</span>
+    <span class="n">out_file</span><span class="p">,</span>
+    <span class="n">material</span><span class="p">,</span>
+    <span class="n">model</span><span class="p">,</span>
+    <span class="n">numerics</span><span class="p">,</span>
+    <span class="n">masses</span><span class="p">,</span>
+    <span class="n">times</span><span class="p">,</span>
+    <span class="n">v_e</span><span class="p">,</span>
+    <span class="n">all_total_rate_list</span><span class="p">,</span>
+    <span class="n">all_diff_rate_list</span><span class="p">,</span>
+    <span class="n">all_binned_rate_list</span><span class="p">,</span>
+    <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Write data to hdf5 file in PhonoDark format</span>
+
+<span class="sd">    all_*_rate_list has a complicated format.</span>
+<span class="sd">    For starters, it has as many elements as there are jobs. Each element is a list of the</span>
+<span class="sd">    (m_chi, time) pairs that have been computed. Each of those elements is a two element array.</span>
+<span class="sd">    The first element is a tuple of the mass and time index. The second element is either a scalar</span>
+<span class="sd">    (total) or an array (binned and diff). For binned and diff, the dimensions of the array are</span>
+<span class="sd">    num_bins and num_modes respectively.</span>
+
+<span class="sd">    So for example, if we have 4 masses and 2 times, distributed over 4 jobs, then diff_rate list will look like this:</span>
+<span class="sd">    [</span>
+<span class="sd">        # This is the job 1 array, which does mass index 0 at time indices 0,1</span>
+<span class="sd">        [ [ [0, 0], [num_bins elements]], [[0, 1], [num_bins_elements], ...], # job 1</span>
+<span class="sd">        # This is the job 1 array, which does mass index 1 at time indices 0,1</span>
+<span class="sd">        [ [ [1, 0], [num_bins elements]], [[1, 1], [num_bins_elements], ...], # job 2</span>
+<span class="sd">        ...</span>
+<span class="sd">    ]</span>
+<span class="sd">    This format is temporary, just for backwards compatibility with PhonoDark.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      out_file: Path to the output HDF5 file.</span>
+<span class="sd">      material: Material object.</span>
+<span class="sd">      model: Model object.</span>
+<span class="sd">      numerics: Numerics object.</span>
+<span class="sd">      masses: List of masses for the jobs.</span>
+<span class="sd">      times: List of times for the jobs.</span>
+<span class="sd">      all_total_rate_list: List of total rate data.</span>
+<span class="sd">      all_diff_rate_list: List of differential rate data.</span>
+<span class="sd">      all_binned_rate_list: List of binned rate data.</span>
+<span class="sd">      comm: MPI communicator for parallel writing (default is None).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">get_dicts</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">numerics</span><span class="p">,</span> <span class="n">masses</span><span class="p">,</span> <span class="n">times</span><span class="p">):</span>
+        <span class="n">physics_parameters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;threshold&quot;</span><span class="p">:</span> <span class="n">numerics</span><span class="o">.</span><span class="n">_threshold</span><span class="p">,</span>
+            <span class="s2">&quot;times&quot;</span><span class="p">:</span> <span class="n">times</span><span class="p">,</span>
+            <span class="s2">&quot;Fmed_power&quot;</span><span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="n">Fmed_power</span><span class="p">,</span>
+            <span class="s2">&quot;power_V&quot;</span><span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="n">power_V</span><span class="p">,</span>
+            <span class="s2">&quot;special_model&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">&quot;model_name&quot;</span><span class="p">:</span> <span class="s2">&quot;mdm&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">dm_properties_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;spin&quot;</span><span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="n">S_chi</span><span class="p">,</span>
+            <span class="s2">&quot;mass_list&quot;</span><span class="p">:</span> <span class="n">masses</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">coeff</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">coeff_prefactor</span>
+        <span class="n">numerics_parameters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;n_a&quot;</span><span class="p">:</span> <span class="n">numerics</span><span class="o">.</span><span class="n">N_grid</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="s2">&quot;n_b&quot;</span><span class="p">:</span> <span class="n">numerics</span><span class="o">.</span><span class="n">N_grid</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="s2">&quot;n_c&quot;</span><span class="p">:</span> <span class="n">numerics</span><span class="o">.</span><span class="n">N_grid</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+            <span class="s2">&quot;power_a&quot;</span><span class="p">:</span> <span class="n">numerics</span><span class="o">.</span><span class="n">_power_abc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="s2">&quot;power_b&quot;</span><span class="p">:</span> <span class="n">numerics</span><span class="o">.</span><span class="n">_power_abc</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="s2">&quot;power_c&quot;</span><span class="p">:</span> <span class="n">numerics</span><span class="o">.</span><span class="n">_power_abc</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+            <span class="s2">&quot;n_DW_x&quot;</span><span class="p">:</span> <span class="n">numerics</span><span class="o">.</span><span class="n">N_DWF_grid</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="s2">&quot;n_DW_y&quot;</span><span class="p">:</span> <span class="n">numerics</span><span class="o">.</span><span class="n">N_DWF_grid</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="s2">&quot;n_DW_z&quot;</span><span class="p">:</span> <span class="n">numerics</span><span class="o">.</span><span class="n">N_DWF_grid</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+            <span class="s2">&quot;energy_bin_width&quot;</span><span class="p">:</span> <span class="n">numerics</span><span class="o">.</span><span class="n">bin_width</span><span class="p">,</span>
+            <span class="s2">&quot;q_cut&quot;</span><span class="p">:</span> <span class="n">numerics</span><span class="o">.</span><span class="n">use_q_cut</span><span class="p">,</span>
+            <span class="s2">&quot;special_mesh&quot;</span><span class="p">:</span> <span class="n">numerics</span><span class="o">.</span><span class="n">_use_special_mesh</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">physics_parameters</span><span class="p">,</span> <span class="n">dm_properties_dict</span><span class="p">,</span> <span class="n">coeff</span><span class="p">,</span> <span class="n">numerics_parameters</span>
+
+    <span class="n">physics_parameters</span><span class="p">,</span> <span class="n">dm_properties_dict</span><span class="p">,</span> <span class="n">c_dict</span><span class="p">,</span> <span class="n">numerics_parameters</span> <span class="o">=</span> <span class="n">get_dicts</span><span class="p">(</span>
+        <span class="n">model</span><span class="p">,</span> <span class="n">numerics</span><span class="p">,</span> <span class="n">masses</span><span class="p">,</span> <span class="n">times</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Get appropriate context manager for serial/parallel</span>
+    <span class="n">cm</span> <span class="o">=</span> <span class="n">_get_context_manager</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span> <span class="n">comm</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">cm</span> <span class="k">as</span> <span class="n">h5f</span><span class="p">:</span>
+        <span class="c1"># Create groups/datasets and write out input parameters</span>
+        <span class="n">h5group_to_dict</span><span class="p">(</span><span class="n">h5f</span><span class="p">,</span> <span class="s2">&quot;numerics&quot;</span><span class="p">,</span> <span class="n">numerics_parameters</span><span class="p">)</span>
+        <span class="n">h5group_to_dict</span><span class="p">(</span><span class="n">h5f</span><span class="p">,</span> <span class="s2">&quot;particle_physics&quot;</span><span class="p">,</span> <span class="n">physics_parameters</span><span class="p">)</span>
+        <span class="n">h5f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s2">&quot;version&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s2">&quot;0.0.1&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;S&quot;</span><span class="p">))</span>
+        <span class="n">h5group_to_dict</span><span class="p">(</span><span class="n">h5f</span><span class="p">,</span> <span class="s2">&quot;particle_physics/dm_properties&quot;</span><span class="p">,</span> <span class="n">dm_properties_dict</span><span class="p">)</span>
+        <span class="n">h5group_to_dict</span><span class="p">(</span><span class="n">h5f</span><span class="p">,</span> <span class="s2">&quot;particle_physics/c_coeffs&quot;</span><span class="p">,</span> <span class="n">c_dict</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">all_diff_rate_list</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="c1"># Old implementation friendly</span>
+            <span class="n">num_bins</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_diff_rate_list</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">num_modes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_binned_rate_list</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">num_bins</span> <span class="o">=</span> <span class="n">all_diff_rate_list</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">num_modes</span> <span class="o">=</span> <span class="n">all_binned_rate_list</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># In parallel all datasets need to be created by all ranks</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">physics_parameters</span><span class="p">[</span><span class="s2">&quot;times&quot;</span><span class="p">])):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dm_properties_dict</span><span class="p">[</span><span class="s2">&quot;mass_list&quot;</span><span class="p">])):</span>
+                <span class="n">h5f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;data/rate/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;f8&quot;</span><span class="p">)</span>
+                <span class="n">h5f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;data/diff_rate/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">num_bins</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;f8&quot;</span>
+                <span class="p">)</span>
+                <span class="n">h5f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;data/binned_rate/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">num_modes</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;f8&quot;</span>
+                <span class="p">)</span>
+                <span class="c1"># This will work for the new implementation where</span>
+                <span class="c1"># the data is arrays indexed as (time, mass), but not</span>
+                <span class="c1"># in parallel. See parallel implementation below.</span>
+                <span class="n">h5f</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;data/rate/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">][</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_total_rate_list</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+                <span class="n">h5f</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;data/diff_rate/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">][</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_diff_rate_list</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+                <span class="n">h5f</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;data/binned_rate/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">][</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_binned_rate_list</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="darkmagic.io.dict_from_h5group" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">dict_from_h5group</span><span class="p">(</span><span class="n">group</span><span class="p">)</span></code>
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Recurses through an h5py group and creates a dictionary with the same structure.</p>
+
+          <details class="quote">
+            <summary>Source code in <code>darkmagic/io.py</code></summary>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">350</span>
+<span class="normal">351</span>
+<span class="normal">352</span>
+<span class="normal">353</span>
+<span class="normal">354</span>
+<span class="normal">355</span>
+<span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span>
+<span class="normal">359</span>
+<span class="normal">360</span>
+<span class="normal">361</span>
+<span class="normal">362</span>
+<span class="normal">363</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">dict_from_h5group</span><span class="p">(</span><span class="n">group</span><span class="p">:</span> <span class="n">h5py</span><span class="o">.</span><span class="n">Group</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Recurses through an h5py group and creates a dictionary with the same structure.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">group</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">group</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">result</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">dict_from_h5group</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">h5py</span><span class="o">.</span><span class="n">Group</span><span class="p">)</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">result</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+        <span class="c1"># Convert string arrays to strings</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">result</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">char</span> <span class="o">==</span> <span class="s2">&quot;S&quot;</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">result</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="darkmagic.io.h5group_to_dict" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">h5group_to_dict</span><span class="p">(</span><span class="n">hdf5_file</span><span class="p">,</span> <span class="n">group_name</span><span class="p">,</span> <span class="n">data_dict</span><span class="p">)</span></code>
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Recurses through a dictionary and creates appropriate groups or datasets
+This is parallel friendly, nothing is variable length.</p>
+
+
+
+  <p><span class="doc-section-title">Parameters:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td><code>hdf5_file</code></td>
+          <td>
+                <code><span title="h5py.File">File</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The h5py file object to write to</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>group_name</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The name of the group to write to</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>data_dict</code></td>
+          <td>
+                <code>dict</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The dictionary to write</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><span class="doc-section-title">Returns:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>None</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>darkmagic/io.py</code></summary>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">366</span>
+<span class="normal">367</span>
+<span class="normal">368</span>
+<span class="normal">369</span>
+<span class="normal">370</span>
+<span class="normal">371</span>
+<span class="normal">372</span>
+<span class="normal">373</span>
+<span class="normal">374</span>
+<span class="normal">375</span>
+<span class="normal">376</span>
+<span class="normal">377</span>
+<span class="normal">378</span>
+<span class="normal">379</span>
+<span class="normal">380</span>
+<span class="normal">381</span>
+<span class="normal">382</span>
+<span class="normal">383</span>
+<span class="normal">384</span>
+<span class="normal">385</span>
+<span class="normal">386</span>
+<span class="normal">387</span>
+<span class="normal">388</span>
+<span class="normal">389</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">h5group_to_dict</span><span class="p">(</span><span class="n">hdf5_file</span><span class="p">:</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">,</span> <span class="n">group_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Recurses through a dictionary and creates appropriate groups or datasets</span>
+<span class="sd">    This is parallel friendly, nothing is variable length.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        hdf5_file: The h5py file object to write to</span>
+<span class="sd">        group_name: The name of the group to write to</span>
+<span class="sd">        data_dict: The dictionary to write</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">data_dict</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_dict</span><span class="p">[</span><span class="n">index</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">h5group_to_dict</span><span class="p">(</span><span class="n">hdf5_file</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">group_name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">data_dict</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">data_dict</span><span class="p">[</span><span class="n">index</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;S&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_dict</span><span class="p">[</span><span class="n">index</span><span class="p">],</span> <span class="nb">str</span><span class="p">)</span>
+                <span class="k">else</span> <span class="n">data_dict</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">hdf5_file</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">group_name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="darkmagic.io.phonodark_to_darkmagic" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">phonodark_to_darkmagic</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">pp</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">m_chi</span><span class="p">)</span></code>
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Convert the dictionaries from PhonoDark to DarkMAGIC</p>
+
+
+
+  <p><span class="doc-section-title">Parameters:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td><code>n</code></td>
+          <td>
+                <code>dict</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Numerics dictionary from PhonoDark</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>pp</code></td>
+          <td>
+                <code>dict</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Particle physics dictionary from PhonoDark</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>times</code></td>
+          <td>
+                <code><span title="numpy.ndarray">ndarray</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Array of times</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>m_chi</code></td>
+          <td>
+                <code><span title="numpy.ndarray">ndarray</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Array of dark matter masses</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><span class="doc-section-title">Returns:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td>
+                <code><span title="typing.Tuple">Tuple</span>[dict, dict, dict]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Tuple of Calculator, Numerics, Model dictionaries</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>darkmagic/io.py</code></summary>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">392</span>
+<span class="normal">393</span>
+<span class="normal">394</span>
+<span class="normal">395</span>
+<span class="normal">396</span>
+<span class="normal">397</span>
+<span class="normal">398</span>
+<span class="normal">399</span>
+<span class="normal">400</span>
+<span class="normal">401</span>
+<span class="normal">402</span>
+<span class="normal">403</span>
+<span class="normal">404</span>
+<span class="normal">405</span>
+<span class="normal">406</span>
+<span class="normal">407</span>
+<span class="normal">408</span>
+<span class="normal">409</span>
+<span class="normal">410</span>
+<span class="normal">411</span>
+<span class="normal">412</span>
+<span class="normal">413</span>
+<span class="normal">414</span>
+<span class="normal">415</span>
+<span class="normal">416</span>
+<span class="normal">417</span>
+<span class="normal">418</span>
+<span class="normal">419</span>
+<span class="normal">420</span>
+<span class="normal">421</span>
+<span class="normal">422</span>
+<span class="normal">423</span>
+<span class="normal">424</span>
+<span class="normal">425</span>
+<span class="normal">426</span>
+<span class="normal">427</span>
+<span class="normal">428</span>
+<span class="normal">429</span>
+<span class="normal">430</span>
+<span class="normal">431</span>
+<span class="normal">432</span>
+<span class="normal">433</span>
+<span class="normal">434</span>
+<span class="normal">435</span>
+<span class="normal">436</span>
+<span class="normal">437</span>
+<span class="normal">438</span>
+<span class="normal">439</span>
+<span class="normal">440</span>
+<span class="normal">441</span>
+<span class="normal">442</span>
+<span class="normal">443</span>
+<span class="normal">444</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">phonodark_to_darkmagic</span><span class="p">(</span>
+    <span class="n">n</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">pp</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">times</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">m_chi</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert the dictionaries from PhonoDark to DarkMAGIC</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        n (dict): Numerics dictionary from PhonoDark</span>
+<span class="sd">        pp (dict): Particle physics dictionary from PhonoDark</span>
+<span class="sd">        times (np.ndarray): Array of times</span>
+<span class="sd">        m_chi (np.ndarray): Array of dark matter masses</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple of Calculator, Numerics, Model dictionaries</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">numerics</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;_threshold&quot;</span><span class="p">:</span> <span class="n">pp</span><span class="p">[</span><span class="s2">&quot;threshold&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;N_grid&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">n</span><span class="p">[</span><span class="s2">&quot;n_a&quot;</span><span class="p">],</span> <span class="n">n</span><span class="p">[</span><span class="s2">&quot;n_b&quot;</span><span class="p">],</span> <span class="n">n</span><span class="p">[</span><span class="s2">&quot;n_c&quot;</span><span class="p">]],</span>
+        <span class="s2">&quot;_power_abc&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">n</span><span class="p">[</span><span class="s2">&quot;power_a&quot;</span><span class="p">],</span> <span class="n">n</span><span class="p">[</span><span class="s2">&quot;power_b&quot;</span><span class="p">],</span> <span class="n">n</span><span class="p">[</span><span class="s2">&quot;power_c&quot;</span><span class="p">]],</span>
+        <span class="s2">&quot;N_DWF_grid&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">n</span><span class="p">[</span><span class="s2">&quot;n_DW_x&quot;</span><span class="p">],</span> <span class="n">n</span><span class="p">[</span><span class="s2">&quot;n_DW_y&quot;</span><span class="p">],</span> <span class="n">n</span><span class="p">[</span><span class="s2">&quot;n_DW_z&quot;</span><span class="p">]],</span>
+        <span class="s2">&quot;use_q_cut&quot;</span><span class="p">:</span> <span class="n">n</span><span class="p">[</span><span class="s2">&quot;q_cut&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;_use_special_mesh&quot;</span><span class="p">:</span> <span class="n">n</span><span class="p">[</span><span class="s2">&quot;special_mesh&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;bin_width&quot;</span><span class="p">:</span> <span class="n">n</span><span class="p">[</span><span class="s2">&quot;energy_bin_width&quot;</span><span class="p">],</span>
+    <span class="p">}</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+        <span class="s2">&quot;You are reconstructing a Calculator object from a &quot;</span>
+        <span class="s2">&quot;PhonoDark formatted HDF5 file. These files do not &quot;</span>
+        <span class="s2">&quot;contain the coefficient functions, so they will be set to &quot;</span>
+        <span class="s2">&quot;one, which is likely incorrect. Use caution if rerunning &quot;</span>
+        <span class="s2">&quot;this calculation.&quot;</span>
+    <span class="p">)</span>
+    <span class="n">coeff_func</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">alpha</span><span class="p">:</span> <span class="p">{</span><span class="n">psi</span><span class="p">:</span> <span class="n">one</span> <span class="k">for</span> <span class="n">psi</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span> <span class="k">for</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">pp</span><span class="p">[</span><span class="s2">&quot;c_coeffs&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">F_med_prop</span><span class="p">(</span><span class="n">grid</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">grid</span><span class="o">.</span><span class="n">q_norm</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="n">pp</span><span class="p">[</span><span class="s2">&quot;Fmed_power&quot;</span><span class="p">])</span>
+
+    <span class="n">model</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;shortname&quot;</span><span class="p">:</span> <span class="n">pp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;model_name&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;S_chi&quot;</span><span class="p">:</span> <span class="n">pp</span><span class="p">[</span><span class="s2">&quot;dm_properties&quot;</span><span class="p">][</span><span class="s2">&quot;spin&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;coeff_prefactor&quot;</span><span class="p">:</span> <span class="n">pp</span><span class="p">[</span><span class="s2">&quot;c_coeffs&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;coeff_func&quot;</span><span class="p">:</span> <span class="n">coeff_func</span><span class="p">,</span>
+        <span class="s2">&quot;F_med_prop&quot;</span><span class="p">:</span> <span class="n">F_med_prop</span><span class="p">,</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Unknown Model&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">calc</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;calc_type&quot;</span><span class="p">:</span> <span class="s2">&quot;scattering&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;m_chi&quot;</span><span class="p">:</span> <span class="n">m_chi</span><span class="p">,</span>
+        <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="n">times</span><span class="p">,</span>
+        <span class="s2">&quot;v_e&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">calc</span><span class="p">,</span> <span class="n">numerics</span><span class="p">,</span> <span class="n">model</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2024 Omar A. Ashour
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["search.highlight", "search.share"], "search": "../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "develop", "provider": "mike"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      
+        <script src="../../../js/katex.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js"></script>
+      
+    
+  </body>
+</html>
