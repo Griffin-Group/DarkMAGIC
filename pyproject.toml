@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "darkmagic"
-version = "0.0.2"
+version = "0.0.3"
 authors = [{ name = "Omar A. Ashour", email = "ashour@berkeley.edu" }]
 description = "The Dark Matter Ab initio maGnon/phonon Interaction Calculator (DarkMAGIC) is a python package for computing DM interaction rates with collective excitations based on ab initio calculations of material properties."
 readme = "README.md"

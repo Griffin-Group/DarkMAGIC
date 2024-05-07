@@ -5,7 +5,7 @@ More examples coming soon
 ## Light Scalar Mediator, Single Phonons, Solid He
 
 
-This will be run from a Jupyter notebook or as a python script
+This can be run from a Jupyter notebook or as a python script
 ```python
 import numpy as np
 
@@ -33,4 +33,4 @@ full_calc.evaluate()  # Run calculation
 full_calc.to_file()  # Write HDF5 file (default name is "material.name_model.name.h5")
 ```
 
-To run in parallel, simply run with `srun -n <nprocs> python script.py` or whatever alternative your system uses.
+To run in parallel, simply run with `srun -n <nprocs> python script.py` or whatever alternative your system uses, and use `full_calc.evaluate(mpi=True)` instead. Note that you need to install the optional `mpi` dependency for MPI calculations to work (i.e., `pip install darkmagic[mpi]`).
