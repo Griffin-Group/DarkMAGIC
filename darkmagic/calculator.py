@@ -180,6 +180,44 @@ class Calculator:
             )
         return v_e
 
+    def compute_daily_modulation(
+        self,
+        threshold_meV: float = 1.0,
+    ) -> np.array:
+        r"""
+        Computes the rate $R$ normalized by the average daily rate $\langle R \rangle$.
+
+        Args:
+            threshold_meV (float, optional): The threshold in meV. Defaults to 1 meV.
+
+        Returns:
+            np.array: the normalized rate $R / \langle R \rangle$, indexed as (time, mass)
+        """
+
+        energy_bin_width = self.numerics.bin_width
+        time = np.sort(self.time)
+
+        # TODO: this doesn't deal with some edge cases of poorly sampled time
+        t_idx = np.argwhere(time < 24)[-1][0]
+        # TODO: Clarify this. Should ensure enough time points going from 0 to 23
+        if (t_max := time[t_idx]) < 23:
+            warnings.warn(
+                f"The largest time is {t_max}. Ideally you should sample the time at 1 or 2 hour intervals."
+            )
+
+        # Vanilla PhonoDark calcs have a threshold of 1 meV by default
+        # We need to account for that in the binning
+        bin_cutoff = int(threshold_meV * 1e-3 / energy_bin_width) - int(
+            self.numerics._threshold / energy_bin_width
+        )
+
+        # Sum the rate over the energy bins -> (time, mass) array
+        total_rate = np.sum(self.diff_rate[..., bin_cutoff:], axis=2)
+        # Average the rate over a full day -> (mass,) array
+        day_averaged_rate = np.mean(total_rate[:t_idx, ...], axis=0)
+        # Return normalized rate as a (time, mass) array
+        return total_rate / day_averaged_rate
+
     def compute_reach(
         self,
         threshold_meV: float = 1.0,
@@ -192,11 +230,10 @@ class Calculator:
         Computes the projected reach: the 95% C.L. constraint (3 events, no background) on $\bar{sigma}_n$ or $\bar{sigma}_e$ for a given model, in units of cm2 and normalizing to the appropriate reference cross section.
 
         Args:
-            filename (str): The path to the HDF5 file containing the data.
-            threshold_meV (float, optional): The threshold in meV. Defaults to 1.0.
-            exposure_kg_yr (float, optional): The exposure in kg.yr. Defaults to 1.0.
-            n_cut (float, optional): The number of events. Defaults to 3.0.
-            model (str, optional): The model to use. Defaults to None (i.e., finds the model name in the file)
+            threshold_meV (float, optional): The threshold in meV. Defaults to 1 meV.
+            exposure_kg_yr (float, optional): The exposure in kg.yr. Defaults to 1 kg.yr
+            n_cut (float, optional): The number of events. Defaults to 3.
+            model (str, optional): The model to use. Defaults to the model attribute.
             time (float | str, optional): The time to use. Defaults to 0.
 
         Returns:
@@ -204,7 +241,6 @@ class Calculator:
         """
 
         energy_bin_width = self.numerics.bin_width
-        threshold = self.numerics._threshold  # legacy for PD support
         m_chi = self.m_chi
         # get time index
         try:
@@ -217,7 +253,7 @@ class Calculator:
         # Vanilla PhonoDark calcs have a threshold of 1 meV by default
         # We need to account for that in the binning
         bin_cutoff = int(threshold_meV * 1e-3 / energy_bin_width) - int(
-            threshold / energy_bin_width
+            self.numerics._threshold / energy_bin_width
         )
 
         model_name = model if model is not None else self.model.shortname
@@ -236,7 +272,6 @@ class Calculator:
 
         return sigma
 
-    # @njit
     @staticmethod
     def _evaluate_serial(
         diff_rate: np.ndarray,
