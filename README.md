@@ -1,10 +1,11 @@
 # DarkMAGIC 🔮
-[![Develop Docs](https://img.shields.io/badge/status-pre--alpha-red)](https://oashour.github.io/DarkMAGIC/develop/)
+[![Pre-Alpha](https://img.shields.io/badge/Status-Pre--Alpha-red)](https://Griffin-Group.github.io/DarkMAGIC/develop/)
+![GitHub Release](https://img.shields.io/github/v/release/Griffin-Group/DarkMAGIC?include_prereleases)
 ![Tests](https://github.com/oashour/DarkMAGIC/actions/workflows/run_tests.yaml/badge.svg)
 [![License](https://img.shields.io/badge/License-MIT-blue)](#license "Go to license section")
-[![Stable Docs](https://img.shields.io/badge/docs-stable-blue)](https://Griffin-Group.github.io/DarkMAGIC/latest/)
-[![Develop Docs](https://img.shields.io/badge/docs-develop-purple)](https://Griffin-Group.github.io/DarkMAGIC/develop/)
-![GitHub Release](https://img.shields.io/github/v/release/oashour/DarkMAGIC?include_prereleases)
+[![Stable Docs](https://img.shields.io/badge/Docs-Stable-blue)](https://Griffin-Group.github.io/DarkMAGIC/latest/)
+[![Develop Docs](https://img.shields.io/badge/Docs-Develop-purple)](https://Griffin-Group.github.io/DarkMAGIC/develop/)
+[![DOI](https://zenodo.org/badge/755802517.svg)](https://zenodo.org/doi/10.5281/zenodo.11124265)
 
 The **D**ark **M**atter ***A****b* *initio* phonon/ma**G**non **I**nteraction **C**alculator (DarkMAGIC) is a python package for calculating dark matter interaction rates with phonons and magnons in real materials, based on properties calculated from first principles (mainly, density functional theory). It is based on [the effective field theory developed by Trickle, Zhang and Zurek](https://arxiv.org/abs/2009.13534), and takes inspiration from the code they released with that paper and its precursors, [PhonoDark](https://github.com/tanner-trickle/PhonoDark). 
 
@@ -35,4 +36,19 @@ DarkMAGIC will soon be made available on pip. For now, please install it as
 
 ```shell
 pip install git+https://github.com/oashour/DarkMAGIC
+```
+
+
+# Citation
+If you use DarkMAGIC in your research, please cite it as
+
+```bibtex
+@misc{darkmagic,
+  author       = {Omar A. Ashour and Sin\'{e}ad M. Griffin},
+  title        = { {DarkMAGIC} },
+  month        = May,
+  year         = 2024,
+  doi          = {10.5281/zenodo.11124265},
+  url          = {https://dx.doi.org/10.5281/zenodo.11124265}
+}
 ```
