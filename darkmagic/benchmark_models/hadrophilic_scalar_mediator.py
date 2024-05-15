@@ -1,7 +1,7 @@
 import numpy as np
 
 import darkmagic.constants as const
-from darkmagic import Model
+from darkmagic.model import Model
 from darkmagic.numerics import SphericalGrid
 
 from darkmagic.benchmark_models.utils import one, reduced_mass

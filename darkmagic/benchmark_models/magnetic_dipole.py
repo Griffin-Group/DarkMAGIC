@@ -1,7 +1,7 @@
 import numpy as np
 
 import darkmagic.constants as const
-from darkmagic import Model
+from darkmagic.model import Model
 from darkmagic.benchmark_models.utils import (
     me_on_mchi,
     mp_on_mchi,
