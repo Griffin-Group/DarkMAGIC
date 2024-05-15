@@ -1,7 +1,7 @@
 # DarkMAGIC 🔮
 [![Pre-Alpha](https://img.shields.io/badge/Status-Pre--Alpha-red)](https://Griffin-Group.github.io/DarkMAGIC/develop/)
-![GitHub Release](https://img.shields.io/github/v/release/Griffin-Group/DarkMAGIC?include_prereleases)
-![Tests](https://github.com/oashour/DarkMAGIC/actions/workflows/run_tests.yaml/badge.svg)
+[![GitHub Release](https://img.shields.io/github/v/release/Griffin-Group/DarkMAGIC?include_prereleases)](https://github.com/Griffin-Group/DarkMAGIC/releases)
+[![Tests](https://github.com/oashour/DarkMAGIC/actions/workflows/run_tests.yaml/badge.svg)](https://github.com/Griffin-Group/DarkMAGIC/actions)
 [![License](https://img.shields.io/badge/License-MIT-blue)](#license "Go to license section")
 [![Stable Docs](https://img.shields.io/badge/Docs-Stable-blue)](https://Griffin-Group.github.io/DarkMAGIC/latest/)
 [![Develop Docs](https://img.shields.io/badge/Docs-Develop-purple)](https://Griffin-Group.github.io/DarkMAGIC/develop/)
@@ -35,7 +35,7 @@ DarkMAGIC is currently in pre-alpha testing, so not all features are implemented
 DarkMAGIC will soon be made available on pip. For now, please install it as
 
 ```shell
-pip install git+https://github.com/oashour/DarkMAGIC
+pip install git+https://github.com/Griffin-Group/DarkMAGIC
 ```
 
 
