@@ -102,7 +102,7 @@ class SphericalGrid:
 
         # Get the k-vectors
         self.k_frac = self.q_frac - self.G_frac
-        self.k_cart = np.matmul(self.k_frac, material.recip_frac_to_cart)
+        self.k_cart = np.matmul(self.k_frac, material.recip_frac_to_cart.T)
 
         # Outer product of qhat with itself is frequently used
         self._qhat_qhat = None
@@ -141,8 +141,7 @@ class SphericalGrid:
             q_cart = q_cart[
                 (np.abs(np.dot(q_cart, v_e) / q_norm + q_norm / 2 / m_chi) < const.VESC)
             ]
-        # TODO: double check that right multiplication works well
-        q_frac = np.matmul(q_cart, recip_cart_to_frac)
+        q_frac = np.matmul(q_cart, recip_cart_to_frac.T)
 
         return q_cart, q_frac
 
@@ -162,14 +161,12 @@ class SphericalGrid:
         # Generate the 8 closest G-vectors to each q-point
         offsets = np.indices((2,) * 3).reshape(3, -1).T
         G_frac = np.floor(self.q_frac)[:, None, :] + offsets
-        # TODO: double check that right multiplication works well
-        G_cart = np.matmul(G_frac, recip_frac_to_cart)
+        G_cart = np.matmul(G_frac, recip_frac_to_cart.T)
         # Compute the distances between the q-point and each of the 8 G-vectors
         dist = LA.norm(G_cart - self.q_cart[:, None, :], axis=-1)
         # Pick out the nearest G-vector for each q-point
-        n_q = self.q_frac.shape[0]
-        G_cart = G_cart[np.arange(n_q), mask := np.argmin(dist, axis=1)]
-        G_frac = G_frac[np.arange(n_q), mask]
+        G_cart = G_cart[np.arange(self.nq), mask := np.argmin(dist, axis=1)]
+        G_frac = G_frac[np.arange(self.nq), mask]
 
         return G_cart, G_frac
 
@@ -217,7 +214,7 @@ class Numerics:
     Args:
         N_grid (ArrayLike, optional): The number of grid points in each dimension. Defaults to [20, 10, 10].
         power_abc (ArrayLike, optional): The power of each dimension in the grid. Defaults to [2, 1, 1].
-        N_DWF_grid (ArrayLike, optional): The number of grid points in each dimension for the density-weighted Fermi grid. Defaults to [20, 20, 20].
+        N_DWF_grid (ArrayLike, optional): The number of grid points in each dimension for the Monkhorst-Pack grid used to compute the Debye-Waller factor. Defaults to [20, 20, 20].
         bin_width (float, optional): The width of the bin. Defaults to 1e-3 (1 meV).
         use_q_cut (bool, optional): Whether to use a cutoff in momentum space. Defaults to True.
         use_special_mesh (bool, optional): Whether to use a special mesh for the grid. Defaults to False.
@@ -330,12 +327,12 @@ class Numerics:
 
     def get_DWF_grid(self) -> MonkhorstPackGrid:
         """
-        Returns the density-weighted Fermi grid object.
+        Returns the Monkhorst-Pack grid object for computing the Debye-Waller factor.
 
         Args:
             material (Material): The material object.
 
         Returns:
-            MonkhorstPackGrid: The density-weighted Fermi grid object.
+            MonkhorstPackGrid: The Monkhorst-Pack grid object for computing DWF.
         """
         return MonkhorstPackGrid(self.N_DWF_grid)
