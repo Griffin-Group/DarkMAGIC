@@ -1,3 +1,6 @@
+"""
+Module for classes used to represent materials and their properties
+"""
 from abc import ABC, abstractmethod
 from typing import Tuple
 

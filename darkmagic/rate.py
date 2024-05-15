@@ -1,3 +1,6 @@
+""""
+Module with classes for calculating the rate
+"""
 import math
 from abc import ABC, abstractmethod
 
@@ -9,7 +12,7 @@ import darkmagic.constants as const
 from darkmagic.material import MagnonMaterial, Material, PhononMaterial
 from darkmagic.model import Model, Potential
 from darkmagic.numerics import Numerics
-from darkmagic.v_integrals import MBDistribution
+from darkmagic.maxwell_boltzmann import MBDistribution
 
 # dictionary to hold the calculation classes
 global RATE_CALC_CLASSES

@@ -6,4 +6,4 @@ from darkmagic.material import (
 from darkmagic.model import Model as Model
 from darkmagic.numerics import Numerics as Numerics
 from darkmagic.calculator import Calculator as Calculator
-from darkmagic.v_integrals import MBDistribution as MBDistribution
+from darkmagic.maxwell_boltzmann import MBDistribution as MBDistribution

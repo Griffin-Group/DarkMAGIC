@@ -1,6 +1,8 @@
+"""
+This module contains the Calculator class, the main class of DarkMAGIC
+"""
 import math
 import warnings
-# import itertools
 
 import numpy as np
 from numpy.typing import ArrayLike
