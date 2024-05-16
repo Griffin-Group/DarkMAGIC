@@ -1,6 +1,7 @@
 """
 This module contains the Calculator class, the main class of DarkMAGIC
 """
+
 import math
 import warnings
 

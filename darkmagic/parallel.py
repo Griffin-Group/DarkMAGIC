@@ -5,7 +5,7 @@ Module with utilities for parallel execution
 import numpy as np
 
 ROOT_PROCESS = 0  # Root MPI process global
-JOB_SENTINEL = -99999 # Sentinel for jobs that are not to be executed
+JOB_SENTINEL = -99999  # Sentinel for jobs that are not to be executed
 
 
 def setup_mpi():
@@ -15,7 +15,7 @@ def setup_mpi():
     from mpi4py.MPI import COMM_WORLD
 
     n_ranks = COMM_WORLD.Get_size()  # Number of ranks
-    rank = COMM_WORLD.Get_rank()     # current task rank
+    rank = COMM_WORLD.Get_rank()  # current task rank
 
     if rank == ROOT_PROCESS:
         print(f"Done setting up MPI. Using {n_ranks} ranks.")
@@ -32,7 +32,7 @@ def distribute_load(n_ranks, calc_list):
     # Our task list is a list of tuples, where each tuple is a pair of (m, v) indices
     nm, nv = len(calc_list[0]), len(calc_list)
     # total_job_list = np.array(list(itertools.product(range(nm), range(nv))))
-    full_task_list = np.indices((nm, nv)).T.reshape(-1, 2) 
+    full_task_list = np.indices((nm, nv)).T.reshape(-1, 2)
     n_jobs = len(full_task_list)
 
     base_jobs_per_rank = n_jobs // n_ranks  # each processor has at least this many jobs
