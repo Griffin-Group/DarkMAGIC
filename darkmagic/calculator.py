@@ -257,7 +257,7 @@ class Calculator:
         except IndexError as e:
             raise ValueError(f"Time {time} not found in the list of times.") from e
 
-        total_rate = self.get_total_rate(threshold_meV)[t_idx, :]
+        total_rate = self.get_total_rate(threshold_meV)[t_idx, :] + 1e-50
 
         model_name = model if model is not None else self.model.shortname
         if model_name is None:
