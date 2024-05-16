@@ -14,8 +14,8 @@ from darkmagic.io import read_h5, write_h5
 from darkmagic.material import Material
 from darkmagic.model import Model
 from darkmagic.numerics import Numerics
-from darkmagic.rate import RATE_CALC_CLASSES
 from darkmagic.parallel import JOB_SENTINEL, ROOT_PROCESS, distribute_load, setup_mpi
+from darkmagic.rate import RATE_CALC_CLASSES
 
 
 class Calculator:
@@ -183,6 +183,27 @@ class Calculator:
             )
         return v_e
 
+    def get_total_rate(self, threshold_meV) -> np.ndarray:
+        """
+        Computes the total rate for a given threshold
+
+        Args:
+            threshold_meV (float): The detector threshold in meV
+
+        Returns:
+            np.ndarray: The total rate
+        """
+        energy_bin_width = self.numerics.bin_width
+        raw_binned_rate = self.diff_rate  # TODO: bad names...
+
+        # Vanilla PhonoDark calcs have a threshold of 1 meV by default
+        # We need to account for that in the binning
+        bin_cutoff = int(threshold_meV * 1e-3 / energy_bin_width) - int(
+            self.numerics._threshold / energy_bin_width
+        )
+
+        return np.sum(raw_binned_rate[..., bin_cutoff:], axis=-1)
+
     def compute_daily_modulation(
         self,
         threshold_meV: float = 1.0,
@@ -197,28 +218,15 @@ class Calculator:
             np.array: the normalized rate $R / \langle R \rangle$, indexed as (time, mass)
         """
 
-        energy_bin_width = self.numerics.bin_width
+        # Time cannot be assumed to be monontonicaly increasing
         time = np.sort(self.time)
-
-        # TODO: this doesn't deal with some edge cases of poorly sampled time
+        # The calculation may have time points larger than 23
         t_idx = np.argwhere(time < 24)[-1][0]
-        # TODO: Clarify this. Should ensure enough time points going from 0 to 23
-        if (t_max := time[t_idx]) < 23:
-            warnings.warn(
-                f"The largest time is {t_max}. Ideally you should sample the time at 1 or 2 hour intervals."
-            )
+        # Get total rate and sort it the same way as before
+        total_rate = self.get_total_rate(threshold_meV)[np.argsort(self.time)]
 
-        # Vanilla PhonoDark calcs have a threshold of 1 meV by default
-        # We need to account for that in the binning
-        bin_cutoff = int(threshold_meV * 1e-3 / energy_bin_width) - int(
-            self.numerics._threshold / energy_bin_width
-        )
-
-        # Sum the rate over the energy bins -> (time, mass) array
-        total_rate = np.sum(self.diff_rate[..., bin_cutoff:], axis=2)
         # Average the rate over a full day -> (mass,) array
         day_averaged_rate = np.mean(total_rate[:t_idx, ...], axis=0)
-        # Return normalized rate as a (time, mass) array
         return total_rate / day_averaged_rate
 
     def compute_reach(
@@ -243,21 +251,13 @@ class Calculator:
             np.array: the cross section.
         """
 
-        energy_bin_width = self.numerics.bin_width
         m_chi = self.m_chi
-        # get time index
         try:
             t_idx = np.argwhere(self.time == time)[0][0]
         except IndexError as e:
             raise ValueError(f"Time {time} not found in the list of times.") from e
 
-        raw_binned_rate = 1e-100 + self.diff_rate[t_idx]  # TODO: bad names...
-
-        # Vanilla PhonoDark calcs have a threshold of 1 meV by default
-        # We need to account for that in the binning
-        bin_cutoff = int(threshold_meV * 1e-3 / energy_bin_width) - int(
-            self.numerics._threshold / energy_bin_width
-        )
+        total_rate = self.get_total_rate(threshold_meV)[t_idx, :]
 
         model_name = model if model is not None else self.model.shortname
         if model_name is None:
@@ -265,7 +265,7 @@ class Calculator:
                 "Model not provided and not found in the file. "
                 "Please provide the model name."
             )
-        sigma = n_cut / np.sum(raw_binned_rate[:, bin_cutoff:], axis=1)
+        sigma = n_cut / total_rate
         sigma /= (
             exposure_kg_yr
             * const.kg_yr
