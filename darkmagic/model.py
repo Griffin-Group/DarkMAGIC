@@ -1,3 +1,7 @@
+"""
+Module for classes used to define DM models
+"""
+
 import warnings
 from typing import Callable, Tuple
 

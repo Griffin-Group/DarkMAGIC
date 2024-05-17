@@ -1,3 +1,7 @@
+"""
+Module with classes for numerics (grids, etc.)
+"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Tuple
@@ -70,6 +74,7 @@ class SphericalGrid:
         use_q_cut: bool,
         N_grid: ArrayLike,
         material: Material,
+        use_special_mesh: bool = False,
     ):
         """
         Spherical grid constructor.
@@ -85,8 +90,9 @@ class SphericalGrid:
         q_cut = material.q_cut if use_q_cut else 1e10
         self.q_max = min(2 * m_chi * (const.VESC + const.VE), q_cut)
         self.q_cart, self.q_frac = self._get_q_points(
-            N_grid, m_chi, v_e, material.recip_cart_to_frac
+            N_grid, m_chi, v_e, material.recip_cart_to_frac, use_special_mesh
         )
+
         self.nq = self.q_cart.shape[0]
         # These show up often so it's efficient to compute them only once
         self.q_norm = LA.norm(self.q_cart, axis=1)
@@ -96,13 +102,19 @@ class SphericalGrid:
         self.G_cart, self.G_frac = self._get_G_vectors(material.recip_frac_to_cart)
         # Deriving this is straightforward, remember we're sampling
         # with a power of 2 in the q direction, hence the square roots on |q|
-        self.jacobian = 8 * np.pi * self.q_norm ** (5 / 2) * self.q_max ** (1 / 2)
+        if use_special_mesh:
+            q_min = 1e-3 / (const.VE + const.VESC)
+            self.jacobian = (
+                4 * np.pi * np.log(self.q_max / q_min) * (self.q_norm) ** 3
+            )
+        else:
+            self.jacobian = 8 * np.pi * self.q_norm ** (5 / 2) * self.q_max ** (1 / 2)
         # Volume element dV = d^3q J(q) / (2pi)^3 / N^3
         self.vol_element = self.jacobian / ((2 * np.pi) ** 3 * np.prod(N_grid))
 
         # Get the k-vectors
         self.k_frac = self.q_frac - self.G_frac
-        self.k_cart = np.matmul(self.k_frac, material.recip_frac_to_cart)
+        self.k_cart = np.matmul(self.k_frac, material.recip_frac_to_cart.T)
 
         # Outer product of qhat with itself is frequently used
         self._qhat_qhat = None
@@ -119,6 +131,7 @@ class SphericalGrid:
         m_chi: float,
         v_e: ArrayLike,
         recip_cart_to_frac: ArrayLike,
+        use_special_mesh: bool,
     ) -> Tuple[np.ndarray, np.ndarray]:
         """
         Get the q points for the spherical grid.
@@ -133,7 +146,10 @@ class SphericalGrid:
             tuple: A tuple containing the Cartesian and fractional coordinates of the q points.
         """
         # Get maximum q value and generate spherical grid
-        q_cart = self._generate_spherical_grid(self.q_max, *N_grid)
+        if use_special_mesh:
+            q_cart = self._generate_special_grid(self.q_max, *N_grid)
+        else:
+            q_cart = self._generate_spherical_grid(self.q_max, *N_grid)
 
         # Apply kinematic constraints
         q_norm = LA.norm(q_cart, axis=1)
@@ -141,8 +157,7 @@ class SphericalGrid:
             q_cart = q_cart[
                 (np.abs(np.dot(q_cart, v_e) / q_norm + q_norm / 2 / m_chi) < const.VESC)
             ]
-        # TODO: double check that right multiplication works well
-        q_frac = np.matmul(q_cart, recip_cart_to_frac)
+        q_frac = np.matmul(q_cart, recip_cart_to_frac.T)
 
         return q_cart, q_frac
 
@@ -162,16 +177,52 @@ class SphericalGrid:
         # Generate the 8 closest G-vectors to each q-point
         offsets = np.indices((2,) * 3).reshape(3, -1).T
         G_frac = np.floor(self.q_frac)[:, None, :] + offsets
-        # TODO: double check that right multiplication works well
-        G_cart = np.matmul(G_frac, recip_frac_to_cart)
+        G_cart = np.matmul(G_frac, recip_frac_to_cart.T)
         # Compute the distances between the q-point and each of the 8 G-vectors
         dist = LA.norm(G_cart - self.q_cart[:, None, :], axis=-1)
         # Pick out the nearest G-vector for each q-point
-        n_q = self.q_frac.shape[0]
-        G_cart = G_cart[np.arange(n_q), mask := np.argmin(dist, axis=1)]
-        G_frac = G_frac[np.arange(n_q), mask]
+        G_cart = G_cart[np.arange(self.nq), mask := np.argmin(dist, axis=1)]
+        G_frac = G_frac[np.arange(self.nq), mask]
 
         return G_cart, G_frac
+
+    @staticmethod
+    def _generate_special_grid(radius, n_r, n_phi, n_theta) -> np.ndarray:
+        """
+        Generate a non-uniformly sampled grid inside and up to the surface
+        of a sphere of radius `radius` with `n_r` points in the radial direction,
+        `n_theta` points in the polar direction, and `n_phi` points in the
+        azimuthal direction. Currently this only works for the delta = -4 case.
+
+        Args:
+            radius (float): The radius of the sphere.
+            n_r (int): The number of points in the radial direction.
+            n_phi (int): The number of points in the azimuthal direction.
+            n_theta (int): The number of points in the polar direction.
+
+        Returns:
+            ndarray: An array containing the Cartesian coordinates of the points in the spherical grid.
+        """
+        # Using physicists' convention for theta and phi
+        delta_r = 1 / (2 * n_r)
+        qmin = 1e-3 / (const.VE + const.VESC)  # This builds in a 1 meV threshold
+        a = np.linspace(delta_r, 1 - delta_r, n_r)
+        r = radius * (qmin / radius) ** (1 - a)
+        # Phi
+        delta_phi = 1 / (2 * n_phi)
+        phi = 2 * np.pi * np.linspace(delta_phi, 1 - delta_phi, n_phi)  # Azimuthal
+        delta_theta = 1 / (2 * n_theta)
+
+        # Theta
+        b = np.linspace(delta_theta, 1 - delta_theta, n_theta)
+        theta = np.arccos(2 * b - 1)
+
+        # Convert to cartesian
+        x = np.outer(r, np.outer(np.sin(theta), np.cos(phi))).flatten()
+        y = np.outer(r, np.outer(np.sin(theta), np.sin(phi))).flatten()
+        z = np.outer(r, np.outer(np.cos(theta), np.ones_like(phi))).flatten()
+
+        return np.array([x, y, z]).T
 
     @staticmethod
     def _generate_spherical_grid(radius, n_r, n_phi, n_theta) -> np.ndarray:
@@ -217,7 +268,7 @@ class Numerics:
     Args:
         N_grid (ArrayLike, optional): The number of grid points in each dimension. Defaults to [20, 10, 10].
         power_abc (ArrayLike, optional): The power of each dimension in the grid. Defaults to [2, 1, 1].
-        N_DWF_grid (ArrayLike, optional): The number of grid points in each dimension for the density-weighted Fermi grid. Defaults to [20, 20, 20].
+        N_DWF_grid (ArrayLike, optional): The number of grid points in each dimension for the Monkhorst-Pack grid used to compute the Debye-Waller factor. Defaults to [20, 20, 20].
         bin_width (float, optional): The width of the bin. Defaults to 1e-3 (1 meV).
         use_q_cut (bool, optional): Whether to use a cutoff in momentum space. Defaults to True.
         use_special_mesh (bool, optional): Whether to use a special mesh for the grid. Defaults to False.
@@ -326,16 +377,18 @@ class Numerics:
         Returns:
             SphericalGrid: The spherical grid object.
         """
-        return SphericalGrid(m_chi, v_e, self.use_q_cut, self.N_grid, material)
+        return SphericalGrid(
+            m_chi, v_e, self.use_q_cut, self.N_grid, material, self._use_special_mesh
+        )
 
     def get_DWF_grid(self) -> MonkhorstPackGrid:
         """
-        Returns the density-weighted Fermi grid object.
+        Returns the Monkhorst-Pack grid object for computing the Debye-Waller factor.
 
         Args:
             material (Material): The material object.
 
         Returns:
-            MonkhorstPackGrid: The density-weighted Fermi grid object.
+            MonkhorstPackGrid: The Monkhorst-Pack grid object for computing DWF.
         """
         return MonkhorstPackGrid(self.N_DWF_grid)

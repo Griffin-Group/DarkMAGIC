@@ -1,3 +1,7 @@
+"""
+Module for classes and utilities for the Maxwell-Boltzmann distribution and the velocity (G) integrals
+"""
+
 import numpy as np
 import numpy.linalg as LA
 

@@ -1,3 +1,7 @@
+""" "
+Module with classes for calculating the rate
+"""
+
 import math
 from abc import ABC, abstractmethod
 
@@ -9,7 +13,7 @@ import darkmagic.constants as const
 from darkmagic.material import MagnonMaterial, Material, PhononMaterial
 from darkmagic.model import Model, Potential
 from darkmagic.numerics import Numerics
-from darkmagic.v_integrals import MBDistribution
+from darkmagic.maxwell_boltzmann import MBDistribution
 
 # dictionary to hold the calculation classes
 global RATE_CALC_CLASSES
@@ -76,7 +80,7 @@ class SingleRateCalc(ABC):
 
         # TODO: the names here aren't great
         max_bin_num = math.ceil(self.material.max_dE / self.numerics.bin_width)
-        bin_num = np.floor((omegas) / self.numerics.bin_width).astype(int)
+        bin_num = np.floor(omegas / self.numerics.bin_width).astype(int)
         # Each bin has the rate from processes of energies within that bin
         diff_rate = np.zeros(max_bin_num)
         np.add.at(diff_rate, bin_num, deltaR)
@@ -162,15 +166,21 @@ class PhononScatterRate(SingleRateCalc):
             self.grid.q_cart[:, None, None, :] * epsilons.conj(), axis=3
         )  # (nq, nmodes, na)
 
-        # H(q)_{\nu j} = e^{i G x_j} e^{- W_j(q)}  \times
-        # \frac{q \cdot \epsilon_{k j \nu}^*}{\sqrt{2 m_j \omega_{k \nu}}
-        H_q_nu_j = (exponential[:, None, :] * q_dot_epsconj) / np.sqrt(
-            2 * self.material.m_atoms[None, None, :] * omegas[..., None]
-        )
-        # TODO: better way to deal with this.
-        # We get issues from the very small negative frequencies very close to Gamma
-        # Which we're not avoiding since I don't want to put a built-in threshold.
-        H_q_nu_j = np.nan_to_num(H_q_nu_j)
+        # NOTE: we have some very small negative frequencies near Gamma
+        # due to numerical errors in applying the ASR. This is normal but
+        # Cause issues due to the 1/sqrt(omega) factor. This can be avoided
+        # With a built-in threshold but I want to avoid that for now.
+        # We just filter these NaNs out by setting them to zeros so they
+        # don't contribute to the rate.
+        # TODO: think of a better way to handle this
+        with np.testing.suppress_warnings() as sup:
+            sup.filter(RuntimeWarning, "invalid value encountered in")
+            # H(q)_{\nu j} = e^{i G x_j} e^{- W_j(q)}  \times
+            # \frac{q \cdot \epsilon_{k j \nu}^*}{\sqrt{2 m_j \omega_{k \nu}}
+            H_q_nu_j = (exponential[:, None, :] * q_dot_epsconj) / np.sqrt(
+                2 * self.material.m_atoms[None, None, :] * omegas[..., None]
+            )
+        H_q_nu_j = np.nan_to_num(H_q_nu_j)  # Set nans to zeros
 
         # Compute potential
         pot = Potential(self.model)
