@@ -52,3 +52,5 @@ If you use DarkMAGIC in your research, please cite it as
   url          = {https://dx.doi.org/10.5281/zenodo.11124265}
 }
 ```
+
+Please also make sure to cite the work DarkMAGIC is based on, [the effective field theory of Trickle, Zhang and Zurek](https://arxiv.org/abs/2009.13534).

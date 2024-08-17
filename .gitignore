@@ -18,3 +18,4 @@ venv/**
 run.py
 omni_model.py
 ./*.h5
+.DS_Store
