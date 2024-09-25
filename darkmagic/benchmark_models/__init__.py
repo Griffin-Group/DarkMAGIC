@@ -1,4 +1,7 @@
 from darkmagic.benchmark_models.anapole import anapole as anapole
+from darkmagic.benchmark_models.dark_photon import (
+    dark_photon as dark_photon,
+)
 from darkmagic.benchmark_models.hadrophilic_scalar_mediator import (
     heavy_scalar_mediator as heavy_scalar_mediator,
 )
