@@ -104,9 +104,7 @@ class SphericalGrid:
         # with a power of 2 in the q direction, hence the square roots on |q|
         if use_special_mesh:
             q_min = 1e-3 / (const.VE + const.VESC)
-            self.jacobian = (
-                4 * np.pi * np.log(self.q_max / q_min) * (self.q_norm) ** 3
-            )
+            self.jacobian = 4 * np.pi * np.log(self.q_max / q_min) * (self.q_norm) ** 3
         else:
             self.jacobian = 8 * np.pi * self.q_norm ** (5 / 2) * self.q_max ** (1 / 2)
         # Volume element dV = d^3q J(q) / (2pi)^3 / N^3

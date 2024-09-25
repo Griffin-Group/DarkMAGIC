@@ -1,5 +1,6 @@
-from numpy.typing import ArrayLike
 import numpy as np
+from numpy.typing import ArrayLike
+
 import darkmagic.constants as const
 
 

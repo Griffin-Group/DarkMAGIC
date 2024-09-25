@@ -1,10 +1,9 @@
 import numpy as np
 
 import darkmagic.constants as const
+from darkmagic.benchmark_models.utils import one, reduced_mass
 from darkmagic.model import Model
 from darkmagic.numerics import SphericalGrid
-
-from darkmagic.benchmark_models.utils import one, reduced_mass
 
 
 def get_model(mass: str) -> Model:

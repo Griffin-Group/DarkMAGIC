@@ -3,11 +3,11 @@ Module for handling input/output of data
 """
 
 import warnings
+from importlib.metadata import version
 from typing import Tuple
 
 import h5py
 import numpy as np
-from importlib.metadata import version
 
 from darkmagic.benchmark_models.utils import one
 from darkmagic.parallel import ROOT_PROCESS

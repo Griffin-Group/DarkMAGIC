@@ -1,8 +1,8 @@
 import numpy as np
 
 import darkmagic.constants as const
-from darkmagic.model import Model
 from darkmagic.benchmark_models.utils import q_sq_on_mchi_sq, reduced_mass
+from darkmagic.model import Model
 
 
 def get_model() -> Model:

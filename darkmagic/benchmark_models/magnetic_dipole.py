@@ -1,7 +1,6 @@
 import numpy as np
 
 import darkmagic.constants as const
-from darkmagic.model import Model
 from darkmagic.benchmark_models.utils import (
     me_on_mchi,
     mp_on_mchi,
@@ -9,6 +8,7 @@ from darkmagic.benchmark_models.utils import (
     q_sq_on_mchi_mp,
     q_sq_on_mchi_sq,
 )
+from darkmagic.model import Model
 
 
 def get_model() -> Model:

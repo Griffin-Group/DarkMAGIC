@@ -13,7 +13,7 @@ from pymatgen.core.structure import Structure
 from radtools import MagnonDispersion, SpinHamiltonian
 
 import darkmagic.constants as const
-from darkmagic.numerics import SphericalGrid, MonkhorstPackGrid
+from darkmagic.numerics import MonkhorstPackGrid, SphericalGrid
 
 
 class MaterialParameters:

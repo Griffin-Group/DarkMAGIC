@@ -11,9 +11,9 @@ from numpy.typing import ArrayLike
 
 import darkmagic.constants as const
 from darkmagic.material import MagnonMaterial, Material, PhononMaterial
+from darkmagic.maxwell_boltzmann import MBDistribution
 from darkmagic.model import Model, Potential
 from darkmagic.numerics import Numerics
-from darkmagic.maxwell_boltzmann import MBDistribution
 
 # dictionary to hold the calculation classes
 global RATE_CALC_CLASSES

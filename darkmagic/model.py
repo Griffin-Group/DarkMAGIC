@@ -8,8 +8,8 @@ from typing import Callable, Tuple
 import numpy as np
 
 from darkmagic.constants import levi_civita
-from darkmagic.numerics import SphericalGrid
 from darkmagic.material import Material
+from darkmagic.numerics import SphericalGrid
 
 SUPPORTED_OPERATORS = {
     "1",
