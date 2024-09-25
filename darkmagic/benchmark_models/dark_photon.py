@@ -15,7 +15,7 @@ def get_model() -> Model:
     }
 
     coeff_func = {
-        "1": {"e": one, "n": one},
+        "1": {"e": one, "p": one},
     }
 
     def F_mediator_propagator(grid: SphericalGrid) -> np.array:

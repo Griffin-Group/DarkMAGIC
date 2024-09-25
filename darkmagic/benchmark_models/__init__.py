@@ -19,5 +19,6 @@ BUILT_IN_MODELS = {
         heavy_scalar_mediator,
         magnetic_dipole,
         anapole,
+        dark_photon,
     ]
 }
