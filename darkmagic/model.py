@@ -203,7 +203,8 @@ class Model:
             for alpha in self.operators
         }
         for alpha, c_alpha in screened_coeff.items():
-            for psi in c_alpha.keys():
+            # Reverse sort to ensure we do proton then electron
+            for psi in sorted(c_alpha.keys(), reverse=True):
                 if psi == "e":
                     c_alpha[psi] *= 1 / q_eps_q
                 elif psi == "p":
